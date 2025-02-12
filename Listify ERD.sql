@@ -1,0 +1,102 @@
+
+CREATE DATABASE ListifyDB
+GO
+USE ListifyDB
+
+
+---===============================  Tables  ===================================================---
+GO
+CREATE TABLE [Users] (
+  [userID] INT PRIMARY KEY NOT NULL IDENTITY(1, 1),
+  [gitHubID] VARCHAR(2083) NOT NULL,
+  [createdAt] DATETIME NOT NULL,
+  [updatedAt] DATETIME NOT NULL,
+)
+GO
+
+CREATE TABLE [TeamMembers] (
+  [teamMemberID] INT PRIMARY KEY NOT NULL,
+  [userID] INT NOT NULL,
+  [teamID] INT NOT NULL,
+  [isTeamLeader] BIT NOT NULL,
+  FOREIGN KEY ([userID]) REFERENCES [Users] ([userID]),
+  FOREIGN KEY ([teamID]) REFERENCES [Teams] ([teamID])
+)
+GO
+
+CREATE TABLE [Teams] (
+  [teamID] INT PRIMARY KEY NOT NULL IDENTITY(1, 1),
+  [teamName] VARCHAR(100) NOT NULL,
+  [createdAt] DATETIME NOT NULL,
+  [updateAt] DATETIME NOT NULL,
+
+)
+GO
+
+CREATE TABLE [Projects] (
+  [projectID] INT PRIMARY KEY NOT NULL IDENTITY(1, 1),
+  [teamID] INT NOT NULL,
+  [projectName] VARCHAR(100) NOT NULL,
+  [projectDescription] VARCHAR(500),
+  [createdAt] DATETIME NOT NULL,
+  [updatedAt] DATETIME NOT NULL,
+  FOREIGN KEY ([teamID]) REFERENCES [Teams] ([teamID])
+)
+GO
+
+CREATE TABLE [Sections] (
+  [sectionID] INT PRIMARY KEY NOT NULL IDENTITY(1, 1),
+  [projectID] INT NOT NULL,
+  [sectionName] VARCHAR(100) NOT NULL,
+  [sectionPosition] TINYINT NOT NULL,
+  [createdAt] DATETIME NOT NULL,
+  [updatedAt] DATETIME NOT NULL,
+  FOREIGN KEY ([projectID]) REFERENCES [Projects] ([projectID])
+)
+GO
+
+CREATE TABLE [Tasks] (
+  [taskID] INT PRIMARY KEY IDENTITY(1, 1),
+  [sectionID] INT NOT NULL,
+  [parentTaskID] INT,
+  [taskName] VARCHAR(100) NOT NULL,
+  [taskDescription] VARCHAR(500),
+  [taskPriority] TINYINT NOT NULL DEFAULT (0),
+  [taskPosition] TINYINT NOT NULL,
+  [whenCompleted] DATETIME,
+  [dueDate] DATETIME,
+  [createdAt] DATETIME NOT NULL,
+  [updatedAt] DATETIME,
+  FOREIGN KEY ([sectionID]) REFERENCES [Sections] ([sectionID]),
+  FOREIGN KEY ([parentTaskID]) REFERENCES [Tasks] (taskID)
+)
+GO
+
+CREATE TABLE [TaskAssignees] (
+  [taskAssigneeID] INT PRIMARY KEY NOT NULL,
+  [userID] INT NOT NULL,
+  [taskID] INT NOT NULL,
+  FOREIGN KEY ([userID]) REFERENCES [Users] ([userID]),
+  FOREIGN KEY ([taskID]) REFERENCES [Tasks] ([taskID])
+)
+GO
+
+CREATE TABLE [TaskDependencies] (
+  [taskDependencyID] INT PRIMARY KEY NOT NULL,
+  [taskID] INT NOT NULL,
+  [dependentTaskID] INT NOT NULL,
+  FOREIGN KEY ([taskID]) REFERENCES [Tasks] ([taskID]),
+  FOREIGN KEY ([dependentTaskID]) REFERENCES [Tasks] ([taskID])
+)
+GO
+
+CREATE TABLE [ProjectAssignees] (
+  [projectAssigneeID] INT PRIMARY KEY NOT NULL,
+  [userID] INT NOT NULL,
+  [projectID] INT NOT NULL,
+  FOREIGN KEY ([projectID]) REFERENCES [Projects] ([projectID]),
+  FOREIGN KEY ([userID]) REFERENCES [Users] ([userID])
+)
+GO
+
+---===============================  ????  ===================================================---
