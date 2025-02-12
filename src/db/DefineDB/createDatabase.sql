@@ -1,4 +1,3 @@
-
 CREATE DATABASE ListifyDB
 GO
 USE ListifyDB
@@ -14,22 +13,22 @@ CREATE TABLE [Users] (
 )
 GO
 
-CREATE TABLE [TeamMembers] (
-  [teamMemberID] INT PRIMARY KEY NOT NULL,
-  [userID] INT NOT NULL,
-  [teamID] INT NOT NULL,
-  [isTeamLeader] BIT NOT NULL,
-  FOREIGN KEY ([userID]) REFERENCES [Users] ([userID]),
-  FOREIGN KEY ([teamID]) REFERENCES [Teams] ([teamID])
-)
-GO
-
 CREATE TABLE [Teams] (
   [teamID] INT PRIMARY KEY NOT NULL IDENTITY(1, 1),
   [teamName] VARCHAR(100) NOT NULL,
   [createdAt] DATETIME NOT NULL,
-  [updateAt] DATETIME NOT NULL,
+  [updatedAt] DATETIME NOT NULL,
 
+)
+GO
+
+CREATE TABLE [TeamMembers] (
+  [teamMemberID] INT PRIMARY KEY NOT NULL,
+  [userID] INT NOT NULL,
+  [teamID] INT NOT NULL,
+  [isTeamLeader] BIT NOT NULL DEFAULT 0,
+  FOREIGN KEY ([userID]) REFERENCES [Users] ([userID]),
+  FOREIGN KEY ([teamID]) REFERENCES [Teams] ([teamID])
 )
 GO
 
@@ -39,7 +38,7 @@ CREATE TABLE [Projects] (
   [projectName] VARCHAR(100) NOT NULL,
   [projectDescription] VARCHAR(500),
   [createdAt] DATETIME NOT NULL,
-  [updatedAt] DATETIME NOT NULL,
+  [updatedAt] DATETIME,
   FOREIGN KEY ([teamID]) REFERENCES [Teams] ([teamID])
 )
 GO
@@ -50,7 +49,7 @@ CREATE TABLE [Sections] (
   [sectionName] VARCHAR(100) NOT NULL,
   [sectionPosition] TINYINT NOT NULL,
   [createdAt] DATETIME NOT NULL,
-  [updatedAt] DATETIME NOT NULL,
+  [updatedAt] DATETIME,
   FOREIGN KEY ([projectID]) REFERENCES [Projects] ([projectID])
 )
 GO
@@ -63,7 +62,7 @@ CREATE TABLE [Tasks] (
   [taskDescription] VARCHAR(500),
   [taskPriority] TINYINT NOT NULL DEFAULT (0),
   [taskPosition] TINYINT NOT NULL,
-  [whenCompleted] DATETIME,
+  [dateCompleted] DATETIME,
   [dueDate] DATETIME,
   [createdAt] DATETIME NOT NULL,
   [updatedAt] DATETIME,
