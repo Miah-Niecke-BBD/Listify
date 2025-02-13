@@ -1,7 +1,7 @@
 GO
 CREATE PROCEDURE uspRemoveUserFromTask
-	@UserID INT,
-	@TaskID INT,
+	@userID INT,
+	@taskID INT,
 	@assigningUserID INT  
 AS
 BEGIN 
