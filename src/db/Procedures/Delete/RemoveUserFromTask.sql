@@ -1,7 +1,7 @@
 GO
 CREATE PROCEDURE uspRemoveUserFromTask
-	@UserID INT
-	@TaskID INT
+	@UserID INT,
+	@TaskID INT,
 	@assigningUserID INT  
 AS
 BEGIN 
@@ -17,11 +17,11 @@ BEGIN
     JOIN Teams tm ON tm.teamID = p.teamID
     WHERE t.taskID = @taskID;
 
-	IF NOT EXIST (
+	IF NOT EXISTS (
 		SELECT 1 FROM TeamMembers WHERE userID = @assigningUserID AND TeamID = @teamID AND isTeamLeader = 1
 	)
 	 BEGIN
-            THROW 50006, 'Only team leaders can delete users to tasks', 1;
+           THROW 50006, 'Only team leaders can delete users to tasks', 1;
      END;
 
 	 DELETE FROM TaskAssignees
