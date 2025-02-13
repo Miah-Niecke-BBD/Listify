@@ -1,8 +1,8 @@
 GO
 CREATE PROCEDURE uspDeleteTaskDependency
-	@TaskID INT,
-	@TaskDependencyID INT,
-	@UserID INT
+	@taskID INT,
+	@taskDependencyID INT,
+	@userID INT
 AS
 BEGIN
 
@@ -19,14 +19,14 @@ BEGIN
     WHERE t.taskID = @taskID;
 
 	IF NOT EXISTS (
-		SELECT 1 FROM TeamMembers WHERE userID = @UserID AND TeamID = @teamID AND isTeamLeader = 1
+		SELECT 1 FROM TeamMembers WHERE userID = @userID AND TeamID = @teamID AND isTeamLeader = 1
 	)
 	 BEGIN
            THROW 50006, 'Only team leaders can edit tasks', 1;
      END;
 
 	 DELETE TaskDependencies
-	 WHERE TaskID = @TaskID AND dependentTaskID = @TaskDependencyID
+	 WHERE taskID = @taskID AND dependentTaskID = @taskDependencyID
 
 	 COMMIT;
 	 END TRY
