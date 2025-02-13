@@ -27,6 +27,7 @@ BEGIN
 
     END TRY
     BEGIN CATCH
+        PRINT 'Error occured:' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END;
