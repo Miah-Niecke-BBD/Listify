@@ -5,7 +5,7 @@ CREATE PROCEDURE uspAssignUserToTask
     @assigningUserID INT      
 AS
 BEGIN
-    DECLARE @teamID INT, @projectID INT, @taskSectionID INT, @teamLeader INT;
+    DECLARE @teamID INT, @projectID INT, @taskSectionID INT;
 
     BEGIN TRANSACTION
     BEGIN TRY
