@@ -9,7 +9,7 @@ CREATE TABLE [Users] (
   [userID] INT PRIMARY KEY NOT NULL IDENTITY(1, 1),
   [gitHubID] VARCHAR(2083) NOT NULL,
   [createdAt] DATETIME NOT NULL,
-  [updatedAt] DATETIME NOT NULL,
+  [updatedAt] DATETIME ,
 )
 GO
 
@@ -17,7 +17,7 @@ CREATE TABLE [Teams] (
   [teamID] INT PRIMARY KEY NOT NULL IDENTITY(1, 1),
   [teamName] VARCHAR(100) NOT NULL,
   [createdAt] DATETIME NOT NULL,
-  [updatedAt] DATETIME NOT NULL,
+  [updatedAt] DATETIME ,
 
 )
 GO
