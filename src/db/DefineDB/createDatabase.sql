@@ -9,7 +9,7 @@ CREATE TABLE [Users] (
   [userID] INT PRIMARY KEY NOT NULL IDENTITY(1, 1),
   [gitHubID] VARCHAR(2083) NOT NULL,
   [createdAt] DATETIME NOT NULL,
-  [updatedAt] DATETIME NOT NULL,
+  [updatedAt] DATETIME ,
 )
 GO
 
@@ -17,13 +17,13 @@ CREATE TABLE [Teams] (
   [teamID] INT PRIMARY KEY NOT NULL IDENTITY(1, 1),
   [teamName] VARCHAR(100) NOT NULL,
   [createdAt] DATETIME NOT NULL,
-  [updatedAt] DATETIME NOT NULL,
+  [updatedAt] DATETIME ,
 
 )
 GO
 
 CREATE TABLE [TeamMembers] (
-  [teamMemberID] INT PRIMARY KEY NOT NULL IDENTITY(1, 1),
+  [teamMemberID] INT PRIMARY KEY IDENTITY(1, 1),
   [userID] INT NOT NULL,
   [teamID] INT NOT NULL,
   [isTeamLeader] BIT NOT NULL DEFAULT 0,
@@ -33,7 +33,7 @@ CREATE TABLE [TeamMembers] (
 GO
 
 CREATE TABLE [Projects] (
-  [projectID] INT PRIMARY KEY NOT NULL IDENTITY(1, 1),
+  [projectID] INT PRIMARY KEY IDENTITY(1, 1),
   [teamID] INT NOT NULL,
   [projectName] VARCHAR(100) NOT NULL,
   [projectDescription] VARCHAR(500),

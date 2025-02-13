@@ -1,4 +1,4 @@
-CREATE VIEW ProjectCompletedTasks AS
+CREATE VIEW ProjectUncompletedTasks AS
 SELECT
 	p.projectID,
 	p.projectName,
@@ -18,4 +18,4 @@ INNER JOIN
 	Sections s ON t.sectionID = s.sectionID
 INNER JOIN
 	Projects p ON s.projectID = p.projectID
-WHERE dateCompleted IS NOT NULL
+WHERE dateCompleted IS NULL
