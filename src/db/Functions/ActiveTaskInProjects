@@ -1,0 +1,14 @@
+CREATE FUNCTION GetActiveTaskCountForProject(@projectID INT)
+RETURNS INT
+AS
+BEGIN
+    DECLARE @activeTasks INT;
+
+    SELECT @activeTasks = COUNT(*)
+    FROM Tasks t
+    WHERE t.projectID = @projectID 
+    AND EXISTS (SELECT 1 FROM TaskDependencies td WHERE td.taskID = t.taskID);
+
+    RETURN @activeTasks;
+END;
+GO
