@@ -1,14 +1,23 @@
-CREATE FUNCTION dbo.UserExists(@gitHubID VARCHAR(2083))
-RETURNS BIT
+CREATE PROCEDURE CompleteTask
+@taskID INT 
 AS
 BEGIN
-    DECLARE @exists BIT = 0;
+    BEGIN TRANSACTION
+    BEGIN TRY
+        IF NOT EXISTS (SELECT 1 FROM Tasks WHERE taskID = @taskID)
+        BEGIN
+            THROW 50010, 'Task does not exist.', 1;
+        END;
 
-    IF @gitHubID IS NULL RETURN 0;
+        UPDATE Tasks
+        SET dateCompleted = GETDATE()
+        WHERE taskID = @taskID;
 
-    IF EXISTS (SELECT 1 FROM Users WHERE gitHubID = @gitHubID)
-        SET @exists = 1;
-
-    RETURN @exists;
+        COMMIT;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK;
+        THROW;
+    END CATCH
 END;
 GO
