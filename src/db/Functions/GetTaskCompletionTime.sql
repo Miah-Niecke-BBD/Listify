@@ -1,4 +1,4 @@
-REATE FUNCTION dbo.GetTaskCompletionTime(@taskID INT)
+CREATE FUNCTION dbo.GetTaskCompletionTime(@taskID INT)
 RETURNS INT
 AS
 BEGIN
