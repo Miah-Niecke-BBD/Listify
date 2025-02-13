@@ -1,5 +1,5 @@
 GO
-CREATE PROCEDURE uspDeleteTask
+CREATE PROCEDURE DeleteTask
     @taskID INT,    
     @deletingUserID INT  
 AS
