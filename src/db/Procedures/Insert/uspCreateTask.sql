@@ -6,8 +6,7 @@ CREATE PROCEDURE uspCreateTask
     @taskName VARCHAR(100),
     @taskDescription VARCHAR(500) = NULL , 
     @taskPriority TINYINT = 0, 
-    @taskPosition TINYINT,        
-    @parentTaskID INT = NULL  
+    @taskPosition TINYINT 
 AS
 BEGIN
     DECLARE @teamID INT, @maxTaskPosition TINYINT;
@@ -53,8 +52,8 @@ BEGIN
             SET @taskPosition = @maxTaskPosition + 1;
         END
 
-        INSERT INTO Tasks (sectionID, taskName, taskDescription, taskPriority, taskPosition, dueDate, parentTaskID, createdAt)
-        VALUES (@sectionID, @taskName, @taskDescription, @taskPriority, @taskPosition, SYSDATETIME(), @parentTaskID, SYSDATETIME());
+        INSERT INTO Tasks (sectionID, taskName, taskDescription, taskPriority, taskPosition, dueDate,  createdAt)
+        VALUES (@sectionID, @taskName, @taskDescription, @taskPriority, @taskPosition, SYSDATETIME(),  SYSDATETIME());
 
         COMMIT;
     END TRY

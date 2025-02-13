@@ -37,10 +37,10 @@ BEGIN
         INSERT INTO Tasks (taskName, taskDescription, sectionID, parentTaskID, taskPosition,dueDate, createdAt)
         VALUES (@taskName, @taskDescription, @sectionID, @parentTaskID, @taskPosition,@dueDate,SYSDATETIME());
 
-        DECLARE @subTaskID INT = SCOPE_IDENTITY();
+        -- DECLARE @subTaskID INT = SCOPE_IDENTITY();
 
-        INSERT INTO TaskAssignees (userID, taskID)
-        VALUES (@userID, @subTaskID);
+        -- INSERT INTO TaskAssignees (userID, taskID)
+        -- VALUES (@userID, @subTaskID);
 
     END TRY
     BEGIN CATCH

@@ -1,4 +1,4 @@
-CREATE VIEW ProjectCompletedTasks AS
+CREATE VIEW vProjectCompletedTasks AS
 SELECT
 	p.projectID,
 	p.projectName,

@@ -1,4 +1,4 @@
-CREATE VIEW UserAssignedTasks AS
+CREATE VIEW vUserAssignedTasks AS
 SELECT 
     u.userID,
     u.gitHubID,
@@ -10,7 +10,9 @@ SELECT
     t.dateCompleted,
     t.createdAt AS taskCreatedAt,
     t.updatedAt AS taskUpdatedAt,
+    s.sectionID,
     s.sectionName,
+    p.projectID,
     p.projectName
 FROM 
     Users u
