@@ -1,4 +1,4 @@
-CREATE VIEW UserTeams AS
+CREATE VIEW vUserTeams AS
 SELECT 
 	u.userID,
     u.gitHubID,

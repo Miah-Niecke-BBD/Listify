@@ -1,4 +1,4 @@
-CREATE VIEW ProjectSections AS
+CREATE VIEW vProjectSections AS
 SELECT
 	p.projectID,
 	p.projectName,

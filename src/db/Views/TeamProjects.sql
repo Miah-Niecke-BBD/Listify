@@ -1,7 +1,4 @@
-USE ListifyDB
-GO
-
-CREATE VIEW TeamProjects AS
+CREATE VIEW vTeamProjects AS
 SELECT
 	t.teamID,
 	t.teamName,

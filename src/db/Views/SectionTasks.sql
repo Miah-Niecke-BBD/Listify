@@ -1,4 +1,4 @@
-CREATE VIEW SectionTasks AS
+CREATE VIEW vSectionTasks AS
 SELECT
 	s.sectionID,
 	s.sectionName,
