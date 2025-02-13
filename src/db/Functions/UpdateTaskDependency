@@ -1,0 +1,21 @@
+CREATE PROCEDURE UpdateTaskDependency
+    @taskID INT,
+    @dependentTaskID INT
+AS
+BEGIN
+    BEGIN TRANSACTION
+
+    BEGIN TRY
+        DELETE FROM TaskDependencies WHERE taskID = @taskID AND dependentTaskID = @dependentTaskID;
+
+        INSERT INTO TaskDependencies (taskID, dependentTaskID)
+        VALUES (@taskID, @dependentTaskID);
+
+        COMMIT;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK;
+        THROW;
+    END CATCH
+END;
+GO
