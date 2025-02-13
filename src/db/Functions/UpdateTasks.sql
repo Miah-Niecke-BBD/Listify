@@ -6,11 +6,23 @@ CREATE PROCEDURE UpdateTask
     @dueDate DATETIME
 AS
 BEGIN
-    UPDATE Tasks
-    SET taskName = @taskName,
-        taskDescription = @taskDescription,
-        taskPriority = @taskPriority,
-        dueDate = @dueDate,
-        updatedAt = GETDATE()
-    WHERE taskID = @taskID;
+    BEGIN TRANSACTION
+
+    BEGIN TRY
+        UPDATE Tasks
+        SET taskName = @taskName,
+            taskDescription = @taskDescription,
+            taskPriority = @taskPriority,
+            dueDate = @dueDate,
+            updatedAt = GETDATE()
+        WHERE taskID = @taskID;
+
+        COMMIT;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK;
+
+        THROW;
+    END CATCH
 END;
+GO
