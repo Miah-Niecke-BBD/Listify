@@ -5,9 +5,8 @@ BEGIN
     DECLARE @activeTasks INT;
 
     SELECT @activeTasks = COUNT(*)
-    FROM Tasks t
-    WHERE t.projectID = @projectID 
-    AND EXISTS (SELECT 1 FROM TaskDependencies td WHERE td.taskID = t.taskID);
+    FROM Tasks
+    WHERE projectID = @projectID AND dateCompleted IS NULL;
 
     RETURN @activeTasks;
 END;
