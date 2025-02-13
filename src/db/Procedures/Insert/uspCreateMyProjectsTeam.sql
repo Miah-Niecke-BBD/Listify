@@ -17,8 +17,11 @@ BEGIN
         INSERT INTO TeamMembers (userID, teamID, isTeamLeader)
         VALUES (@userID, @teamID, 1);
 
-        INSERT INTO Projects (teamID, projectName, projectDescription, createdAt, updatedAt)
-        VALUES (@teamID, 'MyList', 'Default personal project', SYSDATETIME(), SYSDATETIME());
+        INSERT INTO Projects (teamID, projectName, projectDescription, createdAt)
+        VALUES (@teamID, 'MyList', 'Random Tasks', SYSDATETIME());
+
+        INSERT INTO Projects (teamID, projectName, projectDescription, createdAt)
+        VALUES (@teamID, 'Home','Default personal project', SYSDATETIME());
 
         SET @projectID = SCOPE_IDENTITY();
 
