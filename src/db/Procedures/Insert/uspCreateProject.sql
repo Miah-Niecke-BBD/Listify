@@ -25,7 +25,7 @@ BEGIN
         SET @projectID = SCOPE_IDENTITY();
 
         INSERT INTO ProjectAssignees (userID, projectID)
-        VALUES (@userID, @projectID);
+        VALUES (@teamLeaderID, @projectID);
 
         COMMIT;
     END TRY
