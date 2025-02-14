@@ -19,6 +19,7 @@ BEGIN
         BEGIN
             PRINT 'Only team leaders can assign users to a project';
             ROLLBACK;
+            RETURN;
         END;
 
         IF NOT EXISTS (
@@ -28,6 +29,17 @@ BEGIN
         BEGIN
             PRINT 'User is not a member of this team';
             ROLLBACK;
+            RETURN;
+        END;
+
+        IF EXISTS (
+            SELECT 1 FROM ProjectAssignees 
+            WHERE userID = @userID AND projectID = @projectID
+        )
+        BEGIN
+			ROLLBACK;
+            PRINT 'User is already assigned to this project';
+            RETURN;
         END;
 
         INSERT INTO ProjectAssignees (userID, projectID)

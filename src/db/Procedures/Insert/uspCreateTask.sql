@@ -18,6 +18,7 @@ BEGIN
         BEGIN
             PRINT 'Task position cannot be negative';
             ROLLBACK;
+            RETURN;
         END;
 
         SELECT @teamID = teamID FROM Projects WHERE projectID = @projectID;
@@ -29,6 +30,7 @@ BEGIN
         BEGIN
             PRINT 'Only team leaders can create tasks';
             ROLLBACK;
+            RETURN;
         END;
 
         IF NOT EXISTS (
@@ -38,6 +40,7 @@ BEGIN
         BEGIN
             PRINT 'The section does not exist in this project';
             ROLLBACK;
+            RETURN;
         END;
 
         SELECT @maxTaskPosition = MAX(taskPosition) FROM Tasks WHERE sectionID = @sectionID;
