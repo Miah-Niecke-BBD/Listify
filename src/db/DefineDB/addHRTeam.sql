@@ -1,11 +1,8 @@
--- Insert the "Human Resources" team
 INSERT INTO [Teams] ([teamName], [createdAt], [updatedAt])
-VALUES ('Human Resources', GETDATE(), GETDATE());
+VALUES ('Human Resources', '2023-06-01', '2023-06-01');
 
--- Get the team ID
 DECLARE @teamID INT = SCOPE_IDENTITY();
 
--- Assign users 4-10 to the team with User 4 as the team leader
 INSERT INTO [TeamMembers] ([userID], [teamID], [isTeamLeader])
 VALUES 
   (4, @teamID, 1),
@@ -16,20 +13,18 @@ VALUES
   (9, @teamID, 0),
   (10, @teamID, 0);
 
--- Insert the "Manage Staff" project
 INSERT INTO [Projects] ([teamID], [projectName], [projectDescription], [createdAt], [updatedAt])
-VALUES (@teamID, 'Manage Staff', 'A project to oversee staff management processes.', GETDATE(), GETDATE());
+VALUES (@teamID, 'Manage Staff', 'A project to oversee staff management processes.', '2023-06-01', '2023-06-01');
 
 -- Get the project ID
 DECLARE @projectID INT = SCOPE_IDENTITY();
 
--- Insert project sections
 INSERT INTO [Sections] ([projectID], [sectionName], [sectionPosition], [createdAt], [updatedAt])
 VALUES 
-  (@projectID, 'Recruitment', 1, GETDATE(), GETDATE()),
-  (@projectID, 'Training', 2, GETDATE(), GETDATE()),
-  (@projectID, 'Payroll & Benefits', 3, GETDATE(), GETDATE()),
-  (@projectID, 'Performance Management', 4, GETDATE(), GETDATE());
+  (@projectID, 'Recruitment', 1, '2023-06-01', '2023-06-01'),
+  (@projectID, 'Training', 2, '2023-06-01', '2023-06-01'),
+  (@projectID, 'Payroll & Benefits', 3, '2023-06-01', '2023-06-01'),
+  (@projectID, 'Performance Management', 4, '2023-06-01', '2023-06-01');
 
 -- Store section IDs
 DECLARE @recruitment INT, @training INT, @payroll INT, @performance INT;
@@ -41,22 +36,21 @@ SELECT @performance = sectionID FROM [Sections] WHERE sectionName = 'Performance
 -- Insert tasks for the project
 INSERT INTO [Tasks] ([sectionID], [taskName], [taskDescription], [taskPriority], [taskPosition], [dueDate], [createdAt], [updatedAt])
 VALUES 
-  (@recruitment, 'Post Job Listings', 'Create and publish job descriptions.', 1, 1, DATEADD(DAY, 7, GETDATE()), GETDATE(), GETDATE()),
-  (@recruitment, 'Screen Resumes', 'Review submitted applications.', 2, 2, DATEADD(DAY, 14, GETDATE()), GETDATE(), GETDATE()),
-  (@recruitment, 'Conduct Interviews', 'Schedule and perform interviews.', 3, 3, NULL, GETDATE(), GETDATE()),
-  (@recruitment, 'Finalize Hiring', 'Make final hiring decisions.', 1, 4, DATEADD(DAY, 21, GETDATE()), GETDATE(), GETDATE()),
-  (@training, 'Onboarding Sessions', 'Conduct training for new hires.', 2, 1, NULL, GETDATE(), GETDATE()),
-  (@training, 'Compliance Training', 'Ensure employees complete mandatory training.', 3, 2, DATEADD(DAY, 30, GETDATE()), GETDATE(), GETDATE()),
-  (@training, 'Skill Development', 'Enroll employees in skill workshops.', 2, 3, NULL, GETDATE(), GETDATE()),
-  (@payroll, 'Process Payroll', 'Calculate and process monthly salaries.', 1, 1, DATEADD(DAY, 10, GETDATE()), GETDATE(), GETDATE()),
-  (@payroll, 'Review Benefits', 'Ensure benefits packages are up to date.', 3, 2, NULL, GETDATE(), GETDATE()),
-  (@payroll, 'Manage Taxes', 'Ensure payroll tax compliance.', 2, 3, DATEADD(DAY, 20, GETDATE()), GETDATE(), GETDATE()),
-  (@performance, 'Conduct Performance Reviews', 'Evaluate employee performance.', 1, 1, DATEADD(DAY, 40, GETDATE()), GETDATE(), GETDATE()),
-  (@performance, 'Update Promotion Criteria', 'Review and adjust promotion policies.', 3, 2, NULL, GETDATE(), GETDATE()),
-  (@performance, 'Handle Employee Complaints', 'Address workplace concerns.', 2, 3, DATEADD(DAY, 25, GETDATE()), GETDATE(), GETDATE()),
-  (@performance, 'Implement Feedback Mechanism', 'Improve feedback collection methods.', 2, 4, NULL, GETDATE(), GETDATE());
+  (@recruitment, 'Post Job Listings', 'Create and publish job descriptions.', 1, 1, '2023-06-08', '2023-06-01', '2023-06-01'),
+  (@recruitment, 'Screen Resumes', 'Review submitted applications.', 2, 2, '2023-06-15', '2023-06-01', '2023-06-01'),
+  (@recruitment, 'Conduct Interviews', 'Schedule and perform interviews.', 3, 3, NULL, '2023-06-01', '2023-06-01'),
+  (@recruitment, 'Finalize Hiring', 'Make final hiring decisions.', 1, 4, '2023-06-22', '2023-06-01', '2023-06-01'),
+  (@training, 'Onboarding Sessions', 'Conduct training for new hires.', 2, 1, NULL, '2023-06-01', '2023-06-01'),
+  (@training, 'Compliance Training', 'Ensure employees complete mandatory training.', 3, 2, '2023-06-30', '2023-06-01', '2023-06-01'),
+  (@training, 'Skill Development', 'Enroll employees in skill workshops.', 2, 3, NULL, '2023-06-01', '2023-06-01'),
+  (@payroll, 'Process Payroll', 'Calculate and process monthly salaries.', 1, 1, '2023-06-11', '2023-06-01', '2023-06-01'),
+  (@payroll, 'Review Benefits', 'Ensure benefits packages are up to date.', 3, 2, NULL, '2023-06-01', '2023-06-01'),
+  (@payroll, 'Manage Taxes', 'Ensure payroll tax compliance.', 2, 3, '2023-06-20', '2023-06-01', '2023-06-01'),
+  (@performance, 'Conduct Performance Reviews', 'Evaluate employee performance.', 1, 1, '2023-07-10', '2023-06-01', '2023-06-01'),
+  (@performance, 'Update Promotion Criteria', 'Review and adjust promotion policies.', 3, 2, NULL, '2023-06-01', '2023-06-01'),
+  (@performance, 'Handle Employee Complaints', 'Address workplace concerns.', 2, 3, '2023-06-26', '2023-06-01', '2023-06-01'),
+  (@performance, 'Implement Feedback Mechanism', 'Improve feedback collection methods.', 2, 4, NULL, '2023-06-01', '2023-06-01');
 
--- Assign team members to tasks
 INSERT INTO [TaskAssignees] ([userID], [taskID])
 VALUES 
   (4, 1), (4, 2),
@@ -67,7 +61,6 @@ VALUES
   (9, 11), (9, 12),
   (10, 13), (10, 14);
 
--- Set dependencies (each second task depends on the first one)
 INSERT INTO [TaskDependencies] ([taskID], [dependentTaskID])
 VALUES 
   (1, 2),
@@ -78,7 +71,6 @@ VALUES
   (11, 12),
   (13, 14);
 
--- Assign team members to the project
 INSERT INTO [ProjectAssignees] ([userID], [projectID])
 VALUES 
   (4, @projectID),
@@ -88,3 +80,4 @@ VALUES
   (8, @projectID),
   (9, @projectID),
   (10, @projectID);
+

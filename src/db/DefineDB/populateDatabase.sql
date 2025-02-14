@@ -1,45 +1,44 @@
 USE ListifyDB
 
--- Inserting sample Users
 INSERT INTO [Users] ([gitHubID], [createdAt], [updatedAt])
 VALUES 
-  ('user1_github', GETDATE(), GETDATE()),
-  ('user2_github', GETDATE(), GETDATE()),
-  ('user3_github', GETDATE(), GETDATE()),
-  ('user4_github', GETDATE(), GETDATE()),
-  ('user5_github', GETDATE(), GETDATE()),
-  ('user6_github', GETDATE(), GETDATE()),
-  ('user7_github', GETDATE(), GETDATE()),
-  ('user8_github', GETDATE(), GETDATE()),
-  ('user9_github', GETDATE(), GETDATE()),
-  ('user10_github', GETDATE(), GETDATE()),
-  ('user11_github', GETDATE(), GETDATE()),
-  ('user12_github', GETDATE(), GETDATE()),
-  ('user13_github', GETDATE(), GETDATE()),
-  ('user14_github', GETDATE(), GETDATE()),
-  ('user15_github', GETDATE(), GETDATE());
+  ('user1_github', '2023-01-15', '2023-01-15'),
+  ('user2_github', '2023-02-20', '2023-02-20'),
+  ('user3_github', '2023-03-25', '2023-03-25'),
+  ('user4_github', '2023-04-30', '2023-04-30'),
+  ('user5_github', '2023-05-10', '2023-05-10'),
+  ('user6_github', '2023-06-05', '2023-06-05'),
+  ('user7_github', '2023-07-18', '2023-07-18'),
+  ('user8_github', '2023-08-22', '2023-08-22'),
+  ('user9_github', '2023-09-17', '2023-09-17'),
+  ('user10_github', '2023-10-02', '2023-10-02'),
+  ('user11_github', '2023-11-09', '2023-11-09'),
+  ('user12_github', '2023-12-01', '2023-12-01'),
+  ('user13_github', '2024-01-14', '2024-01-14'),
+  ('user14_github', '2024-02-18', '2024-02-18'),
+  ('user15_github', '2024-03-25', '2024-03-25');
 
--- Inserting "My Projects" teams for each user
+
 INSERT INTO [Teams] ([teamName], [createdAt], [updatedAt])
 VALUES 
-  ('My Projects', GETDATE(), GETDATE()), -- for user 1
-  ('My Projects', GETDATE(), GETDATE()), -- for user 2
-  ('My Projects', GETDATE(), GETDATE()), -- for user 3
-  ('My Projects', GETDATE(), GETDATE()), -- for user 4
-  ('My Projects', GETDATE(), GETDATE()), -- for user 5
-  ('My Projects', GETDATE(), GETDATE()), -- for user 6
-  ('My Projects', GETDATE(), GETDATE()), -- for user 7
-  ('My Projects', GETDATE(), GETDATE()), -- for user 8
-  ('My Projects', GETDATE(), GETDATE()), -- for user 9
-  ('My Projects', GETDATE(), GETDATE()), -- for user 10
-  ('My Projects', GETDATE(), GETDATE()), -- for user 11
-  ('My Projects', GETDATE(), GETDATE()), -- for user 12
-  ('My Projects', GETDATE(), GETDATE()), -- for user 13
-  ('My Projects', GETDATE(), GETDATE()), -- for user 14
-  ('My Projects', GETDATE(), GETDATE()); -- for user 15
+  ('My Projects', '2023-01-15', '2023-01-15'), -- for user 1
+  ('My Projects', '2023-02-20', '2023-02-20'), -- for user 2
+  ('My Projects', '2023-03-25', '2023-03-25'), -- for user 3
+  ('My Projects', '2023-04-30', '2023-04-30'), -- for user 4
+  ('My Projects', '2023-05-10', '2023-05-10'), -- for user 5
+  ('My Projects', '2023-06-05', '2023-06-05'), -- for user 6
+  ('My Projects', '2023-07-18', '2023-07-18'), -- for user 7
+  ('My Projects', '2023-08-22', '2023-08-22'), -- for user 8
+  ('My Projects', '2023-09-17', '2023-09-17'), -- for user 9
+  ('My Projects', '2023-10-02', '2023-10-02'), -- for user 10
+  ('My Projects', '2023-11-09', '2023-11-09'), -- for user 11
+  ('My Projects', '2023-12-01', '2023-12-01'), -- for user 12
+  ('My Projects', '2024-01-14', '2024-01-14'), -- for user 13
+  ('My Projects', '2024-02-18', '2024-02-18'), -- for user 14
+  ('My Projects', '2024-03-25', '2024-03-25'); -- for user 15
 
--- Inserting "My List" and "Home" projects for "My Projects" team
--- For simplicity, we're assuming user IDs are in sequential order starting from 1.
+
+
 INSERT INTO [Projects] ([teamID], [projectName], [projectDescription], [createdAt], [updatedAt])
 VALUES
   (1, 'My List', 'Personal list of tasks and items.', GETDATE(), GETDATE()),
@@ -87,7 +86,6 @@ VALUES
   (15, 'My List', 'Personal list of tasks and items.', GETDATE(), GETDATE()),
   (15, 'Home', 'Tasks related to home management.', GETDATE(), GETDATE());
 
--- Inserting Sections for "My List" and "Home" Projects (for simplification, we’ll add only one section for each)
 INSERT INTO [Sections] ([projectID], [sectionName], [sectionPosition], [createdAt], [updatedAt])
 VALUES 
   (1, 'To Do', 1, GETDATE(), GETDATE()),
@@ -106,7 +104,7 @@ VALUES
   (14, 'To Do', 1, GETDATE(), GETDATE()),
   (15, 'To Do', 1, GETDATE(), GETDATE());
 
--- Inserting Tasks for the "To Do" section in the "My List" project (Example task for each user)
+
 INSERT INTO [Tasks] ([sectionID], [taskName], [taskDescription], [taskPriority], [taskPosition], [createdAt], [updatedAt])
 VALUES
   (1, 'Buy groceries', 'Buy milk, eggs, and bread', 0, 1, GETDATE(), GETDATE()),
@@ -125,8 +123,7 @@ VALUES
   (14, 'Declutter workspace', 'Clear the desk and organize files', 0, 1, GETDATE(), GETDATE()),
   (15, 'Bake cookies', 'Make chocolate chip cookies', 0, 1, GETDATE(), GETDATE());
 
-  -- Inserting TeamMembers (linking users to their "My Projects" team)
--- Assuming each user has only one team, which is "My Projects"
+
 INSERT INTO [TeamMembers] ([userID], [teamID], [isTeamLeader])
 VALUES
   (1, 1, 1), -- user 1
@@ -145,15 +142,8 @@ VALUES
   (14, 14, 1), -- user 14
   (15, 15, 1); -- user 15
 
--- Inserting TaskAssignees (No assignees for tasks in "My Projects" as per guidelines)
--- This step is skipped as tasks for "My Projects" should not have assignees. If we needed this, 
--- we would assign users to tasks, but no assignees are added here because it's explicitly mentioned.
 
--- Inserting TaskDependencies (No dependencies in "My Projects" tasks)
--- Task dependencies are not required for "My Projects" tasks. So, this is also skipped.
 
--- Inserting ProjectAssignees (Linking users to their projects)
--- Each user is assigned to their own "My List" and "Home" projects
 INSERT INTO [ProjectAssignees] ([userID], [projectID])
 VALUES
   (1, 1), -- user 1 to "My List"
