@@ -53,8 +53,8 @@ BEGIN
 
         IF EXISTS (
             SELECT 1 FROM TaskDependencies td
-            JOIN TaskDependencies rd ON td.dependentTaskID = rd.taskID
-            WHERE td.taskID = @dependentTaskID AND rd.dependentTaskID = @taskID
+            JOIN TaskDependencies tsd ON td.dependentTaskID = tsd.taskID
+            WHERE td.taskID = @dependentTaskID AND tsd.dependentTaskID = @taskID
         )
         BEGIN
             PRINT 'Circular dependency detected';
