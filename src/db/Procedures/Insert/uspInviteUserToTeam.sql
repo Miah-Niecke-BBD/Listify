@@ -1,24 +1,31 @@
 GO
 CREATE PROCEDURE uspInviteUserToTeam
+    @teamLeaderID INT,
     @userID INT,
-    @teamID INT,
-    @isTeamLeader BIT = 0
+    @teamID INT
 AS
 BEGIN
     BEGIN TRANSACTION
     BEGIN TRY
+
+         IF NOT EXISTS (
+            SELECT 1 FROM TeamMembers 
+            WHERE userID = @teamLeaderID AND teamID = @teamID AND isTeamLeader = 1
+        )
+        BEGIN
+            PRINT 'Only team leaders can create projects';
+        END;
 
         IF EXISTS (
             SELECT 1 FROM TeamMembers 
             WHERE userID = @userID AND teamID = @teamID
         )
         BEGIN
-            THROW 50002, 'User is already a member of this team', 1;
+            PRINT 'User is already a member of this team';
         END;
-
-        -- Insert user into TeamMembers table
+        
         INSERT INTO TeamMembers (userID, teamID, isTeamLeader)
-        VALUES (@userID, @teamID, @isTeamLeader);
+        VALUES (@userID, @teamID, 0);
 
         COMMIT;
     END TRY

@@ -1,6 +1,6 @@
 GO
 CREATE PROCEDURE uspCreateProject
-    @userID INT,
+    @teamLeaderID INT,
     @teamID INT,
     @projectName VARCHAR(100),
     @projectDescription VARCHAR(500) = NULL
@@ -13,10 +13,10 @@ BEGIN
 
         IF NOT EXISTS (
             SELECT 1 FROM TeamMembers 
-            WHERE userID = @userID AND teamID = @teamID AND isTeamLeader = 1
+            WHERE userID = @teamLeaderID AND teamID = @teamID AND isTeamLeader = 1
         )
         BEGIN
-            THROW 'Only team leaders can create projects', 1;
+            PRINT 'Only team leaders can create projects';
         END;
 
         INSERT INTO Projects (teamID, projectName, projectDescription, createdAt)

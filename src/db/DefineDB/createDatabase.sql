@@ -23,7 +23,7 @@ CREATE TABLE [Teams] (
 GO
 
 CREATE TABLE [TeamMembers] (
-  [teamMemberID] INT PRIMARY KEY IDENTITY(1, 1),
+  [teamMemberID] INT PRIMARY KEY NOT NULL IDENTITY(1, 1),
   [userID] INT NOT NULL,
   [teamID] INT NOT NULL,
   [isTeamLeader] BIT NOT NULL DEFAULT 0,
@@ -33,8 +33,8 @@ CREATE TABLE [TeamMembers] (
 GO
 
 CREATE TABLE [Projects] (
-  [projectID] INT PRIMARY KEY IDENTITY(1, 1),
-  [teamID] INT NOT NULL,
+  [projectID] INT PRIMARY KEY NOT NULL IDENTITY(1, 1),
+  [teamID] INT NOT NULL, 
   [projectName] VARCHAR(100) NOT NULL,
   [projectDescription] VARCHAR(500),
   [createdAt] DATETIME NOT NULL,
@@ -67,7 +67,7 @@ CREATE TABLE [Tasks] (
   [createdAt] DATETIME NOT NULL,
   [updatedAt] DATETIME,
   FOREIGN KEY ([sectionID]) REFERENCES [Sections] ([sectionID])ON DELETE CASCADE, 
-  FOREIGN KEY ([parentTaskID]) REFERENCES [Tasks] (taskID)ON DELETE CASCADE
+  FOREIGN KEY ([parentTaskID]) REFERENCES [Tasks] (taskID)
 )
 GO
 
@@ -75,8 +75,8 @@ CREATE TABLE [TaskAssignees] (
   [taskAssigneeID] INT PRIMARY KEY NOT NULL IDENTITY(1, 1),
   [userID] INT NOT NULL,
   [taskID] INT NOT NULL,
-  FOREIGN KEY ([userID]) REFERENCES [Users] ([userID]) ON DELETE CASCADE,
-  FOREIGN KEY ([taskID]) REFERENCES [Tasks] ([taskID]) ON DELETE CASCADE
+  FOREIGN KEY ([userID]) REFERENCES [Users] ([userID]) ,
+  FOREIGN KEY ([taskID]) REFERENCES [Tasks] ([taskID])
 )
 GO
 
@@ -84,8 +84,8 @@ CREATE TABLE [TaskDependencies] (
   [taskDependencyID] INT PRIMARY KEY NOT NULL IDENTITY(1, 1),
   [taskID] INT NOT NULL,
   [dependentTaskID] INT NOT NULL,
-  FOREIGN KEY ([taskID]) REFERENCES [Tasks] ([taskID]) ON DELETE CASCADE,
-  FOREIGN KEY ([dependentTaskID]) REFERENCES [Tasks] ([taskID]) ON DELETE CASCADE
+  FOREIGN KEY ([taskID]) REFERENCES [Tasks] ([taskID]) ,
+  FOREIGN KEY ([dependentTaskID]) REFERENCES [Tasks] ([taskID]) 
 )
 GO
 
@@ -93,8 +93,8 @@ CREATE TABLE [ProjectAssignees] (
   [projectAssigneeID] INT PRIMARY KEY NOT NULL IDENTITY(1, 1),
   [userID] INT NOT NULL,
   [projectID] INT NOT NULL,
-  FOREIGN KEY ([projectID]) REFERENCES [Projects] ([projectID])ON DELETE CASCADE,
-  FOREIGN KEY ([userID]) REFERENCES [Users] ([userID]) ON DELETE CASCADE
+  FOREIGN KEY ([projectID]) REFERENCES [Projects] ([projectID]),
+  FOREIGN KEY ([userID]) REFERENCES [Users] ([userID])
 )
 GO
 
