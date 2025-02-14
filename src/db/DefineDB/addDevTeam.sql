@@ -20,7 +20,7 @@ INSERT INTO ProjectAssignees (userID, projectID) VALUES
 (3, @TaskAppProjectID);
 
 INSERT INTO Sections (projectID, sectionName, sectionPosition, createdAt, updatedAt) VALUES
-(@TaskAppProjectID, 'Development', 1, '2024-01-10', '2024-01-10');
+(@TaskAppProjectID, 'Development', 0, '2024-01-10', '2024-01-10');
 
 DECLARE @DevelopmentSectionID INT = SCOPE_IDENTITY();
 
