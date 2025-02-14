@@ -24,7 +24,6 @@ BEGIN
         BEGIN
             ROLLBACK;
             PRINT'Only team leaders can remove tasks from projects.';
-            RETURN;
         END
 
         DELETE FROM Tasks

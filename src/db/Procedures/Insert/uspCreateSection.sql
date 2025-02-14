@@ -14,7 +14,7 @@ BEGIN
         IF @sectionPosition < 0
         BEGIN
             PRINT 'Section position cannot be negative';
-            RETURN;
+            ROLLBACK;
         END;
 
         SELECT @teamID = teamID FROM Projects WHERE projectID = @projectID;
@@ -25,7 +25,7 @@ BEGIN
         )
         BEGIN
             PRINT 'Only team leaders can create sections';
-            RETURN;
+           ROLLBACK;
         END;
 
         SELECT @maxSectionPosition = MAX(sectionPosition) FROM Sections WHERE projectID = @projectID;

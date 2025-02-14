@@ -20,12 +20,14 @@ BEGIN
         IF @isTeamLeader IS NULL
         BEGIN
             PRINT 'Only team leaders can create subtasks.';
+            ROLLBACK;
         END
 
 
         IF NOT EXISTS (SELECT 1 FROM Tasks WHERE taskID = @parentTaskID AND parentTaskID IS NULL)
         BEGIN
             PRINT  'Parent task does not exist or is already a subtask.';
+            ROLLBACK;
         END
 
        
@@ -37,10 +39,6 @@ BEGIN
         INSERT INTO Tasks (taskName, taskDescription, sectionID, parentTaskID, taskPosition,dueDate, createdAt)
         VALUES (@taskName, @taskDescription, @sectionID, @parentTaskID, @taskPosition,@dueDate,SYSDATETIME());
 
-        -- DECLARE @subTaskID INT = SCOPE_IDENTITY();
-
-        -- INSERT INTO TaskAssignees (userID, taskID)
-        -- VALUES (@userID, @subTaskID);
 
     END TRY
     BEGIN CATCH

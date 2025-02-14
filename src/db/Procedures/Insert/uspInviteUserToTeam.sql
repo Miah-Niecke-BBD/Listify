@@ -14,6 +14,7 @@ BEGIN
         )
         BEGIN
             PRINT 'Only team leaders can create projects';
+            ROLLBACK;
         END;
 
         IF EXISTS (
@@ -22,6 +23,7 @@ BEGIN
         )
         BEGIN
             PRINT 'User is already a member of this team';
+            ROLLBACK;
         END;
         
         INSERT INTO TeamMembers (userID, teamID, isTeamLeader)

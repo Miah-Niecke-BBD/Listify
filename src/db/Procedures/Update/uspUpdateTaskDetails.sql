@@ -35,6 +35,7 @@ BEGIN
     IF @isTeamLeader <> 1
     BEGIN
         PRINT 'Only team leaders can update tasks.';
+        ROLLBACK;
     END
 
     UPDATE Tasks

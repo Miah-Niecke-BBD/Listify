@@ -18,6 +18,7 @@ BEGIN
         IF @isTeamLeader IS NULL
         BEGIN
             PRINT'Only team leader can remove user.';
+			ROLLBACK;
         END
 
 		DELETE FROM TaskAssignees 
