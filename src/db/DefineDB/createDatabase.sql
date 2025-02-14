@@ -82,8 +82,8 @@ GO
 
 CREATE TABLE [TaskDependencies] (
   [taskDependencyID] INT PRIMARY KEY NOT NULL IDENTITY(1, 1),
-  [taskID] INT NOT NULL,
-  [dependentTaskID] INT NOT NULL,
+  [taskID] INT NOT NULL UNIQUE,
+  [dependentTaskID] INT NOT NULL UNIQUE,
   FOREIGN KEY ([taskID]) REFERENCES [Tasks] ([taskID]) ,
   FOREIGN KEY ([dependentTaskID]) REFERENCES [Tasks] ([taskID]) 
 )
