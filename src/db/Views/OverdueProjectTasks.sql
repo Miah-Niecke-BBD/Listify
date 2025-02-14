@@ -20,6 +20,6 @@ INNER JOIN
 INNER JOIN
 	Projects p ON s.projectID = p.projectID
 WHERE 
-	dateCompleted IS NOT NULL 
+	dateCompleted IS NULL 
     AND dueDate <= DATEADD(DAY, -1, CAST(GETDATE() AS DATE));
 GO

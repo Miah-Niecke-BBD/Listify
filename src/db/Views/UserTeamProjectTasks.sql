@@ -1,5 +1,5 @@
 GO
-CREATE VIEW UserTeamProjectsTasks AS
+CREATE VIEW vUserTeamProjectsTasks AS
 SELECT
 	u.userID,
 	u.githubID,

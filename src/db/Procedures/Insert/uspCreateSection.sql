@@ -13,7 +13,8 @@ BEGIN
 
         IF @sectionPosition < 0
         BEGIN
-            PRINT'Section position cannot be negative', 1;
+            PRINT 'Section position cannot be negative';
+            RETURN;
         END;
 
         SELECT @teamID = teamID FROM Projects WHERE projectID = @projectID;
@@ -24,20 +25,26 @@ BEGIN
         )
         BEGIN
             PRINT 'Only team leaders can create sections';
+            RETURN;
         END;
-
 
         SELECT @maxSectionPosition = MAX(sectionPosition) FROM Sections WHERE projectID = @projectID;
 
-        IF @sectionPosition <= @maxSectionPosition
+        IF EXISTS (SELECT 1 FROM Sections WHERE projectID = @projectID AND sectionPosition = @sectionPosition)
         BEGIN
+            PRINT 'The input position is already taken. Setting to next available position.';
             SET @sectionPosition = @maxSectionPosition + 1;
+        END
+        ELSE
+        BEGIN
+            PRINT 'Setting to input position.';
         END
 
         INSERT INTO Sections (projectID, sectionName, sectionPosition, createdAt)
         VALUES (@projectID, @sectionName, @sectionPosition, SYSDATETIME());
 
         COMMIT;
+
     END TRY
     BEGIN CATCH
         ROLLBACK;
