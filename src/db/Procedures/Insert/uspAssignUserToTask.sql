@@ -2,7 +2,7 @@ GO
 CREATE PROCEDURE uspAssignUserToTask
     @userID INT,          
     @taskID INT,              
-    @assigningUserID INT      
+    @teamLeaderID INT      
 AS
 BEGIN
     DECLARE @teamID INT, @projectID INT, @taskSectionID INT;
@@ -21,35 +21,35 @@ BEGIN
 
         IF @taskSectionID IS NULL
         BEGIN
-            THROW 50011, 'Task does not exist in the given section and project.', 1;
+            PRINT'Task does not exist in the given section and project.';
         END;
 
         IF NOT EXISTS (
-            SELECT 1 FROM TeamMembers WHERE userID = @assigningUserID AND teamID = @teamID AND isTeamLeader = 1
+            SELECT 1 FROM TeamMembers WHERE userID = @teamLeaderID AND teamID = @teamID AND isTeamLeader = 1
         )
         BEGIN
-            THROW 50006, 'Only team leaders can assign users to tasks', 1;
+            PRINT 'Only team leaders can assign users to tasks';
         END;
 
         IF NOT EXISTS (
             SELECT 1 FROM TeamMembers WHERE userID = @userID AND teamID = @teamID
         )
         BEGIN
-            THROW 50008, 'User is not a member of this team', 1;
+            PRINT 'User is not a member of this team';
         END;
 
         IF NOT EXISTS (
             SELECT 1 FROM ProjectAssignees WHERE userID = @userID AND projectID = @projectID
         )
         BEGIN
-            THROW 50009, 'User is not assigned to this project', 1;
+            PRINT 'User is not assigned to this project';
         END;
 
         IF EXISTS (
             SELECT 1 FROM TaskAssignees WHERE userID = @userID AND taskID = @taskID
         )
         BEGIN
-            THROW 50010, 'User is already assigned to this task', 1;
+            PRINT 'User is already assigned to this task';
         END;
 
         INSERT INTO TaskAssignees (userID, taskID)
