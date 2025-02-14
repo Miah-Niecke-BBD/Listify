@@ -13,7 +13,7 @@ BEGIN
 
         IF @sectionPosition < 0
         BEGIN
-            PRINT'Section position cannot be negative', 1;
+            PRINT'Section position cannot be negative';
         END;
 
         SELECT @teamID = teamID FROM Projects WHERE projectID = @projectID;

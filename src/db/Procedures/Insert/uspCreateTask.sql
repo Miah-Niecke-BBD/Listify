@@ -23,7 +23,7 @@ BEGIN
 
         IF NOT EXISTS (
             SELECT 1 FROM TeamMembers 
-            WHERE userID = @userID AND teamID = @teamID AND isTeamLeader = 1
+            WHERE userID = @teamLeaderID AND teamID = @teamID AND isTeamLeader = 1
         )
         BEGIN
             PRINT 'Only team leaders can create tasks';
