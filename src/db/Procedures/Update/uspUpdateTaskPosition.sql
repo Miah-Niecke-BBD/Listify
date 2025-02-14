@@ -2,32 +2,56 @@ CREATE PROCEDURE uspUpdateTaskPosition
 	@teamLeaderID INT,
 	@taskID INT,
 	@newTaskPosition INT,
-    @section INT
+    @sectionID INT
 AS
 BEGIN 
-	DECLARE @teamID INT, @sectionID INT, @currentTaskPosition INT, @currentSection INT;
+	DECLARE @teamID INT, @currentTaskPosition INT, @currentSectionID INT, @currentProjectID INT,  @maxTaskPosition INT,  @minTaskPosition INT
 	BEGIN TRANSACTION
 	BEGIN TRY
-
+ 
 	SELECT 
 		@teamID = tm.teamID,
-		@sectionID = t.sectionID,
 		@currentTaskPosition = t.taskPosition,
-        @currentSection = s.sectionID
+        @currentSectionID = t.sectionID
 	FROM Tasks t
 	JOIN Sections s ON s.sectionID = t.sectionID
     JOIN Projects p ON p.projectID = s.projectID
     JOIN Teams tm ON tm.teamID = p.teamID
     WHERE t.taskID = @taskID;
-
+ 
 	IF NOT EXISTS (
 		SELECT 1 FROM TeamMembers WHERE userID = @teamLeaderID AND TeamID = @teamID AND isTeamLeader = 1
 	)
 	 BEGIN
+		   ROLLBACK;
            PRINT 'Only team leaders can edit users to tasks';
      END;
-
-     IF @currentSection = @section
+ 
+	 IF EXISTS (
+		SELECT 1 FROM Sections WHERE sectionID = @sectionID AND projectID != @currentProjectID
+	 )
+	 BEGIN
+			ROLLBACK;
+            PRINT 'Cannot move task to a section in a different project.';
+     END
+ 
+	  SELECT 
+            @maxTaskPosition = MAX(taskPosition),
+            @minTaskPosition = MIN(taskPosition)
+        FROM Tasks
+        WHERE sectionID = @sectionID;
+ 
+        
+        IF @newTaskPosition < 0
+        BEGIN
+            SET @newTaskPosition = 0;
+        END
+        ELSE IF @newTaskPosition > @maxTaskPosition
+        BEGIN
+            SET @newTaskPosition = @maxTaskPosition; 
+        END
+ 
+     IF @currentSectionID = @sectionID
      BEGIN
 	    UPDATE Tasks
 	    SET taskPosition = taskPosition - 1
@@ -37,17 +61,18 @@ BEGIN
 	 BEGIN 
 	    UPDATE Tasks
 	    SET taskPosition = taskPosition - 1
-	    WHERE taskPosition > @currentTaskPosition AND sectionID = @currentSection
+	    WHERE taskPosition > @currentTaskPosition AND sectionID = @currentSectionID
 	END
-
+ 
 	    UPDATE Tasks
 	    SET taskPosition = taskPosition + 1
 	    WHERE taskPosition >= @newTaskPosition AND sectionID = @sectionID
-
+ 
 	    UPDATE Tasks
-	    SET taskPosition = @newTaskPosition
-	    WHERE taskID = @taskID AND sectionID = @sectionID
-     
+	    SET 
+            taskPosition = @newTaskPosition,
+            sectionID = @sectionID
+	    WHERE taskID = @taskID 
 	 COMMIT;
 	 END TRY
 	 BEGIN CATCH
