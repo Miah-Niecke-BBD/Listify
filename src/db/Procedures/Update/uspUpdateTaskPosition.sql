@@ -5,14 +5,14 @@ CREATE PROCEDURE uspUpdateTaskPosition
     @section INT
 AS
 BEGIN 
-	DECLARE @teamID INT, @sectionID INT, @currentTaskPosition INT, currentSection;
+	DECLARE @teamID INT, @sectionID INT, @currentTaskPosition INT, @currentSection INT;
 	BEGIN TRANSACTION
 	BEGIN TRY
 
 	SELECT 
 		@teamID = tm.teamID,
 		@sectionID = t.sectionID,
-		@currentTaskPosition = t.taskPosition
+		@currentTaskPosition = t.taskPosition,
         @currentSection = s.sectionID
 	FROM Tasks t
 	JOIN Sections s ON s.sectionID = t.sectionID
@@ -27,7 +27,7 @@ BEGIN
            PRINT 'Only team leaders can edit users to tasks';
      END;
 
-     IF @currentSection = section
+     IF @currentSection = @section
      BEGIN
 	    UPDATE Tasks
 	    SET taskPosition = taskPosition - 1

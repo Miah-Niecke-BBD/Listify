@@ -21,7 +21,7 @@ BEGIN
     UPDATE Teams
     SET 
         teamName = COALESCE(@newTeamName, teamName),  
-        updateAt = GETDATE()  
+        updatedAt = GETDATE()  
     WHERE teamID = @teamID;
 
     COMMIT TRANSACTION;

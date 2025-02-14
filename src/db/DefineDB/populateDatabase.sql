@@ -88,40 +88,40 @@ VALUES
 
 INSERT INTO [Sections] ([projectID], [sectionName], [sectionPosition], [createdAt], [updatedAt])
 VALUES 
-  (1, 'To Do', 1, GETDATE(), GETDATE()),
-  (2, 'To Do', 1, GETDATE(), GETDATE()),
-  (3, 'To Do', 1, GETDATE(), GETDATE()),
-  (4, 'To Do', 1, GETDATE(), GETDATE()),
-  (5, 'To Do', 1, GETDATE(), GETDATE()),
-  (6, 'To Do', 1, GETDATE(), GETDATE()),
-  (7, 'To Do', 1, GETDATE(), GETDATE()),
-  (8, 'To Do', 1, GETDATE(), GETDATE()),
-  (9, 'To Do', 1, GETDATE(), GETDATE()),
-  (10, 'To Do', 1, GETDATE(), GETDATE()),
-  (11, 'To Do', 1, GETDATE(), GETDATE()),
-  (12, 'To Do', 1, GETDATE(), GETDATE()),
-  (13, 'To Do', 1, GETDATE(), GETDATE()),
-  (14, 'To Do', 1, GETDATE(), GETDATE()),
-  (15, 'To Do', 1, GETDATE(), GETDATE());
+  (1, 'To Do', 0, GETDATE(), GETDATE()),
+  (2, 'To Do', 0, GETDATE(), GETDATE()),
+  (3, 'To Do', 0, GETDATE(), GETDATE()),
+  (4, 'To Do', 0, GETDATE(), GETDATE()),
+  (5, 'To Do', 0, GETDATE(), GETDATE()),
+  (6, 'To Do', 0, GETDATE(), GETDATE()),
+  (7, 'To Do', 0, GETDATE(), GETDATE()),
+  (8, 'To Do', 0, GETDATE(), GETDATE()),
+  (9, 'To Do', 0, GETDATE(), GETDATE()),
+  (10, 'To Do', 0, GETDATE(), GETDATE()),
+  (11, 'To Do', 0, GETDATE(), GETDATE()),
+  (12, 'To Do', 0, GETDATE(), GETDATE()),
+  (13, 'To Do', 0, GETDATE(), GETDATE()),
+  (14, 'To Do', 0, GETDATE(), GETDATE()),
+  (15, 'To Do', 0, GETDATE(), GETDATE());
 
 
 INSERT INTO [Tasks] ([sectionID], [taskName], [taskDescription], [taskPriority], [taskPosition], [createdAt], [updatedAt])
 VALUES
-  (1, 'Buy groceries', 'Buy milk, eggs, and bread', 0, 1, GETDATE(), GETDATE()),
-  (2, 'Clean the house', 'Vacuum and mop the floors', 0, 1, GETDATE(), GETDATE()),
-  (3, 'Fix the car', 'Take the car to the mechanic', 0, 1, GETDATE(), GETDATE()),
-  (4, 'Work on website', 'Complete homepage layout', 0, 1, GETDATE(), GETDATE()),
-  (5, 'Plan vacation', 'Book tickets for the trip', 0, 1, GETDATE(), GETDATE()),
-  (6, 'Organize closet', 'Sort through clothes', 0, 1, GETDATE(), GETDATE()),
-  (7, 'Prepare meeting notes', 'Prepare agenda for the meeting', 0, 1, GETDATE(), GETDATE()),
-  (8, 'Update resume', 'Make edits to resume and LinkedIn profile', 0, 1, GETDATE(), GETDATE()),
-  (9, 'Read book', 'Finish reading the book', 0, 1, GETDATE(), GETDATE()),
-  (10, 'Complete project', 'Work on the final presentation', 0, 1, GETDATE(), GETDATE()),
-  (11, 'Write blog post', 'Publish a new article on the blog', 0, 1, GETDATE(), GETDATE()),
-  (12, 'Buy new laptop', 'Check reviews and prices', 0, 1, GETDATE(), GETDATE()),
-  (13, 'Study for exam', 'Prepare notes for the exam', 0, 1, GETDATE(), GETDATE()),
-  (14, 'Declutter workspace', 'Clear the desk and organize files', 0, 1, GETDATE(), GETDATE()),
-  (15, 'Bake cookies', 'Make chocolate chip cookies', 0, 1, GETDATE(), GETDATE());
+  (1, 'Buy groceries', 'Buy milk, eggs, and bread', 0, 0, GETDATE(), GETDATE()),
+  (2, 'Clean the house', 'Vacuum and mop the floors', 0, 0, GETDATE(), GETDATE()),
+  (3, 'Fix the car', 'Take the car to the mechanic', 0, 0, GETDATE(), GETDATE()),
+  (4, 'Work on website', 'Complete homepage layout', 0, 0, GETDATE(), GETDATE()),
+  (5, 'Plan vacation', 'Book tickets for the trip', 0, 0, GETDATE(), GETDATE()),
+  (6, 'Organize closet', 'Sort through clothes', 0, 0, GETDATE(), GETDATE()),
+  (7, 'Prepare meeting notes', 'Prepare agenda for the meeting', 0, 0, GETDATE(), GETDATE()),
+  (8, 'Update resume', 'Make edits to resume and LinkedIn profile', 0, 0, GETDATE(), GETDATE()),
+  (9, 'Read book', 'Finish reading the book', 0, 0, GETDATE(), GETDATE()),
+  (10, 'Complete project', 'Work on the final presentation', 0, 0, GETDATE(), GETDATE()),
+  (11, 'Write blog post', 'Publish a new article on the blog', 0, 0, GETDATE(), GETDATE()),
+  (12, 'Buy new laptop', 'Check reviews and prices', 0, 0, GETDATE(), GETDATE()),
+  (13, 'Study for exam', 'Prepare notes for the exam', 0, 0, GETDATE(), GETDATE()),
+  (14, 'Declutter workspace', 'Clear the desk and organize files', 0, 0, GETDATE(), GETDATE()),
+  (15, 'Bake cookies', 'Make chocolate chip cookies', 0, 0, GETDATE(), GETDATE());
 
 
 INSERT INTO [TeamMembers] ([userID], [teamID], [isTeamLeader])

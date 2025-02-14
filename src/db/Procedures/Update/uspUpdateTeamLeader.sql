@@ -1,8 +1,8 @@
 GO
 CREATE PROCEDURE uspUpdateTeamLeader
-	@teamLeaderID
-	@teamID
-	@newTeamLeaderID
+	@teamLeaderID INT,
+	@teamID INT,
+	@newTeamLeaderID INT
 AS
 BEGIN 
 	BEGIN TRANSACTION
