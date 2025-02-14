@@ -19,6 +19,7 @@ BEGIN
     BEGIN
         PRINT 'Project does not exist.';
         ROLLBACK;
+        RETURN
     END
 
     SELECT @isTeamLeader = isTeamLeader
@@ -29,6 +30,7 @@ BEGIN
     BEGIN
         PRINT 'Only team leaders can update projects.';
         ROLLBACK;
+        RETURN
     END
 
     UPDATE Projects

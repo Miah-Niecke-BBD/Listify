@@ -12,8 +12,9 @@ BEGIN
 		SELECT 1 FROM TeamMembers WHERE userID = @teamLeaderID AND TeamID = @teamID AND isTeamLeader = 1
 	)
 	 BEGIN
-		   ROLLBACK;
            PRINT'Only team leaders can reassign a team leader';
+		   ROLLBACK;
+		   RETURN 
      END;
 
 	 UPDATE TeamMembers 
