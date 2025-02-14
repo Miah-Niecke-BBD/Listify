@@ -17,6 +17,7 @@ BEGIN
         IF @taskPosition < 0
         BEGIN
             PRINT 'Task position cannot be negative';
+            RETURN;
         END;
 
         SELECT @teamID = teamID FROM Projects WHERE projectID = @projectID;
@@ -27,6 +28,7 @@ BEGIN
         )
         BEGIN
             PRINT 'Only team leaders can create tasks';
+            RETURN;
         END;
 
         IF NOT EXISTS (
@@ -35,17 +37,24 @@ BEGIN
         )
         BEGIN
             PRINT 'The section does not exist in this project';
+            RETURN;
         END;
 
         SELECT @maxTaskPosition = MAX(taskPosition) FROM Tasks WHERE sectionID = @sectionID;
 
-        IF @taskPosition <= @maxTaskPosition
+        IF @taskPosition > @maxTaskPosition
         BEGIN
+            PRINT 'The input position exceeds the current maximum task position. Setting to next available position.';
+            SET @taskPosition = @maxTaskPosition + 1;
+        END
+        ELSE IF EXISTS (SELECT 1 FROM Tasks WHERE sectionID = @sectionID AND taskPosition = @taskPosition)
+        BEGIN
+            PRINT 'The input position is already taken. Setting to next available position.';
             SET @taskPosition = @maxTaskPosition + 1;
         END
 
         INSERT INTO Tasks (sectionID, taskName, taskDescription, taskPriority, taskPosition, dueDate,  createdAt)
-        VALUES (@sectionID, @taskName, @taskDescription, @taskPriority, @taskPosition, SYSDATETIME(),  SYSDATETIME());
+        VALUES (@sectionID, @taskName, @taskDescription, @taskPriority, @taskPosition, SYSDATETIME(), SYSDATETIME());
 
         COMMIT;
     END TRY
