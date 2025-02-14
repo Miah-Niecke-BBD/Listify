@@ -1,5 +1,5 @@
 CREATE PROCEDURE uspUpdateTaskPosition
-	@userID INT,
+	@teamLeaderID INT,
 	@taskID INT,
 	@newTaskPosition INT,
     @section INT
@@ -21,10 +21,10 @@ BEGIN
     WHERE t.taskID = @taskID;
 
 	IF NOT EXISTS (
-		SELECT 1 FROM TeamMembers WHERE userID = @userID AND TeamID = @teamID AND isTeamLeader = 1
+		SELECT 1 FROM TeamMembers WHERE userID = @teamLeaderID AND TeamID = @teamID AND isTeamLeader = 1
 	)
 	 BEGIN
-           THROW 50006, 'Only team leaders can edit users to tasks', 1;
+           PRINT 'Only team leaders can edit users to tasks';
      END;
 
      IF @currentSection = section

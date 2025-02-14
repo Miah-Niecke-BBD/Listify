@@ -16,14 +16,14 @@ BEGIN
 		JOIN Sections s ON s.sectionID = t.sectionID
 		JOIN Projects p ON p.projectID = s.projectID
 		JOIN Teams tm ON tm.teamID = p.teamID
-		JOIN TeamMembers tms ON tms.teamID = tm.teamID
+		JOIN TeamMembers tms ON tms.teamID = tm.teamID AND userID = @teamLeaderID
 		WHERE t.taskID = @taskID;
 	
  
 		IF @isTeamLeader IS NULL
 		BEGIN
 			ROLLBACK;
-			THROW 50001, 'Only team leaders can remove tasks from projects.', 1;
+			PRINT'Only team leaders can remove tasks from projects.';
 		END
 	
 		DELETE FROM Tasks

@@ -1,6 +1,6 @@
 GO
 CREATE PROCEDURE uspCreateTask
-    @userID INT,              
+    @teamLeaderID INT,              
     @projectID INT,           
     @sectionID INT,           
     @taskName VARCHAR(100),
@@ -16,25 +16,17 @@ BEGIN
 
         IF @taskPosition < 0
         BEGIN
-            THROW 50010, 'Task position cannot be negative', 1;
+            PRINT 'Task position cannot be negative';
         END;
 
         SELECT @teamID = teamID FROM Projects WHERE projectID = @projectID;
 
         IF NOT EXISTS (
             SELECT 1 FROM TeamMembers 
-            WHERE userID = @userID AND teamID = @teamID
-        )
-        BEGIN
-            THROW 50008, 'User is not a member of this team', 1;
-        END;
-
-        IF NOT EXISTS (
-            SELECT 1 FROM TeamMembers 
             WHERE userID = @userID AND teamID = @teamID AND isTeamLeader = 1
         )
         BEGIN
-            THROW 50006, 'Only team leaders can create tasks', 1;
+            PRINT 'Only team leaders can create tasks';
         END;
 
         IF NOT EXISTS (
@@ -42,7 +34,7 @@ BEGIN
             WHERE projectID = @projectID AND sectionID = @sectionID
         )
         BEGIN
-            THROW 50009, 'The section does not exist in this project', 1;
+            PRINT 'The section does not exist in this project';
         END;
 
         SELECT @maxTaskPosition = MAX(taskPosition) FROM Tasks WHERE sectionID = @sectionID;

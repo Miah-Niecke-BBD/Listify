@@ -1,6 +1,6 @@
 GO
 CREATE PROCEDURE uspAssignTaskDependency
-    @userID INT,              
+    @teamLeaderID INT,              
     @taskID INT,              
     @dependentTaskID INT      
 AS
@@ -21,10 +21,10 @@ BEGIN
 
         IF NOT EXISTS (
             SELECT 1 FROM TeamMembers 
-            WHERE userID = @userID AND teamID = @teamID AND isTeamLeader = 1
+            WHERE userID = @teamLeaderID AND teamID = @teamID AND isTeamLeader = 1
         )
         BEGIN
-            THROW 50006, 'Only team leaders can assign dependencies', 1;
+            PRINT 'Only team leaders can assign dependencies';
         END;
 
         SELECT @dependentTaskProjectID = p.projectID
@@ -35,12 +35,12 @@ BEGIN
 
         IF @projectID <> @dependentTaskProjectID
         BEGIN
-            THROW 50010, 'The dependent task does not belong to the same project', 1;
+            PRINT 'The dependent task does not belong to the same project';
         END;
 
         IF @taskID = @dependentTaskID
         BEGIN
-            THROW 50011, 'A task cannot depend on itself', 1;
+            PRINT 'A task cannot depend on itself';
         END;
 
         IF EXISTS (
@@ -48,7 +48,7 @@ BEGIN
             WHERE taskID = @taskID AND dependentTaskID = @dependentTaskID
         )
         BEGIN
-            THROW 50013, 'Dependency already exists', 1;
+            PRINT 'Dependency already exists';
         END;
 
         IF EXISTS (
@@ -57,7 +57,7 @@ BEGIN
             WHERE td.taskID = @dependentTaskID AND rd.dependentTaskID = @taskID
         )
         BEGIN
-            THROW 50012, 'Circular dependency detected', 1;
+            PRINT 'Circular dependency detected';
         END;
 
         INSERT INTO TaskDependencies (taskID, dependentTaskID)

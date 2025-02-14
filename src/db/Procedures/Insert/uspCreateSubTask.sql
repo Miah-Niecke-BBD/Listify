@@ -1,6 +1,6 @@
 GO
 CREATE PROCEDURE uspCreateSubTask
-    @userID INT,
+    @teamLeaderID INT,
     @parentTaskID INT,  
     @taskName VARCHAR(100),
     @taskDescription VARCHAR(500),
@@ -15,17 +15,17 @@ BEGIN
         SELECT @isTeamLeader = isTeamLeader, 
                @teamID = tm.teamID
         FROM TeamMembers tm
-        WHERE tm.userID = @userID AND tm.isTeamLeader = 1;
+        WHERE tm.userID = @teamLeaderID AND tm.isTeamLeader = 1;
 
         IF @isTeamLeader IS NULL
         BEGIN
-            THROW 50001, 'Only team leaders can create subtasks.', 1;
+            PRINT 'Only team leaders can create subtasks.';
         END
 
 
         IF NOT EXISTS (SELECT 1 FROM Tasks WHERE taskID = @parentTaskID AND parentTaskID IS NULL)
         BEGIN
-            THROW 50002, 'Parent task does not exist or is already a subtask.', 1;
+            PRINT  'Parent task does not exist or is already a subtask.';
         END
 
        
