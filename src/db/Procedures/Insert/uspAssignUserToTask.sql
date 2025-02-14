@@ -22,6 +22,7 @@ BEGIN
         IF @taskSectionID IS NULL
         BEGIN
             PRINT'Task does not exist in the given section and project.';
+            ROLLBACK;
         END;
 
         IF NOT EXISTS (
@@ -29,6 +30,7 @@ BEGIN
         )
         BEGIN
             PRINT 'Only team leaders can assign users to tasks';
+            ROLLBACK;
         END;
 
         IF NOT EXISTS (
@@ -36,6 +38,7 @@ BEGIN
         )
         BEGIN
             PRINT 'User is not a member of this team';
+            ROLLBACK;
         END;
 
         IF NOT EXISTS (
@@ -43,6 +46,7 @@ BEGIN
         )
         BEGIN
             PRINT 'User is not assigned to this project';
+            ROLLBACK;
         END;
 
         IF EXISTS (
@@ -50,6 +54,7 @@ BEGIN
         )
         BEGIN
             PRINT 'User is already assigned to this task';
+            ROLLBACK;
         END;
 
         INSERT INTO TaskAssignees (userID, taskID)

@@ -15,10 +15,10 @@ BEGIN
     FROM Sections
     WHERE sectionID = @sectionID;
 
-    -- Check if the project exists
     IF @projectID IS NULL
     BEGIN
         PRINT 'Section does not exist.';
+        ROLLBACK;
     END
 
     SELECT @teamID = teamID
@@ -32,6 +32,7 @@ BEGIN
     IF @isTeamLeader <> 1
     BEGIN
         PRINT 'Only team leaders can update sections.';
+        ROLLBACK;
     END
 
     UPDATE Sections

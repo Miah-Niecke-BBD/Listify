@@ -22,6 +22,7 @@ BEGIN
 	)
 	 BEGIN
            PRINT 'Only team leaders can delete sections';
+		   ROLLBACK;
      END;
 
 

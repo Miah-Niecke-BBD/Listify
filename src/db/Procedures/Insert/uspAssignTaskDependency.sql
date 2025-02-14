@@ -25,6 +25,7 @@ BEGIN
         )
         BEGIN
             PRINT 'Only team leaders can assign dependencies';
+            ROLLBACK;
         END;
 
         SELECT @dependentTaskProjectID = p.projectID
@@ -36,11 +37,13 @@ BEGIN
         IF @projectID <> @dependentTaskProjectID
         BEGIN
             PRINT 'The dependent task does not belong to the same project';
+            ROLLBACK;
         END;
 
         IF @taskID = @dependentTaskID
         BEGIN
             PRINT 'A task cannot depend on itself';
+            ROLLBACK;
         END;
 
         IF EXISTS (
@@ -49,6 +52,7 @@ BEGIN
         )
         BEGIN
             PRINT 'Dependency already exists';
+            ROLLBACK;
         END;
 
         IF EXISTS (
@@ -58,6 +62,7 @@ BEGIN
         )
         BEGIN
             PRINT 'Circular dependency detected';
+            ROLLBACK;
         END;
 
         INSERT INTO TaskDependencies (taskID, dependentTaskID)

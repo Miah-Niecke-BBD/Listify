@@ -22,6 +22,7 @@ BEGIN
 	)
 	 BEGIN
            PRINT 'Only team leaders can delete users to tasks';
+		   ROLLBACK;
      END;
 
 	 DELETE FROM TaskAssignees
