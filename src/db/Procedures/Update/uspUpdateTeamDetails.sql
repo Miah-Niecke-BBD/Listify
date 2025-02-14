@@ -17,6 +17,7 @@ BEGIN
     BEGIN
         PRINT 'Only team leaders can update teams.';
         ROLLBACK;
+        RETURN
     END
 
     UPDATE Teams

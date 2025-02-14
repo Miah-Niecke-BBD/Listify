@@ -23,16 +23,18 @@ BEGIN
 		SELECT 1 FROM TeamMembers WHERE userID = @teamLeaderID AND TeamID = @teamID AND isTeamLeader = 1
 	)
 	 BEGIN
-		   ROLLBACK;
            PRINT 'Only team leaders can edit users to tasks';
+		   ROLLBACK;
+		   RETURN
      END;
  
 	 IF EXISTS (
 		SELECT 1 FROM Sections WHERE sectionID = @sectionID AND projectID != @currentProjectID
 	 )
 	 BEGIN
-			ROLLBACK;
             PRINT 'Cannot move task to a section in a different project.';
+			ROLLBACK;
+			RETURN
      END
  
 	  SELECT 

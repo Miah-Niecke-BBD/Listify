@@ -19,6 +19,7 @@ BEGIN
     BEGIN
         PRINT 'Section does not exist.';
         ROLLBACK;
+        RETURN
     END
 
     SELECT @teamID = teamID
@@ -33,6 +34,7 @@ BEGIN
     BEGIN
         PRINT 'Only team leaders can update sections.';
         ROLLBACK;
+        RETURN
     END
 
     UPDATE Sections

@@ -1,4 +1,3 @@
-GO
 CREATE PROCEDURE uspUpdateTaskDetails
     @taskID INT,
     @teamLeaderID INT,
@@ -36,7 +35,15 @@ BEGIN
     BEGIN
         PRINT 'Only team leaders can update tasks.';
         ROLLBACK;
+        RETURN
     END
+
+	IF @newTaskPriority < 0 OR @newTaskPriority > 3
+	BEGIN
+		ROLLBACK;
+		PRINT 'Task priority can only have values between 0 and 3'
+		RETURN
+	END
 
     UPDATE Tasks
     SET 

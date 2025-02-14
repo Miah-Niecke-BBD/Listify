@@ -4,7 +4,7 @@ CREATE PROCEDURE uspUpdateSectionPosition
 	@newSectionPosition INT
 AS
 BEGIN 
-	DECLARE @teamID INT, @projectID INT, @currentPosition INT;
+	DECLARE @teamID INT, @projectID INT, @currentPosition INT, @maxTaskPosition INT, @minTaskPosition INT;
 	BEGIN TRANSACTION
 	BEGIN TRY
 
@@ -23,7 +23,24 @@ BEGIN
 	 BEGIN
            PRINT 'Only team leaders can delete sections';
 		   ROLLBACK;
+		   RETURN
      END;
+
+	 SELECT 
+            @maxTaskPosition = MAX(sectionPosition),
+            @minTaskPosition = MIN(sectionPosition)
+        FROM Sections
+        WHERE projectID = @projectID
+ 
+        
+        IF @newSectionPosition < 0
+        BEGIN
+            SET @newSectionPosition = 0;
+        END
+        ELSE IF @newSectionPosition > @maxTaskPosition
+        BEGIN
+            SET @newSectionPosition = @maxTaskPosition; 
+        END
 
 
 	 UPDATE Sections
