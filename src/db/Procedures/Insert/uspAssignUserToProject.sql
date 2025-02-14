@@ -18,6 +18,7 @@ BEGIN
         )
         BEGIN
             PRINT 'Only team leaders can assign users to a project';
+            RETURN;
         END;
 
         IF NOT EXISTS (
@@ -26,6 +27,7 @@ BEGIN
         )
         BEGIN
             PRINT 'User is not a member of this team';
+            RETURN;
         END;
 
         INSERT INTO ProjectAssignees (userID, projectID)
