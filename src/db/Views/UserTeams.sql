@@ -5,7 +5,7 @@ SELECT
 	t.teamID,
 	t.teamName,
 	t.createdAt AS teamCreatedAt,
-	t.updateAt AS teamUpdatedAt,
+	t.updatedAt AS teamUpdatedAt,
 	tm.teamMemberID,
 	tm.isTeamLeader
 FROM 
