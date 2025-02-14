@@ -19,7 +19,7 @@ BEGIN
         IF @isTeamLeader IS NULL
         BEGIN
 			ROLLBACK;
-            THROW 50001, 'Only team leaders can remove user from the project.', 1;
+            PRINT 'Only team leaders can remove user from the project.';
         END
 
 		DELETE FROM ProjectAssignees 

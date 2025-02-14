@@ -1,6 +1,6 @@
 GO
 CREATE PROCEDURE uspCreateSection
-    @userID INT,              
+    @teamLeaderID INT,              
     @projectID INT,           
     @sectionName VARCHAR(100), 
     @sectionPosition TINYINT   
@@ -13,26 +13,19 @@ BEGIN
 
         IF @sectionPosition < 0
         BEGIN
-            THROW 50010, 'Section position cannot be negative', 1;
+            PRINT'Section position cannot be negative', 1;
         END;
 
         SELECT @teamID = teamID FROM Projects WHERE projectID = @projectID;
 
         IF NOT EXISTS (
             SELECT 1 FROM TeamMembers 
-            WHERE userID = @userID AND teamID = @teamID AND isTeamLeader = 1
+            WHERE userID = @teamLeaderID AND teamID = @teamID AND isTeamLeader = 1
         )
         BEGIN
-            THROW 50006, 'Only team leaders can create sections', 1;
+            PRINT 'Only team leaders can create sections';
         END;
 
-        IF NOT EXISTS (
-            SELECT 1 FROM TeamMembers 
-            WHERE userID = @userID AND teamID = @teamID
-        )
-        BEGIN
-            THROW 50007, 'User is not a member of this team', 1;
-        END;
 
         SELECT @maxSectionPosition = MAX(sectionPosition) FROM Sections WHERE projectID = @projectID;
 

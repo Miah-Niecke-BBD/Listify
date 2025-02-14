@@ -1,6 +1,6 @@
 GO
 CREATE PROCEDURE uspAssignUserToProject
-    @assignerID INT, 
+    @teamLeaderID INT, 
     @userID INT,
     @projectID INT
 AS
@@ -14,10 +14,10 @@ BEGIN
 
         IF NOT EXISTS (
             SELECT 1 FROM TeamMembers 
-            WHERE userID = @assignerID AND teamID = @teamID AND isTeamLeader = 1
+            WHERE userID = @teamLeaderID AND teamID = @teamID AND isTeamLeader = 1
         )
         BEGIN
-            THROW 50004, 'Only team leaders can assign users to a project', 1;
+            PRINT 'Only team leaders can assign users to a project';
         END;
 
         IF NOT EXISTS (
@@ -25,7 +25,7 @@ BEGIN
             WHERE userID = @userID AND teamID = @teamID
         )
         BEGIN
-            THROW 50005, 'User is not a member of this team', 1;
+            PRINT 'User is not a member of this team';
         END;
 
         INSERT INTO ProjectAssignees (userID, projectID)

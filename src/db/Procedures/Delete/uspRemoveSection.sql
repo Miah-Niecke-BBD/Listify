@@ -1,6 +1,6 @@
 GO
 CREATE PROCEDURE uspRemoveSection
-	@userID INT,
+	@teamLeader INT,
 	@sectionID INT
 AS
 BEGIN
@@ -18,10 +18,10 @@ BEGIN
     WHERE s.sectionID = @sectionID
 
 	IF NOT EXISTS (
-		SELECT 1 FROM TeamMembers WHERE userID = @userID AND TeamID = @teamID AND isTeamLeader = 1
+		SELECT 1 FROM TeamMembers WHERE userID = @teamLeader AND TeamID = @teamID AND isTeamLeader = 1
 	)
 	 BEGIN
-           THROW 50006, 'Only team leaders can delete sections', 1;
+           PRINT'Only team leaders can delete sections';
      END;
 
 	 UPDATE Sections

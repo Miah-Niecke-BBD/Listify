@@ -43,7 +43,7 @@ BEGIN
         taskDescription = COALESCE(@newTaskDescription, taskDescription),
         taskPriority = COALESCE(@newTaskPriority, taskPriority),
         dueDate = COALESCE(@newDueDate, dueDate),
-        updatedAt = GETDATE()  -- Always update the updatedAt field
+        updatedAt = GETDATE() 
     WHERE taskID = @taskID;
 
     COMMIT TRANSACTION;
