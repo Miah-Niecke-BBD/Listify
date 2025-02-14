@@ -18,6 +18,7 @@ BEGIN
         BEGIN
             PRINT 'Only team leaders can create projects';
             ROLLBACK;
+            RETURN;
         END;
 
         INSERT INTO Projects (teamID, projectName, projectDescription, createdAt)

@@ -23,6 +23,7 @@ BEGIN
         BEGIN
             PRINT'Task does not exist in the given section and project.';
             ROLLBACK;
+            RETURN;
         END;
 
         IF NOT EXISTS (
@@ -31,6 +32,7 @@ BEGIN
         BEGIN
             PRINT 'Only team leaders can assign users to tasks';
             ROLLBACK;
+            RETURN;
         END;
 
         IF NOT EXISTS (
@@ -39,6 +41,7 @@ BEGIN
         BEGIN
             PRINT 'User is not a member of this team';
             ROLLBACK;
+            RETURN;
         END;
 
         IF NOT EXISTS (
@@ -47,6 +50,7 @@ BEGIN
         BEGIN
             PRINT 'User is not assigned to this project';
             ROLLBACK;
+            RETURN;
         END;
 
         IF EXISTS (
@@ -55,6 +59,7 @@ BEGIN
         BEGIN
             PRINT 'User is already assigned to this task';
             ROLLBACK;
+            RETURN;
         END;
 
         INSERT INTO TaskAssignees (userID, taskID)

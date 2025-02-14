@@ -7,6 +7,7 @@ AS
 BEGIN
     DECLARE @teamID INT, @projectID INT, @dependentTaskProjectID INT;
     DECLARE @teamLeader BIT;
+    DECLARE @currentTaskID INT;
 
     BEGIN TRANSACTION
     BEGIN TRY
@@ -26,6 +27,7 @@ BEGIN
         BEGIN
             PRINT 'Only team leaders can assign dependencies';
             ROLLBACK;
+            RETURN;
         END;
 
         SELECT @dependentTaskProjectID = p.projectID
@@ -38,12 +40,14 @@ BEGIN
         BEGIN
             PRINT 'The dependent task does not belong to the same project';
             ROLLBACK;
+            RETURN;
         END;
 
         IF @taskID = @dependentTaskID
         BEGIN
             PRINT 'A task cannot depend on itself';
             ROLLBACK;
+            RETURN;
         END;
 
         IF EXISTS (
@@ -53,16 +57,19 @@ BEGIN
         BEGIN
             PRINT 'Dependency already exists';
             ROLLBACK;
+            RETURN;
         END;
 
-        IF EXISTS (
-            SELECT 1 FROM TaskDependencies td
-            JOIN TaskDependencies tsd ON td.dependentTaskID = tsd.taskID
-            WHERE td.taskID = @dependentTaskID AND tsd.dependentTaskID = @taskID
+        SET @currentTaskID = @dependentTaskID;
+
+        WHILE EXISTS (
+            SELECT 1 FROM TaskDependencies 
+            WHERE taskID = @currentTaskID AND dependentTaskID = @taskID
         )
         BEGIN
             PRINT 'Circular dependency detected';
             ROLLBACK;
+            RETURN;
         END;
 
         INSERT INTO TaskDependencies (taskID, dependentTaskID)

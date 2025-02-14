@@ -21,6 +21,7 @@ BEGIN
         BEGIN
             PRINT 'Only team leaders can create subtasks.';
             ROLLBACK;
+            RETURN;
         END
 
 
@@ -28,6 +29,7 @@ BEGIN
         BEGIN
             PRINT  'Parent task does not exist or is already a subtask.';
             ROLLBACK;
+            RETURN;
         END
 
        
