@@ -21,45 +21,40 @@ BEGIN
 
         IF @taskSectionID IS NULL
         BEGIN
-            PRINT'Task does not exist in the given section and project.';
             ROLLBACK;
-            RETURN;
+            THROW 50034,'Task does not exist in the given section and project.',1;
         END;
 
         IF NOT EXISTS (
             SELECT 1 FROM TeamMembers WHERE userID = @teamLeaderID AND teamID = @teamID AND isTeamLeader = 1
         )
         BEGIN
-            PRINT 'Only team leaders can assign users to tasks';
             ROLLBACK;
-            RETURN;
+            THROW 50037, 'Only team leaders can assign users to tasks',1;
         END;
 
         IF NOT EXISTS (
             SELECT 1 FROM TeamMembers WHERE userID = @userID AND teamID = @teamID
         )
         BEGIN
-            PRINT 'User is not a member of this team';
             ROLLBACK;
-            RETURN;
+            THROW 50039, 'User is not a member of this team',1;
         END;
 
         IF NOT EXISTS (
             SELECT 1 FROM ProjectAssignees WHERE userID = @userID AND projectID = @projectID
         )
         BEGIN
-            PRINT 'User is not assigned to this project';
             ROLLBACK;
-            RETURN;
+            THROW 50040, 'User is not assigned to this project',1;
         END;
 
         IF EXISTS (
             SELECT 1 FROM TaskAssignees WHERE userID = @userID AND taskID = @taskID
         )
         BEGIN
-            PRINT 'User is already assigned to this task';
             ROLLBACK;
-            RETURN;
+            THROW  50041,'User is already assigned to this task',1;
         END;
 
         INSERT INTO TaskAssignees (userID, taskID)

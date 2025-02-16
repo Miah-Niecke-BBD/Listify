@@ -16,9 +16,8 @@ BEGIN
             WHERE userID = @teamLeaderID AND teamID = @teamID AND isTeamLeader = 1
         )
         BEGIN
-            PRINT 'Only team leaders can create projects';
             ROLLBACK;
-            RETURN;
+            THROW 50042, 'Only team leaders can create projects',1;
         END;
 
         INSERT INTO Projects (teamID, projectName, projectDescription, createdAt)

@@ -17,9 +17,8 @@ BEGIN
 
     IF @teamID IS NULL
     BEGIN
-        PRINT 'Project does not exist.';
         ROLLBACK;
-        RETURN
+        THROW 50062, 'Project does not exist.',1;
     END
 
     SELECT @isTeamLeader = isTeamLeader
@@ -28,9 +27,8 @@ BEGIN
 
     IF @isTeamLeader <> 1
     BEGIN
-        PRINT 'Only team leaders can update projects.';
         ROLLBACK;
-        RETURN
+        THROW 50067, 'Only team leaders can update projects.',1;
     END
 
     UPDATE Projects

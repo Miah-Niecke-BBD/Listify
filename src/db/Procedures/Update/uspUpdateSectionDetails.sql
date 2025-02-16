@@ -17,9 +17,8 @@ BEGIN
 
     IF @projectID IS NULL
     BEGIN
-        PRINT 'Section does not exist.';
         ROLLBACK;
-        RETURN
+        THROW 50070, 'Section does not exist.',1;
     END
 
     SELECT @teamID = teamID
@@ -32,9 +31,8 @@ BEGIN
 
     IF @isTeamLeader <> 1
     BEGIN
-        PRINT 'Only team leaders can update sections.';
         ROLLBACK;
-        RETURN
+        THROW 50072, 'Only team leaders can update sections.',1;
     END
 
     UPDATE Sections

@@ -19,16 +19,15 @@
 
 			IF @isTeamLeader IS NULL
 			BEGIN
-				PRINT 'Only team leaders can create subtasks.';
 				ROLLBACK;
+				THROW 50053, 'Only team leaders can create subtasks.',1;
             RETURN;
         END
 
         IF NOT EXISTS (SELECT 1 FROM Tasks WHERE taskID = @parentTaskID AND parentTaskID IS NULL)
         BEGIN
-            PRINT  'Parent task does not exist or is already a subtask.';
-            ROLLBACK;
-            RETURN;
+			ROLLBACK;
+            THROW 50053,  'Parent task does not exist or is already a subtask.',1;
         END
 
         SELECT @taskPosition = ISNULL(MAX(taskPosition), 0) + 1

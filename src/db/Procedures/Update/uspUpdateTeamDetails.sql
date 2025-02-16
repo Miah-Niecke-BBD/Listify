@@ -15,9 +15,8 @@ BEGIN
 
     IF @isTeamLeader <> 1
     BEGIN
-        PRINT 'Only team leaders can update teams.';
         ROLLBACK;
-        RETURN
+        THROW 50086, 'Only team leaders can update teams.',1;
     END
 
     UPDATE Teams

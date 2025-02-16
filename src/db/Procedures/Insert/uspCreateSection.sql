@@ -13,9 +13,8 @@ BEGIN
 
         IF @sectionPosition < 0
         BEGIN
-            PRINT 'Section position cannot be negative';
             ROLLBACK;
-            RETURN;
+            THROW 50047, 'Section position cannot be negative',1;
         END;
 
         SELECT @teamID = teamID FROM Projects WHERE projectID = @projectID;
@@ -25,9 +24,8 @@ BEGIN
             WHERE userID = @teamLeaderID AND teamID = @teamID AND isTeamLeader = 1
         )
         BEGIN
-            PRINT 'Only team leaders can create sections';
-           ROLLBACK;
-           RETURN;
+            ROLLBACK;
+            THROW 50049, 'Only team leaders can create sections',1;
         END;
 
         SELECT @maxSectionPosition = MAX(sectionPosition) FROM Sections WHERE projectID = @projectID;
@@ -39,7 +37,8 @@ BEGIN
         END
         ELSE
         BEGIN
-            PRINT 'Setting to input position.';
+            ROLLBACK;
+            THROW 50050, 'Setting to input position.',1;
         END
 
         INSERT INTO Sections (projectID, sectionName, sectionPosition, createdAt)
