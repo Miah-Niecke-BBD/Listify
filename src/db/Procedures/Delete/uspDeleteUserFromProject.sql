@@ -1,5 +1,5 @@
 GO
-CREATE PROCEDURE uspRemoveUserFromProjects
+CREATE PROCEDURE uspDeleteUserFromProjects
 @userID INT,
 @projectID INT,
 @teamLeaderID INT
@@ -20,6 +20,7 @@ BEGIN
         BEGIN
 			ROLLBACK;
             PRINT 'Only team leaders can remove user from the project.';
+			RETURN;
         END
 
 		DELETE FROM ProjectAssignees 
