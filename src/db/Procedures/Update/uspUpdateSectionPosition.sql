@@ -21,9 +21,8 @@ BEGIN
 		SELECT 1 FROM TeamMembers WHERE userID = @teamLeaderID AND TeamID = @teamID AND isTeamLeader = 1
 	)
 	 BEGIN
-           PRINT 'Only team leaders can delete sections';
-		   ROLLBACK;
-		   RETURN
+	 		ROLLBACK;
+           THROW 50078, 'Only team leaders can delete sections',1;
      END;
 
 	 SELECT 

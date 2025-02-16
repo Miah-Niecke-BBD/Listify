@@ -14,18 +14,14 @@ BEGIN
 
         IF @isTeamLeader IS NULL
         BEGIN
-            PRINT'Only team leader can remove user.';
-			ROLLBACK;
-			RETURN;
+            THROW 50016,'Only team leader can remove user.',1;
         END
 
 		IF NOT EXISTS (
             SELECT 1 FROM TeamMembers WHERE userID = @userID AND teamID =@teamID
         )
 		BEGIN
-            PRINT 'User is not a part of the team';
-            ROLLBACK;
-            RETURN;
+            THROW 50018, 'User is not a part of the team',1;
         END;
 
 

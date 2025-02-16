@@ -22,9 +22,8 @@ BEGIN
 		SELECT 1 FROM TeamMembers WHERE userID = @teamLeaderID AND TeamID = @teamID AND isTeamLeader = 1
 	)
 	 BEGIN
-           PRINT 'Only team leaders can edit tasks';
-		   ROLLBACK;
-		   RETURN
+			ROLLBACK;
+           THROW 50011, 'Only team leaders can edit tasks',1;
      END;
 
 	 DELETE TaskDependencies

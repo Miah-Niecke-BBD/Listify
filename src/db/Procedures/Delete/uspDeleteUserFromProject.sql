@@ -17,17 +17,15 @@ BEGIN
         IF @isTeamLeader IS NULL
         BEGIN
 			ROLLBACK;
-            PRINT 'Only team leaders can remove user from the project.';
-			RETURN;
+            THROW 50014, 'Only team leaders can remove user from the project.',1;
         END
 
 		IF NOT EXISTS (
             SELECT 1 FROM ProjectAssignees WHERE userID = @userID AND projectID =@projectID
         )
         BEGIN
-            PRINT 'User is not a part of the project';
             ROLLBACK;
-            RETURN;
+            THROW 50015, 'User is not a part of the project',1;
         END;
 
 		DELETE ta

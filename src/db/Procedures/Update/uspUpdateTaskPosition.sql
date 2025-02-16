@@ -32,9 +32,8 @@ BEGIN
 		SELECT 1 FROM Sections WHERE sectionID = @sectionID AND projectID != @currentProjectID
 	 )
 	 BEGIN
-            PRINT 'Cannot move task to a section in a different project.';
-			ROLLBACK;
-			RETURN
+	 		ROLLBACK;
+            THROW 50084, 'Cannot move task to a section in a different project.',1;
      END
  
 	  SELECT 

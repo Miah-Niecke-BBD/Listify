@@ -11,6 +11,7 @@ BEGIN
 
     BEGIN TRANSACTION
     BEGIN TRY
+        SET DEADLOCK_PRIORITY LOW;
 
         SELECT @teamID = tm.teamID, 
                @projectID = p.projectID
@@ -25,9 +26,9 @@ BEGIN
             WHERE userID = @teamLeaderID AND teamID = @teamID AND isTeamLeader = 1
         )
         BEGIN
-            PRINT 'Only team leaders can assign dependencies';
-            ROLLBACK;
-            RETURN;
+			ROLLBACK;
+            THROW 50020, 'Only team leaders can assign dependencies', 1;
+			
         END;
 
         SELECT @dependentTaskProjectID = p.projectID
@@ -38,16 +39,14 @@ BEGIN
 
         IF @projectID <> @dependentTaskProjectID
         BEGIN
-            PRINT 'The dependent task does not belong to the same project';
-            ROLLBACK;
-            RETURN;
+			ROLLBACK;
+            THROW 50022, 'The dependent task does not belong to the same project', 1;
         END;
 
         IF @taskID = @dependentTaskID
         BEGIN
-            PRINT 'A task cannot depend on itself';
-            ROLLBACK;
-            RETURN;
+			ROLLBACK;
+            THROW 50023, 'A task cannot depend on itself', 1;
         END;
 
         IF EXISTS (
@@ -55,9 +54,8 @@ BEGIN
             WHERE taskID = @taskID AND dependentTaskID = @dependentTaskID
         )
         BEGIN
-            PRINT 'Dependency already exists';
-            ROLLBACK;
-            RETURN;
+			ROLLBACK;
+            THROW 50024, 'Dependency already exists', 1;
         END;
 
         SET @currentTaskID = @dependentTaskID;
@@ -67,9 +65,8 @@ BEGIN
             WHERE taskID = @currentTaskID AND dependentTaskID = @taskID
         )
         BEGIN
-            PRINT 'Circular dependency detected';
-            ROLLBACK;
-            RETURN;
+			ROLLBACK;
+            THROW 50025, 'Circular dependency detected', 1;
         END;
 
         INSERT INTO TaskDependencies (taskID, dependentTaskID)
@@ -79,8 +76,6 @@ BEGIN
     END TRY
     BEGIN CATCH
         ROLLBACK;
-        DECLARE @ErrorMessage NVARCHAR(MAX) = ERROR_MESSAGE();
-        PRINT 'Error occurred: ' + @ErrorMessage;
         THROW;
     END CATCH
 END;

@@ -33,16 +33,13 @@ BEGIN
 
     IF @isTeamLeader <> 1
     BEGIN
-        PRINT 'Only team leaders can update tasks.';
-        ROLLBACK;
-        RETURN
+        THROW 50080, 'Only team leaders can update tasks.',1;
     END
 
 	IF @newTaskPriority < 0 OR @newTaskPriority > 3
 	BEGIN
 		ROLLBACK;
-		PRINT 'Task priority can only have values between 0 and 3'
-		RETURN
+		THROW 50081, 'Task priority can only have values between 0 and 3',1;
 	END
 
     UPDATE Tasks
