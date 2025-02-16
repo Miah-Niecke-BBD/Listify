@@ -1,4 +1,3 @@
-GO
 CREATE PROCEDURE uspRemoveSection
     @teamLeader INT,
     @sectionID INT
@@ -23,7 +22,15 @@ BEGIN
         BEGIN
             PRINT 'Only team leaders can delete sections';
             ROLLBACK;
+            RETURN;
         END;
+
+        DELETE FROM TaskAssignees
+        WHERE taskID IN (
+            SELECT taskID
+            FROM tasks
+            WHERE sectionID = @sectionID
+        );
 
         UPDATE Sections
         SET sectionPosition = sectionPosition - 1
