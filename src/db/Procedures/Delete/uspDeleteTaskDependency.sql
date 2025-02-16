@@ -24,6 +24,7 @@ BEGIN
 	 BEGIN
            PRINT 'Only team leaders can edit tasks';
 		   ROLLBACK;
+		   RETURN
      END;
 
 	 DELETE TaskDependencies
