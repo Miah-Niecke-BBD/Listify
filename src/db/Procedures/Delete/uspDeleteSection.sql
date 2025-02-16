@@ -1,4 +1,4 @@
-CREATE PROCEDURE uspRemoveSection
+CREATE PROCEDURE uspDeleteSection
     @teamLeader INT,
     @sectionID INT
 AS
