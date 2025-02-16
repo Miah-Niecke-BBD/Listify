@@ -75,8 +75,8 @@ CREATE TABLE [TaskAssignees] (
   [taskAssigneeID] INT PRIMARY KEY NOT NULL IDENTITY(1, 1),
   [userID] INT NOT NULL,
   [taskID] INT NOT NULL,
-  FOREIGN KEY ([userID]) REFERENCES [Users] ([userID]) ,
-  FOREIGN KEY ([taskID]) REFERENCES [Tasks] ([taskID])
+  FOREIGN KEY ([userID]) REFERENCES [Users] ([userID]),
+  FOREIGN KEY ([taskID]) REFERENCES [Tasks] ([taskID]) ON DELETE CASCADE
 )
 GO
 
@@ -84,7 +84,7 @@ CREATE TABLE [TaskDependencies] (
   [taskDependencyID] INT PRIMARY KEY NOT NULL IDENTITY(1, 1),
   [taskID] INT NOT NULL UNIQUE,
   [dependentTaskID] INT NOT NULL UNIQUE,
-  FOREIGN KEY ([taskID]) REFERENCES [Tasks] ([taskID]) ,
+  FOREIGN KEY ([taskID]) REFERENCES [Tasks] ([taskID]) ON DELETE CASCADE,
   FOREIGN KEY ([dependentTaskID]) REFERENCES [Tasks] ([taskID]) 
 )
 GO
@@ -93,7 +93,7 @@ CREATE TABLE [ProjectAssignees] (
   [projectAssigneeID] INT PRIMARY KEY NOT NULL IDENTITY(1, 1),
   [userID] INT NOT NULL,
   [projectID] INT NOT NULL,
-  FOREIGN KEY ([projectID]) REFERENCES [Projects] ([projectID]),
+  FOREIGN KEY ([projectID]) REFERENCES [Projects] ([projectID]) ON DELETE CASCADE,
   FOREIGN KEY ([userID]) REFERENCES [Users] ([userID])
 )
 GO
