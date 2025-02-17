@@ -39,13 +39,11 @@ To simulate the addition of a new team, execute the `3-addMarketingTeam.sql` scr
 ### Step 4: Add a Project in the Development Team
 To add a new project under the Development team, execute the `4-addProjectInDevTeam.sql` script. This will create a new project, assign sections to it, and set up tasks under that project.
 
+## Functions
+Functions are located in the `Functions` folder and provide reusable logic for specific operations within the database. These can be used retrieve specific data points without needing to repeatedly write complex queries.
 
 ## Stored Procedures
 All stored procedures used in the ListifyDB are located in the `Procedures` folder. These procedures are designed to simplify common database operations, such as task assignment, project management, and team membership. You can use these stored procedures to interact with the database efficiently.
-
-
-## Functions
-Functions are located in the `Functions` folder and provide reusable logic for specific operations within the database. These can be used retrieve specific data points without needing to repeatedly write complex queries.
 
 ## Views
 Views in the `Views` folder are pre-defined queries that aggregate data for easier access. These views simplify the process of retrieving complex datasets without writing extensive SQL queries.
