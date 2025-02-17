@@ -1,9 +1,9 @@
-INSERT INTO [Teams] ([teamName], [createdAt], [updatedAt])
+INSERT INTO [listify].[Teams] ([teamName], [createdAt], [updatedAt])
 VALUES ('Marketing', '2023-07-01', '2023-07-01');
 
 DECLARE @MarketingTeamID INT = SCOPE_IDENTITY();
 
-INSERT INTO [TeamMembers] ([userID], [teamID], [isTeamLeader])
+INSERT INTO [listify].[TeamMembers] ([userID], [teamID], [isTeamLeader])
 VALUES 
   (11, @MarketingTeamID, 1),  -- Team Leader
   (12, @MarketingTeamID, 0),
@@ -11,12 +11,12 @@ VALUES
   (14, @MarketingTeamID, 0),
   (15, @MarketingTeamID, 0);
 
-INSERT INTO [Projects] ([teamID], [projectName], [projectDescription], [createdAt], [updatedAt])
+INSERT INTO [listify].[Projects] ([teamID], [projectName], [projectDescription], [createdAt], [updatedAt])
 VALUES (@MarketingTeamID, 'Task App Launch', 'Launching the new Task App', '2023-07-01', '2023-07-01');
 
 DECLARE @ProjectID INT = SCOPE_IDENTITY();
 
-INSERT INTO [Sections] ([projectID], [sectionName], [sectionPosition], [createdAt], [updatedAt])
+INSERT INTO [listify].[Sections] ([projectID], [sectionName], [sectionPosition], [createdAt], [updatedAt])
 VALUES 
   (@ProjectID, 'Planning & Research', 0, '2023-07-01', '2023-07-01'),
   (@ProjectID, 'Development', 1, '2023-07-01', '2023-07-01'),
@@ -26,9 +26,9 @@ VALUES
 DECLARE @Section1 INT, @Section2 INT, @Section3 INT, @Section4 INT;
 SELECT @Section1 = MIN(sectionID), @Section2 = MIN(sectionID) + 1, 
        @Section3 = MIN(sectionID) + 2, @Section4 = MIN(sectionID) + 3 
-FROM [Sections] WHERE projectID = @ProjectID;
+FROM [listify].[Sections] WHERE projectID = @ProjectID;
 
-INSERT INTO [Tasks] ([sectionID], [taskName], [taskDescription], [taskPriority], [taskPosition], [dueDate], [createdAt], [updatedAt])
+INSERT INTO [listify].[Tasks] ([sectionID], [taskName], [taskDescription], [taskPriority], [taskPosition], [dueDate], [createdAt], [updatedAt])
 VALUES 
   (@Section1, 'Conduct Market Research', 'Analyze competitor products and user needs', 2, 0, '2023-07-06', '2023-07-01', '2023-07-01'),
   (@Section1, 'Define MVP Features', 'List essential features for first launch', 2, 1, '2023-07-11', '2023-07-01', '2023-07-01'),
@@ -47,7 +47,7 @@ DECLARE @Task1 INT, @Task2 INT, @Task3 INT, @Task4 INT;
 DECLARE @UserID INT = 11;
 
 DECLARE TaskCursor CURSOR FOR
-SELECT taskID FROM [Tasks] WHERE sectionID IN (@Section1, @Section2, @Section3, @Section4);
+SELECT taskID FROM [listify].[Tasks] WHERE sectionID IN (@Section1, @Section2, @Section3, @Section4);
 
 OPEN TaskCursor;
 
@@ -58,12 +58,12 @@ FETCH NEXT FROM TaskCursor INTO @Task4;
 
 WHILE @@FETCH_STATUS = 0
 BEGIN
-    INSERT INTO [TaskAssignees] ([userID], [taskID]) VALUES (@UserID, @Task1);
-    INSERT INTO [TaskAssignees] ([userID], [taskID]) VALUES (@UserID, @Task2);
-    INSERT INTO [TaskAssignees] ([userID], [taskID]) VALUES (@UserID, @Task3);
-    INSERT INTO [TaskAssignees] ([userID], [taskID]) VALUES (@UserID, @Task4);
+    INSERT INTO [listify].[TaskAssignees] ([userID], [taskID]) VALUES (@UserID, @Task1);
+    INSERT INTO [listify].[TaskAssignees] ([userID], [taskID]) VALUES (@UserID, @Task2);
+    INSERT INTO [listify].[TaskAssignees] ([userID], [taskID]) VALUES (@UserID, @Task3);
+    INSERT INTO [listify].[TaskAssignees] ([userID], [taskID]) VALUES (@UserID, @Task4);
 
-    INSERT INTO [TaskDependencies] ([taskID], [dependentTaskID]) VALUES (@Task1, @Task2);
+    INSERT INTO [listify].[TaskDependencies] ([taskID], [dependentTaskID]) VALUES (@Task1, @Task2);
 
     SET @UserID = @UserID + 1;
     FETCH NEXT FROM TaskCursor INTO @Task1;
@@ -75,5 +75,5 @@ END;
 CLOSE TaskCursor;
 DEALLOCATE TaskCursor;
 
-INSERT INTO [ProjectAssignees] ([userID], [projectID])
+INSERT INTO [listify].[ProjectAssignees] ([userID], [projectID])
 VALUES (11, @ProjectID), (12, @ProjectID), (13, @ProjectID), (14, @ProjectID), (15, @ProjectID);
