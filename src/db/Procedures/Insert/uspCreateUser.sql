@@ -1,5 +1,5 @@
 GO
-CREATE PROCEDURE uspCreateUser
+CREATE PROCEDURE listify.uspCreateUser
     @gitHubID VARCHAR(2083)
 AS
 BEGIN
@@ -8,12 +8,12 @@ BEGIN
     BEGIN TRANSACTION
     BEGIN TRY
 
-        INSERT INTO Users (gitHubID, createdAt)
+        INSERT INTO listify.Users (gitHubID, createdAt)
         VALUES (@gitHubID, SYSDATETIME());
 
         SET @userID = SCOPE_IDENTITY();
 
-        EXEC uspCreateMyProjectsTeam @userID, @gitHubID;
+        EXEC listify.uspCreateMyProjectsTeam @userID, @gitHubID;
 
         COMMIT;
     END TRY

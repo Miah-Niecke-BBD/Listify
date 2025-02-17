@@ -1,4 +1,4 @@
-CREATE VIEW vSectionTasks AS
+CREATE VIEW listify.vSectionTasks AS
 SELECT
 	s.sectionID,
 	s.sectionName,
@@ -15,6 +15,6 @@ SELECT
 	t.createdAt AS taskCreatedAt,
     t.updatedAt AS taskUpdatedAt
 FROM
-	Sections s
+	listify.Sections s
 INNER JOIN
-	Tasks t ON t.sectionID = s.sectionID
+	listify.Tasks t ON t.sectionID = s.sectionID

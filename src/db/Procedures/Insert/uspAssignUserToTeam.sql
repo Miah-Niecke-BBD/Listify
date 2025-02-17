@@ -1,5 +1,5 @@
 GO
-CREATE PROCEDURE uspAssignUserToTeam
+CREATE PROCEDURE listify.uspAssignUserToTeam
     @teamLeaderID INT,
     @userID INT,
     @teamID INT
@@ -9,7 +9,7 @@ BEGIN
     BEGIN TRY
 
          IF NOT EXISTS (
-            SELECT 1 FROM TeamMembers 
+            SELECT 1 FROM listify.TeamMembers 
             WHERE userID = @teamLeaderID AND teamID = @teamID AND isTeamLeader = 1
         )
         BEGIN
@@ -18,7 +18,7 @@ BEGIN
         END;
 
         IF EXISTS (
-            SELECT 1 FROM TeamMembers 
+            SELECT 1 FROM listify.TeamMembers 
             WHERE userID = @userID AND teamID = @teamID
         )
         BEGIN
@@ -26,7 +26,7 @@ BEGIN
             THROW 50060, 'User is already a member of this team',1;
         END;
         
-        INSERT INTO TeamMembers (userID, teamID, isTeamLeader)
+        INSERT INTO listify.TeamMembers (userID, teamID, isTeamLeader)
         VALUES (@userID, @teamID, 0);
 
         COMMIT;

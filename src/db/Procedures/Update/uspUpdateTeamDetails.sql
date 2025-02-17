@@ -1,5 +1,5 @@
 GO
-CREATE PROCEDURE uspUpdateTeamDetails
+CREATE PROCEDURE listify.uspUpdateTeamDetails
     @teamID INT,
     @teamLeaderID INT, 
     @newTeamName VARCHAR(100) = NULL
@@ -10,7 +10,7 @@ BEGIN
     DECLARE @isTeamLeader BIT;
 
     SELECT @isTeamLeader = isTeamLeader
-    FROM TeamMembers
+    FROM listify.TeamMembers
     WHERE userID = @teamLeaderID AND teamID = @teamID;
 
     IF @isTeamLeader <> 1
@@ -19,7 +19,7 @@ BEGIN
         THROW 50086, 'Only team leaders can update teams.',1;
     END
 
-    UPDATE Teams
+    UPDATE listify.Teams
     SET 
         teamName = COALESCE(@newTeamName, teamName),  
         updatedAt = GETDATE()  

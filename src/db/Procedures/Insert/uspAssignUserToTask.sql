@@ -1,5 +1,5 @@
 GO
-CREATE PROCEDURE uspAssignUserToTask
+CREATE PROCEDURE listify.uspAssignUserToTask
     @userID INT,          
     @taskID INT,              
     @teamLeaderID INT      
@@ -13,10 +13,10 @@ BEGIN
         SELECT @taskSectionID = t.sectionID, 
                @projectID = p.projectID, 
                @teamID = tm.teamID
-        FROM Tasks t
-        JOIN Sections s ON s.sectionID = t.sectionID
-        JOIN Projects p ON p.projectID = s.projectID
-        JOIN Teams tm ON tm.teamID = p.teamID
+        FROM listify.Tasks t
+        JOIN listify.Sections s ON s.sectionID = t.sectionID
+        JOIN listify.Projects p ON p.projectID = s.projectID
+        JOIN listify.Teams tm ON tm.teamID = p.teamID
         WHERE t.taskID = @taskID;
 
         IF @taskSectionID IS NULL
@@ -26,7 +26,7 @@ BEGIN
         END;
 
         IF NOT EXISTS (
-            SELECT 1 FROM TeamMembers WHERE userID = @teamLeaderID AND teamID = @teamID AND isTeamLeader = 1
+            SELECT 1 FROM listify.TeamMembers WHERE userID = @teamLeaderID AND teamID = @teamID AND isTeamLeader = 1
         )
         BEGIN
             ROLLBACK;
@@ -34,7 +34,7 @@ BEGIN
         END;
 
         IF NOT EXISTS (
-            SELECT 1 FROM TeamMembers WHERE userID = @userID AND teamID = @teamID
+            SELECT 1 FROM listify.TeamMembers WHERE userID = @userID AND teamID = @teamID
         )
         BEGIN
             ROLLBACK;
@@ -42,7 +42,7 @@ BEGIN
         END;
 
         IF NOT EXISTS (
-            SELECT 1 FROM ProjectAssignees WHERE userID = @userID AND projectID = @projectID
+            SELECT 1 FROM listify.ProjectAssignees WHERE userID = @userID AND projectID = @projectID
         )
         BEGIN
             ROLLBACK;
@@ -50,14 +50,14 @@ BEGIN
         END;
 
         IF EXISTS (
-            SELECT 1 FROM TaskAssignees WHERE userID = @userID AND taskID = @taskID
+            SELECT 1 FROM listify.TaskAssignees WHERE userID = @userID AND taskID = @taskID
         )
         BEGIN
             ROLLBACK;
             THROW  50041,'User is already assigned to this task',1;
         END;
 
-        INSERT INTO TaskAssignees (userID, taskID)
+        INSERT INTO listify.TaskAssignees (userID, taskID)
         VALUES (@userID, @taskID);
 
         COMMIT;

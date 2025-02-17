@@ -1,4 +1,4 @@
-CREATE VIEW vUserAssignedTasks AS
+CREATE VIEW listify.vUserAssignedTasks AS
 SELECT 
     u.userID,
     u.gitHubID,
@@ -15,13 +15,13 @@ SELECT
     p.projectID,
     p.projectName
 FROM 
-    Users u
+    listify.Users u
 INNER JOIN 
-    TaskAssignees ta ON u.userID = ta.userID
+    listify.TaskAssignees ta ON u.userID = ta.userID
 INNER JOIN 
-    Tasks t ON ta.taskID = t.taskID
+    listify.Tasks t ON ta.taskID = t.taskID
 INNER JOIN 
-    Sections s ON t.sectionID = s.sectionID
+    listify.Sections s ON t.sectionID = s.sectionID
 INNER JOIN 
-    Projects p ON s.projectID = p.projectID
+    listify.Projects p ON s.projectID = p.projectID
 GO

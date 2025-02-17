@@ -1,4 +1,4 @@
-CREATE VIEW vTeamProjects AS
+CREATE VIEW listify.vTeamProjects AS
 SELECT
 	t.teamID,
 	t.teamName,
@@ -7,6 +7,6 @@ SELECT
 	p.createdAt AS projectCreatedAt,
 	p.updatedAt AS projectUpdatedAt
 FROM 
-	Projects p
+	listify.Projects p
 INNER JOIN
-	Teams t ON p.teamID = t.teamID
+	listify.Teams t ON p.teamID = t.teamID

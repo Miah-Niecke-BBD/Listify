@@ -1,5 +1,5 @@
 GO
-CREATE PROCEDURE uspAssignUserToProject
+CREATE PROCEDURE listify.uspAssignUserToProject
     @teamLeaderID INT, 
     @userID INT,
     @projectID INT
@@ -10,10 +10,10 @@ BEGIN
     BEGIN TRANSACTION
     BEGIN TRY
      
-        SELECT @teamID = teamID FROM Projects WHERE projectID = @projectID;
+        SELECT @teamID = teamID FROM listify.Projects WHERE projectID = @projectID;
 
         IF NOT EXISTS (
-            SELECT 1 FROM TeamMembers 
+            SELECT 1 FROM listify.TeamMembers 
             WHERE userID = @teamLeaderID AND teamID = @teamID AND isTeamLeader = 1
         )
         BEGIN
@@ -21,7 +21,7 @@ BEGIN
         END;
 
         IF NOT EXISTS (
-            SELECT 1 FROM TeamMembers 
+            SELECT 1 FROM listify.TeamMembers 
             WHERE userID = @userID AND teamID = @teamID
         )
         BEGIN
@@ -29,7 +29,7 @@ BEGIN
         END;
 
         IF EXISTS (
-            SELECT 1 FROM ProjectAssignees 
+            SELECT 1 FROM listify.ProjectAssignees 
             WHERE userID = @userID AND projectID = @projectID
         )
         BEGIN
@@ -37,7 +37,7 @@ BEGIN
             THROW 50026, 'User is already assigned to this project',1;
         END;
 
-        INSERT INTO ProjectAssignees (userID, projectID)
+        INSERT INTO listify.ProjectAssignees (userID, projectID)
         VALUES (@userID, @projectID);
 
         COMMIT;

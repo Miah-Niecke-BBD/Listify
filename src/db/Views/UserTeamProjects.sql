@@ -1,4 +1,4 @@
-CREATE VIEW vUserTeamProjects AS
+CREATE VIEW listify.vUserTeamProjects AS
 SELECT
 	u.userID,
 	u.githubID,
@@ -13,11 +13,11 @@ SELECT
 	t.createdAt AS teamCreatedAt,
 	t.updatedAt AS teamUpdatedAt
 FROM
-	Users u
+	listify.Users u
 INNER JOIN
-	ProjectAssignees pa ON u.userID = pa.userID
+	listify.ProjectAssignees pa ON u.userID = pa.userID
 INNER JOIN
-	Projects p ON pa.projectID = p.projectID
+	listify.Projects p ON pa.projectID = p.projectID
 INNER JOIN 
-	Teams t ON p.teamID = t.teamID
+	listify.Teams t ON p.teamID = t.teamID
 GO

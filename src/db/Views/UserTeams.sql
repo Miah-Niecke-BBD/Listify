@@ -1,4 +1,4 @@
-CREATE VIEW vUserTeams AS
+CREATE VIEW listify.vUserTeams AS
 SELECT 
 	u.userID,
     u.gitHubID,
@@ -9,9 +9,9 @@ SELECT
 	tm.teamMemberID,
 	tm.isTeamLeader
 FROM 
-    Users u
+    listify.Users u
 INNER JOIN
-	TeamMembers tm ON u.userID = tm.userID
+	listify.TeamMembers tm ON u.userID = tm.userID
 INNER JOIN
-	Teams t ON tm.teamID = t.teamID
+	listify.Teams t ON tm.teamID = t.teamID
 GO

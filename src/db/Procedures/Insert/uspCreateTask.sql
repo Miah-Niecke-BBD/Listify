@@ -1,5 +1,5 @@
 GO
-CREATE PROCEDURE uspCreateTask
+CREATE PROCEDURE listify.uspCreateTask
     @teamLeaderID INT,              
     @projectID INT,           
     @sectionID INT,           
@@ -20,10 +20,10 @@ BEGIN
             THROW 50055, 'Task position cannot be negative',1;
         END;
 
-        SELECT @teamID = teamID FROM Projects WHERE projectID = @projectID;
+        SELECT @teamID = teamID FROM listify.Projects WHERE projectID = @projectID;
 
         IF NOT EXISTS (
-            SELECT 1 FROM TeamMembers 
+            SELECT 1 FROM listify.TeamMembers 
             WHERE userID = @teamLeaderID AND teamID = @teamID AND isTeamLeader = 1
         )
         BEGIN
@@ -32,7 +32,7 @@ BEGIN
         END;
 
         IF NOT EXISTS (
-            SELECT 1 FROM Sections 
+            SELECT 1 FROM listify.Sections 
             WHERE projectID = @projectID AND sectionID = @sectionID
         )
         BEGIN
@@ -40,20 +40,20 @@ BEGIN
             THROW 50058, 'The section does not exist in this project',1;
         END;
 
-        SELECT @maxTaskPosition = MAX(taskPosition) FROM Tasks WHERE sectionID = @sectionID;
+        SELECT @maxTaskPosition = MAX(taskPosition) FROM listify.Tasks WHERE sectionID = @sectionID;
 
         IF @taskPosition > @maxTaskPosition
         BEGIN
             PRINT 'The input position exceeds the current maximum task position. Setting to next available position.';
             SET @taskPosition = @maxTaskPosition + 1;
         END
-        ELSE IF EXISTS (SELECT 1 FROM Tasks WHERE sectionID = @sectionID AND taskPosition = @taskPosition)
+        ELSE IF EXISTS (SELECT 1 FROM listify.Tasks WHERE sectionID = @sectionID AND taskPosition = @taskPosition)
         BEGIN
             PRINT 'The input position is already taken. Setting to next available position.';
             SET @taskPosition = @maxTaskPosition + 1;
         END
 
-        INSERT INTO Tasks (sectionID, taskName, taskDescription, taskPriority, taskPosition, dueDate,  createdAt)
+        INSERT INTO listify.Tasks (sectionID, taskName, taskDescription, taskPriority, taskPosition, dueDate,  createdAt)
         VALUES (@sectionID, @taskName, @taskDescription, @taskPriority, @taskPosition, SYSDATETIME(), SYSDATETIME());
 
         COMMIT;

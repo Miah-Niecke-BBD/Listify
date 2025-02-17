@@ -1,4 +1,4 @@
-CREATE PROCEDURE uspUpdateTaskPosition
+CREATE PROCEDURE listify.uspUpdateTaskPosition
 	@teamLeaderID INT,
 	@taskID INT,
 	@newTaskPosition INT,
@@ -13,14 +13,14 @@ BEGIN
 		@teamID = tm.teamID,
 		@currentTaskPosition = t.taskPosition,
         @currentSectionID = t.sectionID
-	FROM Tasks t
-	JOIN Sections s ON s.sectionID = t.sectionID
-    JOIN Projects p ON p.projectID = s.projectID
-    JOIN Teams tm ON tm.teamID = p.teamID
+	FROM listify.Tasks t
+	JOIN listify.Sections s ON s.sectionID = t.sectionID
+    JOIN listify.Projects p ON p.projectID = s.projectID
+    JOIN listify.Teams tm ON tm.teamID = p.teamID
     WHERE t.taskID = @taskID;
  
 	IF NOT EXISTS (
-		SELECT 1 FROM TeamMembers WHERE userID = @teamLeaderID AND TeamID = @teamID AND isTeamLeader = 1
+		SELECT 1 FROM listify.TeamMembers WHERE userID = @teamLeaderID AND TeamID = @teamID AND isTeamLeader = 1
 	)
 	 BEGIN
            PRINT 'Only team leaders can edit users to tasks';
@@ -29,7 +29,7 @@ BEGIN
      END;
  
 	 IF EXISTS (
-		SELECT 1 FROM Sections WHERE sectionID = @sectionID AND projectID != @currentProjectID
+		SELECT 1 FROM listify.Sections WHERE sectionID = @sectionID AND projectID != @currentProjectID
 	 )
 	 BEGIN
 	 		ROLLBACK;
@@ -39,7 +39,7 @@ BEGIN
 	  SELECT 
             @maxTaskPosition = MAX(taskPosition),
             @minTaskPosition = MIN(taskPosition)
-        FROM Tasks
+        FROM listify.Tasks
         WHERE sectionID = @sectionID;
  
         
@@ -54,22 +54,22 @@ BEGIN
  
      IF @currentSectionID = @sectionID
      BEGIN
-	    UPDATE Tasks
+	    UPDATE listify.Tasks
 	    SET taskPosition = taskPosition - 1
 	    WHERE taskPosition > @currentTaskPosition AND sectionID = @sectionID
 	END
 	ELSE
 	 BEGIN 
-	    UPDATE Tasks
+	    UPDATE listify.Tasks
 	    SET taskPosition = taskPosition - 1
 	    WHERE taskPosition > @currentTaskPosition AND sectionID = @currentSectionID
 	END
  
-	    UPDATE Tasks
+	    UPDATE listify.Tasks
 	    SET taskPosition = taskPosition + 1
 	    WHERE taskPosition >= @newTaskPosition AND sectionID = @sectionID
  
-	    UPDATE Tasks
+	    UPDATE listify.Tasks
 	    SET 
             taskPosition = @newTaskPosition,
             sectionID = @sectionID

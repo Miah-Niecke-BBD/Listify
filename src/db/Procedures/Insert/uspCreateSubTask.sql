@@ -1,5 +1,5 @@
 	GO
-	CREATE PROCEDURE uspCreateSubTask
+	CREATE PROCEDURE listify.uspCreateSubTask
 		@teamLeaderID INT,
 		@parentTaskID INT,  
 		@taskName VARCHAR(100),
@@ -14,7 +14,7 @@
 
 			SELECT @isTeamLeader = isTeamLeader, 
 				   @teamID = tm.teamID
-			FROM TeamMembers tm
+			FROM listify.TeamMembers tm
 			WHERE tm.userID = @teamLeaderID AND tm.isTeamLeader = 1;
 
 			IF @isTeamLeader IS NULL
@@ -24,17 +24,17 @@
             RETURN;
         END
 
-        IF NOT EXISTS (SELECT 1 FROM Tasks WHERE taskID = @parentTaskID AND parentTaskID IS NULL)
+        IF NOT EXISTS (SELECT 1 FROM listify.Tasks WHERE taskID = @parentTaskID AND parentTaskID IS NULL)
         BEGIN
 			ROLLBACK;
             THROW 50053,  'Parent task does not exist or is already a subtask.',1;
         END
 
         SELECT @taskPosition = ISNULL(MAX(taskPosition), 0) + 1
-        FROM Tasks
+        FROM listify.Tasks
         WHERE parentTaskID = @parentTaskID;
 
-        INSERT INTO Tasks (taskName, taskDescription, sectionID, parentTaskID, taskPosition, dueDate, createdAt)
+        INSERT INTO listify.Tasks (taskName, taskDescription, sectionID, parentTaskID, taskPosition, dueDate, createdAt)
         VALUES (@taskName, @taskDescription, @sectionID, @parentTaskID, @taskPosition, @dueDate, SYSDATETIME());
 
     END TRY

@@ -1,5 +1,5 @@
 GO
-CREATE VIEW vUserTeamProjectsTasks AS
+CREATE VIEW listify.vUserTeamProjectsTasks AS
 SELECT
 	u.userID,
 	u.githubID,
@@ -17,15 +17,15 @@ SELECT
 	t.taskPriority,
 	t.dueDate
 FROM
-	Users u
+	listify.Users u
 INNER JOIN
-	ProjectAssignees pa ON u.userID = pa.userID
+	listify.ProjectAssignees pa ON u.userID = pa.userID
 INNER JOIN
-	Projects p ON pa.projectID = p.projectID
+	listify.Projects p ON pa.projectID = p.projectID
 INNER JOIN 
-	Teams tm ON p.teamID = tm.teamID
+	listify.Teams tm ON p.teamID = tm.teamID
 INNER JOIN 
-	Sections s ON s.projectID = p.projectID
+	listify.Sections s ON s.projectID = p.projectID
 INNER JOIN 
-	Tasks t ON t.sectionID = s.sectionID
+	listify.Tasks t ON t.sectionID = s.sectionID
 GO

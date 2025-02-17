@@ -1,4 +1,4 @@
-CREATE VIEW vProjectCompletedTasks AS
+CREATE VIEW listify.vProjectCompletedTasks AS
 SELECT
 	p.projectID,
 	p.projectName,
@@ -13,9 +13,9 @@ SELECT
 	t.createdAt AS taskCreatedAt,
     t.updatedAt AS taskUpdatedAt
 FROM
-	Tasks t
+	listify.Tasks t
 INNER JOIN 
-	Sections s ON t.sectionID = s.sectionID
+	listify.Sections s ON t.sectionID = s.sectionID
 INNER JOIN
-	Projects p ON s.projectID = p.projectID
+	listify.Projects p ON s.projectID = p.projectID
 WHERE dateCompleted IS NOT NULL

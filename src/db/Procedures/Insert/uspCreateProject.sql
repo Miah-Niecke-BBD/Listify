@@ -1,5 +1,5 @@
 GO
-CREATE PROCEDURE uspCreateProject
+CREATE PROCEDURE listify.uspCreateProject
     @teamLeaderID INT,
     @teamID INT,
     @projectName VARCHAR(100),
@@ -12,7 +12,7 @@ BEGIN
     BEGIN TRY
 
         IF NOT EXISTS (
-            SELECT 1 FROM TeamMembers 
+            SELECT 1 FROM listify.TeamMembers 
             WHERE userID = @teamLeaderID AND teamID = @teamID AND isTeamLeader = 1
         )
         BEGIN
@@ -20,12 +20,12 @@ BEGIN
             THROW 50042, 'Only team leaders can create projects',1;
         END;
 
-        INSERT INTO Projects (teamID, projectName, projectDescription, createdAt)
+        INSERT INTO listify.Projects (teamID, projectName, projectDescription, createdAt)
         VALUES (@teamID, @projectName, @projectDescription, SYSDATETIME());
 
         SET @projectID = SCOPE_IDENTITY();
 
-        INSERT INTO ProjectAssignees (userID, projectID)
+        INSERT INTO listify.ProjectAssignees (userID, projectID)
         VALUES (@teamLeaderID, @projectID);
 
         COMMIT;

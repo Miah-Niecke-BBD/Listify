@@ -17,10 +17,10 @@ BEGIN
             THROW 50047, 'Section position cannot be negative',1;
         END;
 
-        SELECT @teamID = teamID FROM Projects WHERE projectID = @projectID;
+        SELECT @teamID = teamID FROM listify.Projects WHERE projectID = @projectID;
 
         IF NOT EXISTS (
-            SELECT 1 FROM TeamMembers 
+            SELECT 1 FROM listify.TeamMembers 
             WHERE userID = @teamLeaderID AND teamID = @teamID AND isTeamLeader = 1
         )
         BEGIN
@@ -28,9 +28,9 @@ BEGIN
             THROW 50049, 'Only team leaders can create sections',1;
         END;
 
-        SELECT @maxSectionPosition = MAX(sectionPosition) FROM Sections WHERE projectID = @projectID;
+        SELECT @maxSectionPosition = MAX(sectionPosition) FROM listify.Sections WHERE projectID = @projectID;
 
-        IF EXISTS (SELECT 1 FROM Sections WHERE projectID = @projectID AND sectionPosition = @sectionPosition)
+        IF EXISTS (SELECT 1 FROM listify.Sections WHERE projectID = @projectID AND sectionPosition = @sectionPosition)
         BEGIN
             PRINT 'The input position is already taken. Setting to next available position.';
             SET @sectionPosition = @maxSectionPosition + 1;
@@ -41,7 +41,7 @@ BEGIN
             THROW 50050, 'Setting to input position.',1;
         END
 
-        INSERT INTO Sections (projectID, sectionName, sectionPosition, createdAt)
+        INSERT INTO listify.Sections (projectID, sectionName, sectionPosition, createdAt)
         VALUES (@projectID, @sectionName, @sectionPosition, SYSDATETIME());
 
         COMMIT;

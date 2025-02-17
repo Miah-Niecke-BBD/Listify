@@ -1,5 +1,5 @@
 GO
-CREATE PROCEDURE uspAssignTaskDependency
+CREATE PROCEDURE listify.uspAssignTaskDependency
     @teamLeaderID INT,              
     @taskID INT,              
     @dependentTaskID INT      
@@ -15,14 +15,14 @@ BEGIN
 
         SELECT @teamID = tm.teamID, 
                @projectID = p.projectID
-        FROM Tasks t
-        JOIN Sections s ON s.sectionID = t.sectionID
-        JOIN Projects p ON p.projectID = s.projectID
-        JOIN Teams tm ON tm.teamID = p.teamID
+        FROM listify.Tasks t
+        JOIN listify.Sections s ON s.sectionID = t.sectionID
+        JOIN listify.Projects p ON p.projectID = s.projectID
+        JOIN listify.Teams tm ON tm.teamID = p.teamID
         WHERE t.taskID = @taskID;
 
         IF NOT EXISTS (
-            SELECT 1 FROM TeamMembers 
+            SELECT 1 FROM listify.TeamMembers 
             WHERE userID = @teamLeaderID AND teamID = @teamID AND isTeamLeader = 1
         )
         BEGIN
@@ -32,9 +32,9 @@ BEGIN
         END;
 
         SELECT @dependentTaskProjectID = p.projectID
-        FROM Tasks t
-        JOIN Sections s ON s.sectionID = t.sectionID
-        JOIN Projects p ON p.projectID = s.projectID
+        FROM listify.Tasks t
+        JOIN listify.Sections s ON s.sectionID = t.sectionID
+        JOIN listify.Projects p ON p.projectID = s.projectID
         WHERE t.taskID = @dependentTaskID;
 
         IF @projectID <> @dependentTaskProjectID
@@ -50,7 +50,7 @@ BEGIN
         END;
 
         IF EXISTS (
-            SELECT 1 FROM TaskDependencies 
+            SELECT 1 FROM listify.TaskDependencies 
             WHERE taskID = @taskID AND dependentTaskID = @dependentTaskID
         )
         BEGIN
@@ -61,7 +61,7 @@ BEGIN
         SET @currentTaskID = @dependentTaskID;
 
         WHILE EXISTS (
-            SELECT 1 FROM TaskDependencies 
+            SELECT 1 FROM listify.TaskDependencies 
             WHERE taskID = @currentTaskID AND dependentTaskID = @taskID
         )
         BEGIN
@@ -69,7 +69,7 @@ BEGIN
             THROW 50025, 'Circular dependency detected', 1;
         END;
 
-        INSERT INTO TaskDependencies (taskID, dependentTaskID)
+        INSERT INTO listify.TaskDependencies (taskID, dependentTaskID)
         VALUES (@taskID, @dependentTaskID);
 
         COMMIT;

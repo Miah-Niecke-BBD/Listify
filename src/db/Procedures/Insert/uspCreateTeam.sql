@@ -1,5 +1,5 @@
 GO
-CREATE PROCEDURE uspCreateTeam
+CREATE PROCEDURE listify.uspCreateTeam
     @userID INT,
     @teamName VARCHAR(100)
 AS
@@ -9,12 +9,12 @@ BEGIN
     BEGIN TRANSACTION
     BEGIN TRY
 
-        INSERT INTO Teams (teamName, createdAt)
+        INSERT INTO listify.Teams (teamName, createdAt)
         VALUES (@teamName, SYSDATETIME());
 
 		SET @teamID = SCOPE_IDENTITY();
 
-        INSERT INTO TeamMembers (userID, teamID, isTeamLeader)
+        INSERT INTO listify.TeamMembers (userID, teamID, isTeamLeader)
         VALUES (@userID, @teamID, 1);
 
         COMMIT;

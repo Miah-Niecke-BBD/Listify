@@ -1,4 +1,4 @@
-CREATE VIEW vProjectSections AS
+CREATE VIEW listify.vProjectSections AS
 SELECT
 	p.projectID,
 	p.projectName,
@@ -11,7 +11,7 @@ SELECT
 	s.createdAt AS sectionCreatedAt,
 	s.updatedAt AS sectionUpdatedAt
 FROM 
-	Projects p
+	listify.Projects p
 INNER JOIN
-	Sections s ON s.projectID = p.projectID
+	listify.Sections s ON s.projectID = p.projectID
 GO

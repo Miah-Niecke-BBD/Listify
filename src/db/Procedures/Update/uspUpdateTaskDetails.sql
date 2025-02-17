@@ -1,4 +1,4 @@
-CREATE PROCEDURE uspUpdateTaskDetails
+CREATE PROCEDURE listify.uspUpdateTaskDetails
     @taskID INT,
     @teamLeaderID INT,
     @newTaskName VARCHAR(100) = NULL,
@@ -16,19 +16,19 @@ BEGIN
 
 
     SELECT @sectionID = sectionID
-    FROM Tasks
+    FROM listify.Tasks
     WHERE taskID = @taskID;
 
     SELECT @projectID = projectID
-    FROM Sections
+    FROM listify.Sections
     WHERE sectionID = @sectionID;
 
     SELECT @teamID = teamID
-    FROM Projects
+    FROM listify.Projects
     WHERE projectID = @projectID;
 
     SELECT @isTeamLeader = isTeamLeader
-    FROM TeamMembers
+    FROM listify.TeamMembers
     WHERE userID = @teamLeaderID AND teamID = @teamID;
 
     IF @isTeamLeader <> 1
@@ -42,7 +42,7 @@ BEGIN
 		THROW 50081, 'Task priority can only have values between 0 and 3',1;
 	END
 
-    UPDATE Tasks
+    UPDATE listify.Tasks
     SET 
         taskName = COALESCE(@newTaskName, taskName),
         taskDescription = COALESCE(@newTaskDescription, taskDescription),

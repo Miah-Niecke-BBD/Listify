@@ -1,5 +1,5 @@
 GO
-CREATE PROCEDURE uspUpdateTeamLeader
+CREATE PROCEDURE listify.uspUpdateTeamLeader
 	@teamLeaderID INT,
 	@teamID INT,
 	@newTeamLeaderID INT
@@ -9,18 +9,18 @@ BEGIN
 	BEGIN TRY
 
 	IF NOT EXISTS (
-		SELECT 1 FROM TeamMembers WHERE userID = @teamLeaderID AND TeamID = @teamID AND isTeamLeader = 1
+		SELECT 1 FROM listify.TeamMembers WHERE userID = @teamLeaderID AND TeamID = @teamID AND isTeamLeader = 1
 	)
 	 BEGIN
 	 		ROLLBACK;
            THROW 50091,'Only team leaders can reassign a team leader',1;
      END;
 
-	 UPDATE TeamMembers 
+	 UPDATE listify.TeamMembers 
 	 SET isTeamLeader = 1
 	 WHERE UserID = @newTeamLeaderID
 
-	 UPDATE TeamMembers 
+	 UPDATE listify.TeamMembers 
 	 SET isTeamLeader = 0
 	 WHERE UserID = @teamLeaderID
 

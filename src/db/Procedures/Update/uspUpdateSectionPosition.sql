@@ -1,4 +1,4 @@
-CREATE PROCEDURE uspUpdateSectionPosition
+CREATE PROCEDURE listify.uspUpdateSectionPosition
 	@teamLeaderID INT,
 	@sectionID INT,
 	@newSectionPosition INT
@@ -12,13 +12,13 @@ BEGIN
 		@teamID = tm.teamID,
 		@currentPosition = s.sectionPosition,
 		@projectID = p.projectID
-	FROM Sections s
-    JOIN Projects p ON p.projectID = s.projectID
-    JOIN Teams tm ON tm.teamID = p.teamID
+	FROM listify.Sections s
+    JOIN listify.Projects p ON p.projectID = s.projectID
+    JOIN listify.Teams tm ON tm.teamID = p.teamID
     WHERE s.sectionID = @sectionID
 
 	IF NOT EXISTS (
-		SELECT 1 FROM TeamMembers WHERE userID = @teamLeaderID AND TeamID = @teamID AND isTeamLeader = 1
+		SELECT 1 FROM listify.TeamMembers WHERE userID = @teamLeaderID AND TeamID = @teamID AND isTeamLeader = 1
 	)
 	 BEGIN
 	 		ROLLBACK;
@@ -42,15 +42,15 @@ BEGIN
         END
 
 
-	 UPDATE Sections
+	 UPDATE listify.Sections
 	 SET sectionPosition = sectionPosition - 1
 	 WHERE sectionPosition > @currentPosition AND projectID = @projectID
 
-	 UPDATE Sections
+	 UPDATE listify.Sections
 	 SET sectionPosition = sectionPosition + 1
 	 WHERE sectionPosition >= @newSectionPosition AND projectID = @projectID
 
-	 UPDATE Sections
+	 UPDATE listify.Sections
 	 SET sectionPosition = @newSectionPosition
 	 WHERE sectionID = @sectionID AND projectID = @projectID
 

@@ -1,5 +1,5 @@
 GO
-CREATE PROCEDURE uspUpdateSectionDetails
+CREATE PROCEDURE listify.uspUpdateSectionDetails
     @sectionID INT,
     @teamLeaderID INT, 
     @newSectionName VARCHAR(100)
@@ -12,7 +12,7 @@ BEGIN
     DECLARE @isTeamLeader BIT;
 
     SELECT @projectID = projectID
-    FROM Sections
+    FROM listify.Sections
     WHERE sectionID = @sectionID;
 
     IF @projectID IS NULL
@@ -22,11 +22,11 @@ BEGIN
     END
 
     SELECT @teamID = teamID
-    FROM Projects
+    FROM listify.Projects
     WHERE projectID = @projectID;
 
     SELECT @isTeamLeader = isTeamLeader
-    FROM TeamMembers
+    FROM listify.TeamMembers
     WHERE userID = @teamLeaderID AND teamID = @teamID;
 
     IF @isTeamLeader <> 1
@@ -35,7 +35,7 @@ BEGIN
         THROW 50072, 'Only team leaders can update sections.',1;
     END
 
-    UPDATE Sections
+    UPDATE listify.Sections
     SET sectionName = COALESCE(@newSectionName,sectionName),
         updatedAt = GETDATE()
     WHERE sectionID = @sectionID;
