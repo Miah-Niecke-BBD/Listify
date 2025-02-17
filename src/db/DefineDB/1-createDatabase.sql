@@ -53,20 +53,28 @@ CREATE TABLE [Sections] (
 )
 GO
 
+CREATE TABLE PriorityLabels (
+  [priorityLabelID] TINYINT PRIMARY KEY NOT NULL,       
+  [priorityLabelName] VARCHAR(15) NOT NULL,            
+  CONSTRAINT CHK_PriorityLabelID CHECK ([priorityLabelID] BETWEEN 1 AND 3), 
+);
+GO
+
 CREATE TABLE [Tasks] (
   [taskID] INT PRIMARY KEY IDENTITY(1, 1),
   [sectionID] INT NOT NULL,
   [parentTaskID] INT,
   [taskName] VARCHAR(100) NOT NULL,
   [taskDescription] VARCHAR(500),
-  [taskPriority] TINYINT NOT NULL DEFAULT (0),
+  [taskPriority] TINYINT,
   [taskPosition] TINYINT NOT NULL,
   [dateCompleted] DATETIME,
   [dueDate] DATETIME,
   [createdAt] DATETIME NOT NULL,
   [updatedAt] DATETIME,
   FOREIGN KEY ([sectionID]) REFERENCES [Sections] ([sectionID]) ON DELETE CASCADE, 
-  FOREIGN KEY ([parentTaskID]) REFERENCES [Tasks] (taskID)
+  FOREIGN KEY ([parentTaskID]) REFERENCES [Tasks] (taskID),
+  FOREIGN KEY ([taskPriority]) REFERENCES [PriorityLabels] (priorityLabelID)
 )
 GO
 
@@ -96,5 +104,8 @@ CREATE TABLE [ProjectAssignees] (
   FOREIGN KEY ([userID]) REFERENCES [Users] ([userID])
 )
 GO
+
+INSERT INTO PriorityLabels (priorityLabelID, priorityLabelName)
+VALUES (1, 'Low'), (2, 'Medium'), (3, 'High');
 
 ---===============================  ????  ===================================================---
