@@ -18,7 +18,6 @@ CREATE TABLE [Teams] (
   [teamName] VARCHAR(100) NOT NULL,
   [createdAt] DATETIME NOT NULL,
   [updatedAt] DATETIME ,
-
 )
 GO
 
@@ -66,7 +65,7 @@ CREATE TABLE [Tasks] (
   [dueDate] DATETIME,
   [createdAt] DATETIME NOT NULL,
   [updatedAt] DATETIME,
-  FOREIGN KEY ([sectionID]) REFERENCES [Sections] ([sectionID])ON DELETE CASCADE, 
+  FOREIGN KEY ([sectionID]) REFERENCES [Sections] ([sectionID]) ON DELETE CASCADE, 
   FOREIGN KEY ([parentTaskID]) REFERENCES [Tasks] (taskID)
 )
 GO
