@@ -1,4 +1,4 @@
-CREATE PROCEDURE uspRemoveUserFromProjects
+CREATE PROCEDURE [listify].uspRemoveUserFromProjects
 @userID INT,
 @projectID INT,
 @teamLeaderID INT
@@ -8,10 +8,10 @@ BEGIN
 	BEGIN TRY
 		DECLARE @teamID INT, @isTeamLeader BIT
 
-		SELECT @teamID = teamID FROM Projects
+		SELECT @teamID = teamID FROM [listify].Projects
 		WHERE projectID = @projectID
 		
-		SELECT @isTeamLeader = isTeamLeader FROM TeamMembers
+		SELECT @isTeamLeader = isTeamLeader FROM [listify].TeamMembers
 		WHERE teamID = @teamID AND userID = @teamLeaderID;
 
         IF @isTeamLeader IS NULL
@@ -21,7 +21,7 @@ BEGIN
         END
 
 		IF NOT EXISTS (
-            SELECT 1 FROM ProjectAssignees WHERE userID = @userID AND projectID =@projectID
+            SELECT 1 FROM [listify].ProjectAssignees WHERE userID = @userID AND projectID =@projectID
         )
         BEGIN
             ROLLBACK;
@@ -30,15 +30,15 @@ BEGIN
 
 		DELETE ta
 		FROM 
-			TaskAssignees ta
+			[listify].TaskAssignees ta
 		INNER JOIN 
-			Tasks t ON ta.taskID = t.taskID
+			[listify].Tasks t ON ta.taskID = t.taskID
 		INNER JOIN 
-			Sections s ON t.sectionID = s.sectionID
+			[listify].Sections s ON t.sectionID = s.sectionID
 		WHERE 
 			ta.userID = @UserID AND s.projectID = @ProjectID;
 
-		DELETE FROM ProjectAssignees 
+		DELETE FROM [listify].ProjectAssignees 
 		WHERE projectID =@projectID AND userID = @userID 
 		COMMIT;
 

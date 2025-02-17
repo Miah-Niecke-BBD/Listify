@@ -1,5 +1,5 @@
 GO
-CREATE PROCEDURE uspDeleteTaskDependency
+CREATE PROCEDURE [listify].uspDeleteTaskDependency
 	@taskID INT,
 	@taskDependencyID INT,
 	@teamLeaderID INT
@@ -12,21 +12,21 @@ BEGIN
 
 	SELECT 
 		@teamID = tm.teamID
-	FROM Tasks t
-	JOIN Sections s ON s.sectionID = t.sectionID
-    JOIN Projects p ON p.projectID = s.projectID
-    JOIN Teams tm ON tm.teamID = p.teamID
+	FROM [listify].Tasks t
+	JOIN [listify].Sections s ON s.sectionID = t.sectionID
+    JOIN [listify].Projects p ON p.projectID = s.projectID
+    JOIN [listify].Teams tm ON tm.teamID = p.teamID
     WHERE t.taskID = @taskID;
 
 	IF NOT EXISTS (
-		SELECT 1 FROM TeamMembers WHERE userID = @teamLeaderID AND TeamID = @teamID AND isTeamLeader = 1
+		SELECT 1 FROM [listify].TeamMembers WHERE userID = @teamLeaderID AND TeamID = @teamID AND isTeamLeader = 1
 	)
 	 BEGIN
 			ROLLBACK;
            THROW 50011, 'Only team leaders can edit tasks',1;
      END;
 
-	 DELETE TaskDependencies
+	 DELETE [listify].TaskDependencies
 	 WHERE taskID = @taskID AND dependentTaskID = @taskDependencyID
 
 	 COMMIT;

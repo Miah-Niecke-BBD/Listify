@@ -1,4 +1,4 @@
-CREATE FUNCTION fnGetTeamLeaderForTask
+CREATE FUNCTION [listify].fnGetTeamLeaderForTask
 (
 	@taskID INT
 )

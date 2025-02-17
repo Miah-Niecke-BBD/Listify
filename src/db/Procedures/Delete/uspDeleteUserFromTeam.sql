@@ -18,25 +18,25 @@ BEGIN
         END
 
 		IF NOT EXISTS (
-            SELECT 1 FROM TeamMembers WHERE userID = @userID AND teamID =@teamID
+            SELECT 1 FROM [listify].TeamMembers WHERE userID = @userID AND teamID =@teamID
         )
 		BEGIN
             THROW 50018, 'User is not a part of the team',1;
         END;
 
 
-		DELETE FROM TaskAssignees 
-		Where taskID IN(SELECT taskID FROM Tasks
-		WHERE sectionID IN(SELECT projectID FROM Projects
-		WHERE teamID IN (SELECT teamID FROM TeamMembers
+		DELETE FROM [listify].TaskAssignees 
+		Where taskID IN(SELECT taskID FROM [listify].Tasks
+		WHERE sectionID IN(SELECT projectID FROM [listify].Projects
+		WHERE teamID IN (SELECT teamID FROM [listify].TeamMembers
 		WHERE userID = @userID AND teamID = @teamID)));
 
-		DELETE FROM ProjectAssignees
-		WHERE ProjectID IN(SELECT projectID FROM Projects
-		WHERE teamID IN(SELECT teamID FROM TeamMembers
+		DELETE FROM [listify].ProjectAssignees
+		WHERE ProjectID IN(SELECT projectID FROM [listify].Projects
+		WHERE teamID IN(SELECT teamID FROM [listify].TeamMembers
 		WHERE teamID = @teamID AND userID = @userID) );
 
-		DELETE FROM TeamMembers
+		DELETE FROM [listify].TeamMembers
 		WHERE userID = @userID AND teamID = @teamID;
 
 		COMMIT;

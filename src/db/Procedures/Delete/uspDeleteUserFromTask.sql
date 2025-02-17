@@ -1,5 +1,5 @@
 GO
-CREATE PROCEDURE uspDeleteUserFromTask
+CREATE PROCEDURE [listify].uspDeleteUserFromTask
     @userID INT,
     @taskID INT,
     @teamLeaderID INT  
@@ -13,11 +13,11 @@ BEGIN
         SELECT 
             @teamID = tm.teamID,
             @isTeamLeader = tms.isTeamLeader
-        FROM Tasks t
-        JOIN Sections s ON s.sectionID = t.sectionID
-        JOIN Projects p ON p.projectID = s.projectID
-        JOIN Teams tm ON tm.teamID = p.teamID
-        JOIN TeamMembers tms ON tms.teamID = tm.teamID AND tms.userID = @teamLeaderID
+        FROM [listify].Tasks t
+        JOIN [listify].Sections s ON s.sectionID = t.sectionID
+        JOIN [listify].Projects p ON p.projectID = s.projectID
+        JOIN [listify].Teams tm ON tm.teamID = p.teamID
+        JOIN [listify].TeamMembers tms ON tms.teamID = tm.teamID AND tms.userID = @teamLeaderID
         WHERE t.taskID = @taskID;
 
         IF @teamID IS NULL
@@ -33,7 +33,7 @@ BEGIN
         END
 
 
-        DELETE FROM TaskAssignees
+        DELETE FROM [listify].TaskAssignees
         WHERE userID = @userID AND taskID = @taskID;
 
 

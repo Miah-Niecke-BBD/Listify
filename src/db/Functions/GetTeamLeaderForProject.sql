@@ -1,4 +1,4 @@
-CREATE FUNCTION fnGetTeamLeaderForProject
+CREATE FUNCTION [listify]fn.GetTeamLeaderForProject
 (
 	@projectID INT
 )

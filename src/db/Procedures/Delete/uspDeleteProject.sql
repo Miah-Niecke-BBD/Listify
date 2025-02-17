@@ -1,5 +1,5 @@
 GO
-CREATE PROCEDURE uspDeleteProject
+CREATE PROCEDURE [listify].uspDeleteProject
     @projectID INT,
     @teamLeaderID INT  
 AS
@@ -10,7 +10,7 @@ BEGIN
     BEGIN TRY
         
         SELECT @teamID = p.teamID
-        FROM Projects p WITH (UPDLOCK, HOLDLOCK)
+        FROM [listify].Projects p WITH (UPDLOCK, HOLDLOCK)
         WHERE p.projectID = @projectID;
 
         IF @teamID IS NULL
@@ -21,7 +21,7 @@ BEGIN
 
 
         SELECT @isTeamLeader = isTeamLeader
-        FROM TeamMembers WITH (UPDLOCK, HOLDLOCK)
+        FROM [listify].TeamMembers WITH (UPDLOCK, HOLDLOCK)
         WHERE teamID = @teamID AND userID = @teamLeaderID AND isTeamLeader = 1;
 
         IF @isTeamLeader IS NULL OR @isTeamLeader = 0
@@ -31,17 +31,17 @@ BEGIN
         END
 
 
-        DELETE FROM TaskDependencies
-        WHERE taskID IN (SELECT taskID FROM Tasks WHERE sectionID IN (SELECT sectionID FROM Sections WHERE projectID = @projectID))
-           OR dependentTaskID IN (SELECT taskID FROM Tasks WHERE sectionID IN (SELECT sectionID FROM Sections WHERE projectID = @projectID));
+        DELETE FROM [listify].TaskDependencies
+        WHERE taskID IN (SELECT taskID FROM [listify].Tasks WHERE sectionID IN (SELECT sectionID FROM [listify].Sections WHERE projectID = @projectID))
+           OR dependentTaskID IN (SELECT taskID FROM [listify].Tasks WHERE sectionID IN (SELECT sectionID FROM [listify].Sections WHERE projectID = @projectID));
 
-        DELETE FROM TaskAssignees
-        WHERE taskID IN (SELECT taskID FROM Tasks WHERE sectionID IN (SELECT sectionID FROM Sections WHERE projectID = @projectID));
+        DELETE FROM [listify].TaskAssignees
+        WHERE taskID IN (SELECT taskID FROM [listify].Tasks WHERE sectionID IN (SELECT sectionID FROM [listify].Sections WHERE projectID = @projectID));
 
-        DELETE FROM Tasks WHERE sectionID IN (SELECT sectionID FROM Sections WHERE projectID = @projectID);
-        DELETE FROM Sections WHERE projectID = @projectID;
-        DELETE FROM ProjectAssignees WHERE projectID = @projectID;
-        DELETE FROM Projects WHERE projectID = @projectID;
+        DELETE FROM [listify].Tasks WHERE sectionID IN (SELECT sectionID FROM [listify].Sections WHERE projectID = @projectID);
+        DELETE FROM [listify].Sections WHERE projectID = @projectID;
+        DELETE FROM [listify].ProjectAssignees WHERE projectID = @projectID;
+        DELETE FROM [listify].Projects WHERE projectID = @projectID;
 
         COMMIT;
     END TRY
