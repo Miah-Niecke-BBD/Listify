@@ -1,5 +1,5 @@
 GO
-CREATE FUNCTION GetUserTasks(@userID INT)
+CREATE FUNCTION [listify].fnGetUserTasks(@userID INT)
 RETURNS TABLE
 AS
 RETURN (

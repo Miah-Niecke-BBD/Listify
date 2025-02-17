@@ -1,5 +1,5 @@
 GO
-CREATE PROCEDURE uspRemoveUser
+CREATE PROCEDURE [listify].uspRemoveUser
 @userID INT 
 AS
 BEGIN
@@ -8,15 +8,15 @@ BEGIN
 		DECLARE @teamCount INT, @teamID INT
 
 		SELECT @teamCount = COUNT(*) 
-		FROM TeamMembers WHERE userID = @userID AND isTeamLeader =1;
+		FROM [listify].TeamMembers WHERE userID = @userID AND isTeamLeader =1;
 
 		IF @teamCount > 0 
 		BEGIN
-			DELETE FROM Teams
-			WHERE teamID IN(SELECT teamID FROM TeamMembers WHERE userID = @userID AND isTeamLeader = 1)
+			DELETE FROM [listify].Teams
+			WHERE teamID IN(SELECT teamID FROM [listify].TeamMembers WHERE userID = @userID AND isTeamLeader = 1)
 		END
 
-		DELETE FROM Users
+		DELETE FROM [listify].Users
 		WHERE userID = @userID
 		COMMIT;
 	END TRY

@@ -1,5 +1,5 @@
 GO
-CREATE PROCEDURE uspDeleteTask
+CREATE PROCEDURE [listify].uspDeleteTask
     @taskID INT,
     @teamLeaderID INT  
 AS
@@ -14,11 +14,11 @@ BEGIN
             @sectionID = t.sectionID,
             @taskPosition = t.taskPosition,
             @isTeamLeader = tms.isTeamLeader
-        FROM Tasks t
-        JOIN Sections s ON s.sectionID = t.sectionID
-        JOIN Projects p ON p.projectID = s.projectID
-        JOIN Teams tm ON tm.teamID = p.teamID
-        JOIN TeamMembers tms ON tms.teamID = tm.teamID AND tms.userID = @teamLeaderID
+        FROM [listify].Tasks t
+        JOIN [listify].Sections s ON s.sectionID = t.sectionID
+        JOIN [listify].Projects p ON p.projectID = s.projectID
+        JOIN [listify].Teams tm ON tm.teamID = p.teamID
+        JOIN [listify].TeamMembers tms ON tms.teamID = tm.teamID AND tms.userID = @teamLeaderID
         WHERE t.taskID = @taskID;
 
         IF @teamID IS NULL
@@ -34,12 +34,12 @@ BEGIN
         END
 
 
-        DELETE FROM TaskDependencies WHERE taskID = @taskID OR dependentTaskID = @taskID;
-        DELETE FROM TaskAssignees WHERE taskID = @taskID;
-        DELETE FROM Tasks WHERE taskID = @taskID;
+        DELETE FROM [listify].TaskDependencies WHERE taskID = @taskID OR dependentTaskID = @taskID;
+        DELETE FROM [listify].TaskAssignees WHERE taskID = @taskID;
+        DELETE FROM [listify].Tasks WHERE taskID = @taskID;
 
  
-        UPDATE Tasks
+        UPDATE [listify].Tasks
         SET taskPosition = taskPosition - 1
         WHERE sectionID = @sectionID AND taskPosition > @taskPosition;
 
@@ -47,6 +47,8 @@ BEGIN
     END TRY
     BEGIN CATCH
         ROLLBACK;
+		DECLARE @ErrorMessage NVARCHAR(MAX) = ERROR_MESSAGE();
+        PRINT 'Error occurred: ' + @ErrorMessage;
         THROW;
     END CATCH
 END;

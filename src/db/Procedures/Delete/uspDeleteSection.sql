@@ -1,4 +1,4 @@
-CREATE PROCEDURE uspDeleteSection
+CREATE PROCEDURE [listify].uspDeleteSection
     @teamLeader INT,
     @sectionID INT
 AS
@@ -11,31 +11,31 @@ BEGIN
             @teamID = tm.teamID,
             @deletedSectionPosition = s.sectionPosition,
             @projectID = p.projectID
-        FROM Sections s
-        JOIN Projects p ON p.projectID = s.projectID
+        FROM [listify].Sections s
+        JOIN [listify].Projects p ON p.projectID = s.projectID
         JOIN Teams tm ON tm.teamID = p.teamID
         WHERE s.sectionID = @sectionID;
 
         IF NOT EXISTS (
-            SELECT 1 FROM TeamMembers WHERE userID = @teamLeader AND TeamID = @teamID AND isTeamLeader = 1
+            SELECT 1 FROM [listify].TeamMembers WHERE userID = @teamLeader AND TeamID = @teamID AND isTeamLeader = 1
         )
         BEGIN
             ROLLBACK;
             THROW 50010, 'Only team leaders can delete sections',1;
         END;
 
-        DELETE FROM TaskAssignees
+        DELETE FROM [listify].TaskAssignees
         WHERE taskID IN (
             SELECT taskID
             FROM tasks
             WHERE sectionID = @sectionID
         );
 
-        UPDATE Sections
+        UPDATE [listify].Sections
         SET sectionPosition = sectionPosition - 1
         WHERE sectionPosition > @deletedSectionPosition AND projectID = @projectID;
 
-        DELETE FROM Sections
+        DELETE FROM [listify].Sections
         WHERE sectionID = @sectionID;
 
         COMMIT;

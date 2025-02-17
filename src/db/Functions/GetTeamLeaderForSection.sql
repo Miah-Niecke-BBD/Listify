@@ -1,4 +1,4 @@
-CREATE FUNCTION fnGetTeamLeaderForSection
+CREATE FUNCTION [listify].fnGetTeamLeaderForSection
 (
 	@sectionID INT
 )

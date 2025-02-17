@@ -1,6 +1,6 @@
 USE ListifyDB
 
-INSERT INTO [Users] ([gitHubID], [createdAt], [updatedAt])
+INSERT INTO [listify].[Users] ([gitHubID], [createdAt], [updatedAt])
 VALUES 
   ('user1_github', '2023-01-15', '2023-01-15'),
   ('user2_github', '2023-02-20', '2023-02-20'),
@@ -19,7 +19,7 @@ VALUES
   ('user15_github', '2024-03-25', '2024-03-25');
 
 
-INSERT INTO [Teams] ([teamName], [createdAt], [updatedAt])
+INSERT INTO [listify].[Teams] ([teamName], [createdAt], [updatedAt])
 VALUES 
   ('My Projects', '2023-01-15', '2023-01-15'), -- for user 1
   ('My Projects', '2023-02-20', '2023-02-20'), -- for user 2
@@ -39,7 +39,7 @@ VALUES
 
 
 
-INSERT INTO [Projects] ([teamID], [projectName], [projectDescription], [createdAt], [updatedAt])
+INSERT INTO [listify].[Projects] ([teamID], [projectName], [projectDescription], [createdAt], [updatedAt])
 VALUES
   (1, 'My List', 'Personal list of tasks and items.', GETDATE(), GETDATE()),
   (1, 'Home', 'Tasks related to home management.', GETDATE(), GETDATE()),
@@ -86,7 +86,7 @@ VALUES
   (15, 'My List', 'Personal list of tasks and items.', GETDATE(), GETDATE()),
   (15, 'Home', 'Tasks related to home management.', GETDATE(), GETDATE());
 
-INSERT INTO [Sections] ([projectID], [sectionName], [sectionPosition], [createdAt], [updatedAt])
+INSERT INTO [listify].[Sections] ([projectID], [sectionName], [sectionPosition], [createdAt], [updatedAt])
 VALUES 
   (1, 'To Do', 0, GETDATE(), GETDATE()),
   (2, 'To Do', 0, GETDATE(), GETDATE()),
@@ -105,7 +105,7 @@ VALUES
   (15, 'To Do', 0, GETDATE(), GETDATE());
 
 
-INSERT INTO [Tasks] ([sectionID], [taskName], [taskDescription], [taskPriority], [taskPosition], [createdAt], [updatedAt])
+INSERT INTO [listify].[Tasks] ([sectionID], [taskName], [taskDescription], [taskPriority], [taskPosition], [createdAt], [updatedAt])
 VALUES
   (1, 'Buy groceries', 'Buy milk, eggs, and bread', 0, 0, GETDATE(), GETDATE()),
   (2, 'Clean the house', 'Vacuum and mop the floors', 0, 0, GETDATE(), GETDATE()),
@@ -124,7 +124,7 @@ VALUES
   (15, 'Bake cookies', 'Make chocolate chip cookies', 0, 0, GETDATE(), GETDATE());
 
 
-INSERT INTO [TeamMembers] ([userID], [teamID], [isTeamLeader])
+INSERT INTO [listify].[TeamMembers] ([userID], [teamID], [isTeamLeader])
 VALUES
   (1, 1, 1), -- user 1
   (2, 2, 1), -- user 2
@@ -144,7 +144,7 @@ VALUES
 
 
 
-INSERT INTO [ProjectAssignees] ([userID], [projectID])
+INSERT INTO [listify].[ProjectAssignees] ([userID], [projectID])
 VALUES
   (1, 1), -- user 1 to "My List"
   (1, 2), -- user 1 to "Home"
@@ -179,32 +179,32 @@ VALUES
 
 
 
-INSERT INTO Teams (teamName, createdAt, updatedAt) VALUES
+INSERT INTO [listify].[Teams] (teamName, createdAt, updatedAt) VALUES
 ('Dev Team', '2023-12-01', '2023-12-01');
 
 DECLARE @DevTeamID INT = SCOPE_IDENTITY();
 
-INSERT INTO TeamMembers (userID, teamID, isTeamLeader) VALUES
+INSERT INTO [listify].[TeamMembers] (userID, teamID, isTeamLeader) VALUES
 (1, @DevTeamID, 1), -- Team Leader
 (2, @DevTeamID, 0),
 (3, @DevTeamID, 0);
 
-INSERT INTO Projects (teamID, projectName, projectDescription, createdAt, updatedAt) VALUES
+INSERT INTO [listify].[Projects] (teamID, projectName, projectDescription, createdAt, updatedAt) VALUES
 (@DevTeamID, 'Task App', 'A simple task management application.', '2024-01-10', '2024-01-10');
 
 DECLARE @TaskAppProjectID INT = SCOPE_IDENTITY();
 
-INSERT INTO ProjectAssignees (userID, projectID) VALUES
+INSERT INTO [listify].[ProjectAssignees] (userID, projectID) VALUES
 (1, @TaskAppProjectID),
 (2, @TaskAppProjectID),
 (3, @TaskAppProjectID);
 
-INSERT INTO Sections (projectID, sectionName, sectionPosition, createdAt, updatedAt) VALUES
+INSERT INTO [listify].[Sections] (projectID, sectionName, sectionPosition, createdAt, updatedAt) VALUES
 (@TaskAppProjectID, 'Development', 0, '2024-01-10', '2024-01-10');
 
 DECLARE @DevelopmentSectionID INT = SCOPE_IDENTITY();
 
-INSERT INTO Tasks (sectionID, parentTaskID, taskName, taskDescription, taskPriority, taskPosition, dueDate, createdAt, updatedAt) VALUES
+INSERT INTO [listify].[Tasks] (sectionID, parentTaskID, taskName, taskDescription, taskPriority, taskPosition, dueDate, createdAt, updatedAt) VALUES
 (@DevelopmentSectionID, NULL, 'Setup Project Repo', 'Initialize GitHub repository and project structure.', 1, 1, '2024-02-15', '2024-01-10', '2024-01-10'), -- Task 1
 (@DevelopmentSectionID, NULL, 'Design Database Schema', 'Plan and design the database structure.', 1, 2, '2024-02-18', '2024-01-10', '2024-01-10'), -- Task 2
 (@DevelopmentSectionID, NULL, 'Implement User Authentication', 'Create login and registration functionality.', 2, 3, '2024-02-22', '2024-01-10', '2024-01-10'), -- Task 3
@@ -227,7 +227,7 @@ DECLARE @Task8 INT = @Task1 + 7;
 DECLARE @Task9 INT = @Task1 + 8;
 DECLARE @Task10 INT = @Task1 + 9;
 
-INSERT INTO TaskAssignees (userID, taskID) VALUES
+INSERT INTO [listify].[TaskAssignees] (userID, taskID) VALUES
 (1, @Task1),
 (1, @Task6),
 (2, @Task2),
@@ -236,28 +236,28 @@ INSERT INTO TaskAssignees (userID, taskID) VALUES
 (3, @Task8);
 
 
-INSERT INTO TaskDependencies (taskID, dependentTaskID) VALUES
+INSERT INTO [listify].[TaskDependencies] (taskID, dependentTaskID) VALUES
 (@Task6, @Task1), 
 (@Task7, @Task2), 
 (@Task8, @Task3); 
 
 
-INSERT INTO [Projects] (teamID, projectName, projectDescription, createdAt, updatedAt)
-VALUES ((SELECT teamID FROM [Teams] WHERE teamName = 'Dev Team'), 'Deployment', 'Project for deploying applications to production', '2024-01-30', '2024-01-30');
+INSERT INTO [listify].[Projects] (teamID, projectName, projectDescription, createdAt, updatedAt)
+VALUES ((SELECT teamID FROM [listify].[Teams] WHERE teamName = 'Dev Team'), 'Deployment', 'Project for deploying applications to production', '2024-01-30', '2024-01-30');
 
 DECLARE @DeploymentProjectID INT = (SELECT projectID FROM [Projects] WHERE projectName = 'Deployment');
 
-INSERT INTO [Sections] (projectID, sectionName, sectionPosition, createdAt, updatedAt)
+INSERT INTO [listify].[Sections] (projectID, sectionName, sectionPosition, createdAt, updatedAt)
 VALUES
 (@DeploymentProjectID, 'Pre-Deployment Checks', 1, '2024-01-30', '2024-01-30'),
 (@DeploymentProjectID, 'Deployment Execution', 2, '2024-01-30', '2024-01-30'),
 (@DeploymentProjectID, 'Post-Deployment Validation', 3, '2024-01-30', '2024-01-30');
 
-DECLARE @PreDeploymentSectionID INT = (SELECT sectionID FROM [Sections] WHERE sectionName = 'Pre-Deployment Checks' AND projectID = @DeploymentProjectID);
-DECLARE @DeploymentExecutionSectionID INT = (SELECT sectionID FROM [Sections] WHERE sectionName = 'Deployment Execution' AND projectID = @DeploymentProjectID);
-DECLARE @PostDeploymentValidationSectionID INT = (SELECT sectionID FROM [Sections] WHERE sectionName = 'Post-Deployment Validation' AND projectID = @DeploymentProjectID);
+DECLARE @PreDeploymentSectionID INT = (SELECT sectionID FROM [listify].[Sections] WHERE sectionName = 'Pre-Deployment Checks' AND projectID = @DeploymentProjectID);
+DECLARE @DeploymentExecutionSectionID INT = (SELECT sectionID FROM [listify].[Sections] WHERE sectionName = 'Deployment Execution' AND projectID = @DeploymentProjectID);
+DECLARE @PostDeploymentValidationSectionID INT = (SELECT sectionID FROM [listify].[Sections] WHERE sectionName = 'Post-Deployment Validation' AND projectID = @DeploymentProjectID);
 
-INSERT INTO [Tasks] (sectionID, taskName, taskDescription, taskPriority, taskPosition, dueDate, createdAt, updatedAt)
+INSERT INTO [listify].[Tasks] (sectionID, taskName, taskDescription, taskPriority, taskPosition, dueDate, createdAt, updatedAt)
 VALUES
 (@PreDeploymentSectionID, 'Verify application dependencies', 'Ensure all required dependencies are installed.', 1, 1, '2024-02-10', '2024-01-30', '2024-01-30'),
 (@PreDeploymentSectionID, 'Check server resource availability', 'Ensure the server has enough CPU and memory.', 2, 2, '2024-02-12', '2024-01-30', '2024-01-30'),
@@ -274,20 +274,20 @@ VALUES
 (@PostDeploymentValidationSectionID, 'Validate security compliance', 'Check for any security misconfigurations.', 3, 3, '2024-03-05', '2024-01-30', '2024-01-30'),
 (@PostDeploymentValidationSectionID, 'Update deployment documentation', 'Document changes for future reference.', 1, 4, '2024-03-07', '2024-01-30', '2024-01-30');
 
-INSERT INTO [ProjectAssignees] (userID, projectID)
-SELECT userID, @DeploymentProjectID FROM [ProjectAssignees] WHERE projectID = (SELECT projectID FROM [Projects] WHERE projectName = 'Task App');
+INSERT INTO [listify].[ProjectAssignees] (userID, projectID)
+SELECT userID, @DeploymentProjectID FROM [listify].[ProjectAssignees] WHERE projectID = (SELECT projectID FROM [listify].[Projects] WHERE projectName = 'Task App');
 
 DECLARE @UserID INT;
 DECLARE user_cursor CURSOR FOR
-SELECT userID FROM [ProjectAssignees] WHERE projectID = @DeploymentProjectID;
+SELECT userID FROM [listify].[ProjectAssignees] WHERE projectID = @DeploymentProjectID;
 
 OPEN user_cursor;
 FETCH NEXT FROM user_cursor INTO @UserID;
 
 WHILE @@FETCH_STATUS = 0
 BEGIN
-    INSERT INTO [TaskAssignees] (userID, taskID)
-    SELECT TOP 4 @UserID, taskID FROM [Tasks] WHERE sectionID IN (@PreDeploymentSectionID, @DeploymentExecutionSectionID, @PostDeploymentValidationSectionID) ORDER BY NEWID();
+    INSERT INTO [listify].[TaskAssignees] (userID, taskID)
+    SELECT TOP 4 @UserID, taskID FROM [listify].[Tasks] WHERE sectionID IN (@PreDeploymentSectionID, @DeploymentExecutionSectionID, @PostDeploymentValidationSectionID) ORDER BY NEWID();
     FETCH NEXT FROM user_cursor INTO @UserID;
 END
 
@@ -295,12 +295,12 @@ CLOSE user_cursor;
 DEALLOCATE user_cursor;
 
 
-INSERT INTO [Teams] ([teamName], [createdAt], [updatedAt])
+INSERT INTO [listify].[Teams] ([teamName], [createdAt], [updatedAt])
 VALUES ('Human Resources', '2023-06-01', '2023-06-01');
 
 DECLARE @teamID INT = SCOPE_IDENTITY();
 
-INSERT INTO [TeamMembers] ([userID], [teamID], [isTeamLeader])
+INSERT INTO [listify].[TeamMembers] ([userID], [teamID], [isTeamLeader])
 VALUES 
   (4, @teamID, 1),
   (5, @teamID, 0),
@@ -310,13 +310,13 @@ VALUES
   (9, @teamID, 0),
   (10, @teamID, 0);
 
-INSERT INTO [Projects] ([teamID], [projectName], [projectDescription], [createdAt], [updatedAt])
+INSERT INTO [listify].[Projects] ([teamID], [projectName], [projectDescription], [createdAt], [updatedAt])
 VALUES (@teamID, 'Manage Staff', 'A project to oversee staff management processes.', '2023-06-01', '2023-06-01');
 
 -- Get the project ID
 DECLARE @projectID INT = SCOPE_IDENTITY();
 
-INSERT INTO [Sections] ([projectID], [sectionName], [sectionPosition], [createdAt], [updatedAt])
+INSERT INTO [listify].[Sections] ([projectID], [sectionName], [sectionPosition], [createdAt], [updatedAt])
 VALUES 
   (@projectID, 'Recruitment', 0, '2023-06-01', '2023-06-01'),
   (@projectID, 'Training', 1, '2023-06-01', '2023-06-01'),
@@ -331,7 +331,7 @@ SELECT @payroll = sectionID FROM [Sections] WHERE sectionName = 'Payroll & Benef
 SELECT @performance = sectionID FROM [Sections] WHERE sectionName = 'Performance Management';
 
 -- Insert tasks for the project
-INSERT INTO [Tasks] ([sectionID], [taskName], [taskDescription], [taskPriority], [taskPosition], [dueDate], [createdAt], [updatedAt])
+INSERT INTO [listify].[Tasks] ([sectionID], [taskName], [taskDescription], [taskPriority], [taskPosition], [dueDate], [createdAt], [updatedAt])
 VALUES 
   (@recruitment, 'Post Job Listings', 'Create and publish job descriptions.', 1, 0, '2023-06-08', '2023-06-01', '2023-06-01'),
   (@recruitment, 'Screen Resumes', 'Review submitted applications.', 2, 1, '2023-06-15', '2023-06-01', '2023-06-01'),
@@ -348,7 +348,7 @@ VALUES
   (@performance, 'Handle Employee Complaints', 'Address workplace concerns.', 2, 2, '2023-06-26', '2023-06-01', '2023-06-01'),
   (@performance, 'Implement Feedback Mechanism', 'Improve feedback collection methods.', 2, 3, NULL, '2023-06-01', '2023-06-01');
 
-INSERT INTO [TaskAssignees] ([userID], [taskID])
+INSERT INTO [listify].[TaskAssignees] ([userID], [taskID])
 VALUES 
   (4, 1), (4, 2),
   (5, 3), (5, 4),
@@ -358,7 +358,7 @@ VALUES
   (9, 11), (9, 12),
   (10, 13), (10, 14);
 
-INSERT INTO [TaskDependencies] ([taskID], [dependentTaskID])
+INSERT INTO [listify].[TaskDependencies] ([taskID], [dependentTaskID])
 VALUES 
   (1, 2),
   (3, 4),
@@ -368,7 +368,7 @@ VALUES
   (11, 12),
   (13, 14);
 
-INSERT INTO [ProjectAssignees] ([userID], [projectID])
+INSERT INTO [listify].[ProjectAssignees] ([userID], [projectID])
 VALUES 
   (4, @projectID),
   (5, @projectID),
