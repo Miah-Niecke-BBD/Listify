@@ -1,7 +1,5 @@
-CREATE DATABASE ListifyDB
-GO
-USE ListifyDB
 
+USE [inters2025]
 
 ---===============================  Tables  ===================================================---
 GO
@@ -105,7 +103,7 @@ CREATE TABLE [listify].[ProjectAssignees] (
 )
 GO
 
-INSERT INTO PriorityLabels (priorityLabelID, priorityLabelName)
+INSERT INTO [listify].PriorityLabels (priorityLabelID, priorityLabelName)
 VALUES (1, 'Low'), (2, 'Medium'), (3, 'High');
 
 ---===============================  ????  ===================================================---
