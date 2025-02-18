@@ -1,4 +1,4 @@
-GO
+
 CREATE PROCEDURE listify.uspAssignUserToTask
     @userID INT,          
     @taskID INT,              
@@ -69,4 +69,3 @@ BEGIN
         THROW;
     END CATCH
 END;
-GO

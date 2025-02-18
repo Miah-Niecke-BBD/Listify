@@ -1,4 +1,4 @@
-GO
+
 CREATE PROCEDURE listify.uspCreateTeam
     @userID INT,
     @teamName VARCHAR(100)
@@ -26,4 +26,3 @@ BEGIN
         THROW;
     END CATCH
 END;
-GO

@@ -1,4 +1,4 @@
-GO
+
 CREATE PROCEDURE listify.uspCreateMyProjectsTeam
     @userID INT, 
     @gitHubID VARCHAR(2083) 
@@ -34,4 +34,3 @@ BEGIN
         THROW;
     END CATCH
 END;
-GO

@@ -1,4 +1,4 @@
-GO
+
 CREATE PROCEDURE [listify].uspDeleteTeam
     @teamID INT,
     @teamLeaderID INT
@@ -58,4 +58,3 @@ BEGIN
         THROW;
     END CATCH
 END;
-GO

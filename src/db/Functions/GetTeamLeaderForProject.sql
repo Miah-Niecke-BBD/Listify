@@ -1,4 +1,4 @@
-CREATE FUNCTION [listify]fn.GetTeamLeaderForProject
+CREATE FUNCTION [listify].fnGetTeamLeaderForProject
 (
 	@projectID INT
 )
@@ -8,11 +8,11 @@ BEGIN
 	  DECLARE @teamLeaderID INT;
 
 	  SELECT @teamLeaderID = userID  
-	  FROM Projects p
+	  FROM [listify].Projects p
 		INNER JOIN
-			Teams t ON t.teamID = p.teamID
+			[listify].Teams t ON t.teamID = p.teamID
 		INNER JOIN
-			TeamMembers tm ON tm.teamID = t.teamID
+			[listify].TeamMembers tm ON tm.teamID = t.teamID
 		WHERE projectID = @projectID AND tm.isTeamLeader = 1
 
 	RETURN @teamLeaderID

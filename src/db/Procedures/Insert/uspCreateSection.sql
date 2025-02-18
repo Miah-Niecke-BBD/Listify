@@ -1,4 +1,4 @@
-GO
+
 CREATE PROCEDURE uspCreateSection
     @teamLeaderID INT,              
     @projectID INT,           
@@ -54,4 +54,3 @@ BEGIN
         THROW;
     END CATCH
 END;
-GO

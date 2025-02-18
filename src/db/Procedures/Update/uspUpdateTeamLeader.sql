@@ -1,4 +1,4 @@
-GO
+
 CREATE PROCEDURE listify.uspUpdateTeamLeader
 	@teamLeaderID INT,
 	@teamID INT,
@@ -33,4 +33,3 @@ BEGIN
         THROW;
 	END CATCH
 END
-GO

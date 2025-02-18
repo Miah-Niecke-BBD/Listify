@@ -1,4 +1,4 @@
-GO
+
 CREATE PROCEDURE [listify].uspDeleteUserFromTask
     @userID INT,
     @taskID INT,
@@ -44,4 +44,3 @@ BEGIN
         THROW;
     END CATCH
 END;
-GO

@@ -8,13 +8,13 @@ BEGIN
 	  DECLARE @teamLeaderID INT;
 
 	  SELECT @teamLeaderID = userID  
-	  FROM Sections s
+	  FROM [listify].Sections s
 		INNER JOIN
-			Projects p ON p.projectID = s.projectID
+			[listify].Projects p ON p.projectID = s.projectID
 		INNER JOIN
-			Teams t ON t.teamID = p.teamID
+			[listify].Teams t ON t.teamID = p.teamID
 		INNER JOIN
-			TeamMembers tm ON tm.teamID = t.teamID
+			[listify].TeamMembers tm ON tm.teamID = t.teamID
 		WHERE sectionID = @sectionID AND tm.isTeamLeader = 1
 
 	RETURN @teamLeaderID

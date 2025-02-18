@@ -48,16 +48,16 @@ BEGIN TRY
     INSERT INTO [listify].[TaskAssignees] ([userID], [taskID])
     VALUES
     ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user1_github'), @Task1),
-    ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user1_github'), (SELECT [taskID] FROM [listify].[Tasks] WHERE [taskName] = 'Initialize Kubernetes Master'))),
+    ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user1_github'), (SELECT [taskID] FROM [listify].[Tasks] WHERE [taskName] = 'Initialize Kubernetes Master')),
     ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user1_github'), @Task2),
     
     ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user2_github'), @Task3),
-    ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user2_github'), (SELECT [taskID] FROM [listify].[Tasks] WHERE [taskName] = 'Verify Helm Installation'))),
-    ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user2_github'), (SELECT [taskID] FROM [listify].[Tasks] WHERE [taskName] = 'Setup Prometheus Monitoring'))),
+    ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user2_github'), (SELECT [taskID] FROM [listify].[Tasks] WHERE [taskName] = 'Verify Helm Installation')),
+    ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user2_github'), (SELECT [taskID] FROM [listify].[Tasks] WHERE [taskName] = 'Setup Prometheus Monitoring')),
     
-    ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user3_github'), (SELECT [taskID] FROM [listify].[Tasks] WHERE [taskName] = 'Setup Ingress Controller'))),
-    ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user3_github'), (SELECT [taskID] FROM [listify].[Tasks] WHERE [taskName] = 'Configure Logging with ELK'))),
-    ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user3_github'), (SELECT [taskID] FROM [listify].[Tasks] WHERE [taskName] = 'Auto-Scaling Configuration')));
+    ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user3_github'), (SELECT [taskID] FROM [listify].[Tasks] WHERE [taskName] = 'Setup Ingress Controller')),
+    ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user3_github'), (SELECT [taskID] FROM [listify].[Tasks] WHERE [taskName] = 'Configure Logging with ELK')),
+    ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user3_github'), (SELECT [taskID] FROM [listify].[Tasks] WHERE [taskName] = 'Auto-Scaling Configuration'));
 
     INSERT INTO [listify].[Tasks] ([sectionID], [parentTaskID], [taskName], [taskDescription], [taskPriority], [taskPosition], [dueDate], [createdAt], [updatedAt], [dateCompleted])
     VALUES
@@ -78,11 +78,11 @@ BEGIN TRY
     INSERT INTO [listify].[TaskAssignees] ([userID], [taskID])
     VALUES
     ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user2_github'), @Task4),
-    ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user2_github'), (SELECT [taskID] FROM [listify].[Tasks] WHERE [taskName] = 'Test Firewall Rules'))),
+    ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user2_github'), (SELECT [taskID] FROM [listify].[Tasks] WHERE [taskName] = 'Test Firewall Rules')),
     ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user2_github'), @Task5),
-    ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user2_github'), (SELECT [taskID] FROM [listify].[Tasks] WHERE [taskName] = 'Integrate with Prometheus'))),
+    ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user2_github'), (SELECT [taskID] FROM [listify].[Tasks] WHERE [taskName] = 'Integrate with Prometheus')),
     ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user2_github'), @Task6),
-    ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user2_github'), (SELECT [taskID] FROM [listify].[Tasks] WHERE [taskName] = 'Analyze Resource Usage')));
+    ((SELECT [userID] FROM [listify].[Users] WHERE [gitHubID] = 'user2_github'), (SELECT [taskID] FROM [listify].[Tasks] WHERE [taskName] = 'Analyze Resource Usage'));
 
     COMMIT TRANSACTION;
 END TRY

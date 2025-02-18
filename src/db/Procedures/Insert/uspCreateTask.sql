@@ -1,4 +1,4 @@
-GO
+
 CREATE PROCEDURE listify.uspCreateTask
     @teamLeaderID INT,              
     @projectID INT,           
@@ -65,4 +65,3 @@ BEGIN
         THROW;
     END CATCH
 END;
-GO

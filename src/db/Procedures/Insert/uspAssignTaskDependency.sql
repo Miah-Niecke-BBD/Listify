@@ -1,4 +1,4 @@
-GO
+
 CREATE PROCEDURE listify.uspAssignTaskDependency
     @teamLeaderID INT,              
     @taskID INT,              
@@ -79,4 +79,3 @@ BEGIN
         THROW;
     END CATCH
 END;
-GO

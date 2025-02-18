@@ -1,4 +1,4 @@
-GO
+
 CREATE PROCEDURE listify.uspCreateUser
     @gitHubID VARCHAR(2083)
 AS
@@ -26,4 +26,3 @@ BEGIN
         THROW;
     END CATCH
 END;
-GO

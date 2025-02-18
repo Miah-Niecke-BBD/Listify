@@ -1,4 +1,4 @@
-GO
+
 CREATE PROCEDURE [listify].uspDeleteTaskDependency
 	@taskID INT,
 	@taskDependencyID INT,
@@ -38,4 +38,4 @@ BEGIN
         THROW;
 	END CATCH
 END;
-GO
+
