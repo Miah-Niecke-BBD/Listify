@@ -1,7 +1,7 @@
 CREATE LOGIN listifyuser1 WITH PASSWORD = 'X7s*3F$1wZ@qP9kY' CHECK_EXPIRATION = OFF;
 USE interns2025;
 CREATE USER listifyuser1 FOR LOGIN listifyuser1;
-GRANT SELECT, EXECUTE ON SCHEMA::listify TO aplistifyuser1iUser1;
+GRANT SELECT, EXECUTE ON SCHEMA::listify TO listifyuser1;
 
 CREATE LOGIN listifyuser2 WITH PASSWORD = 'G2h#8VbZ!1xT&7pR' CHECK_EXPIRATION = OFF;
 USE interns2025;
