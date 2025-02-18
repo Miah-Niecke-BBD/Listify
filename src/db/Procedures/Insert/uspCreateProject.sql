@@ -1,4 +1,4 @@
-GO
+
 CREATE PROCEDURE listify.uspCreateProject
     @teamLeaderID INT,
     @teamID INT,
@@ -37,4 +37,3 @@ BEGIN
         THROW;
     END CATCH
 END;
-GO

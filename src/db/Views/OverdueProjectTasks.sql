@@ -1,4 +1,4 @@
-GO
+
 CREATE VIEW listify.vOverdueProjectTasks AS
 SELECT
 	p.projectID,
@@ -22,4 +22,3 @@ INNER JOIN
 WHERE 
 	dateCompleted IS NULL 
     AND dueDate <= DATEADD(DAY, -1, CAST(GETDATE() AS DATE));
-GO

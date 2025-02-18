@@ -1,4 +1,4 @@
-GO
+
 CREATE PROCEDURE listify.uspAssignUserToTeam
     @teamLeaderID INT,
     @userID INT,
@@ -38,4 +38,3 @@ BEGIN
         THROW;
     END CATCH
 END;
-GO

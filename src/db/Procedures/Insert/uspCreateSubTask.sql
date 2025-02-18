@@ -1,4 +1,4 @@
-	GO
+	
 	CREATE PROCEDURE listify.uspCreateSubTask
 		@teamLeaderID INT,
 		@parentTaskID INT,  
@@ -44,4 +44,3 @@
         THROW;
     END CATCH
 END;
-GO

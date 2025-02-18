@@ -1,4 +1,4 @@
-GO
+
 CREATE PROCEDURE [listify].uspRemoveUser
 @userID INT 
 AS
@@ -27,6 +27,6 @@ BEGIN
         THROW;
 	END CATCH
 END;
-GO
+
 
 

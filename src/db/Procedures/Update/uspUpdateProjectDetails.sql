@@ -1,4 +1,4 @@
-GO
+
 CREATE PROCEDURE listify.uspUpdateProjectDetails
     @projectID INT,
     @teamLeaderID INT,
@@ -40,4 +40,4 @@ BEGIN
 
     COMMIT TRANSACTION;
 END;
-GO
+

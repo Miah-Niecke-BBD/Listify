@@ -14,4 +14,3 @@ FROM
 	listify.Projects p
 INNER JOIN
 	listify.Sections s ON s.projectID = p.projectID
-GO

@@ -1,4 +1,4 @@
-GO
+
 CREATE PROCEDURE [listify].uspDeleteTask
     @taskID INT,
     @teamLeaderID INT  

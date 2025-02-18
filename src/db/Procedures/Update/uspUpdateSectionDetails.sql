@@ -1,4 +1,4 @@
-GO
+
 CREATE PROCEDURE listify.uspUpdateSectionDetails
     @sectionID INT,
     @teamLeaderID INT, 
@@ -42,4 +42,3 @@ BEGIN
 
     COMMIT TRANSACTION;
 END;
-GO

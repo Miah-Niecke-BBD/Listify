@@ -9,7 +9,7 @@ BEGIN
 		DECLARE @varteamID INT, @isTeamLeader BIT
 
 		SELECT @isTeamLeader = isTeamLeader 
-        FROM TeamMembers tm
+        FROM [listify].TeamMembers tm
         WHERE tm.userID = @teamLeaderID AND tm.isTeamLeader = 1 AND teamID =@teamID;
 
         IF @isTeamLeader IS NULL
@@ -45,4 +45,3 @@ BEGIN
 	ROLLBACK;
 	END CATCH
 END;
-GO

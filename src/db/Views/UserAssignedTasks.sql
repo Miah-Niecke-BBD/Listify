@@ -24,4 +24,3 @@ INNER JOIN
     listify.Sections s ON t.sectionID = s.sectionID
 INNER JOIN 
     listify.Projects p ON s.projectID = p.projectID
-GO
