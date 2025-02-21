@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
+
 @Entity
+@Table(name = "Tasks", schema = "listify")
 public class Tasks {
 
     @Id
@@ -26,15 +28,15 @@ public class Tasks {
     private LocalDateTime dateCompleted;
     @Column(name = "dueDate", nullable = true)
     private LocalDateTime dueDate;
-    @Column(name = "createAt", nullable = false)
-    private LocalDateTime createAt;
+    @Column(name = "createdAt", nullable = false)
+    private LocalDateTime createdAt;
     @Column(name = "updatedAt", nullable = true)
     private LocalDateTime updatedAt;
 
     protected Tasks() {
     }
 
-    public Tasks(Long taskID, Long sectionID, Long parentTaskID, String taskName, String taskDescription, Long taskPriority, int taskPosition, LocalDateTime dateCompleted, LocalDateTime dueDate, LocalDateTime createAt, LocalDateTime updatedAt) {
+    public Tasks(Long taskID, Long sectionID, Long parentTaskID, String taskName, String taskDescription, Long taskPriority, int taskPosition, LocalDateTime dateCompleted, LocalDateTime dueDate, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.taskID = taskID;
         this.sectionID = sectionID;
         this.parentTaskID = parentTaskID;
@@ -44,7 +46,7 @@ public class Tasks {
         this.taskPosition = taskPosition;
         this.dateCompleted = dateCompleted;
         this.dueDate = dueDate;
-        this.createAt = createAt;
+        this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
@@ -60,7 +62,7 @@ public class Tasks {
                 ", taskPosition=" + taskPosition +
                 ", dateCompleted=" + dateCompleted +
                 ", dueDate=" + dueDate +
-                ", createAt=" + createAt +
+                ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';
     }
@@ -73,12 +75,12 @@ public class Tasks {
         this.updatedAt = updatedAt;
     }
 
-    public LocalDateTime getCreateAt() {
-        return createAt;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreateAt(LocalDateTime createAt) {
-        this.createAt = createAt;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public LocalDateTime getDueDate() {
@@ -153,3 +155,4 @@ public class Tasks {
         this.taskID = taskID;
     }
 }
+
