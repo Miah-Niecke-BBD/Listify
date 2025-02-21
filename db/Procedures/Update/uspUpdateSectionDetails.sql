@@ -1,7 +1,6 @@
-
 CREATE PROCEDURE listify.uspUpdateSectionDetails
     @sectionID INT,
-    @teamLeaderID INT, 
+    @userID INT, 
     @newSectionName VARCHAR(100)
 AS
 BEGIN
@@ -9,7 +8,6 @@ BEGIN
 
     DECLARE @projectID INT;
     DECLARE @teamID INT;
-    DECLARE @isTeamLeader BIT;
 
     SELECT @projectID = projectID
     FROM listify.Sections
@@ -18,25 +16,21 @@ BEGIN
     IF @projectID IS NULL
     BEGIN
         ROLLBACK;
-        THROW 50070, 'Section does not exist.',1;
+        THROW 50070, 'Section does not exist.', 1;
     END
 
     SELECT @teamID = teamID
     FROM listify.Projects
     WHERE projectID = @projectID;
 
-    SELECT @isTeamLeader = isTeamLeader
-    FROM listify.TeamMembers
-    WHERE userID = @teamLeaderID AND teamID = @teamID;
-
-    IF @isTeamLeader <> 1
+    IF NOT EXISTS (SELECT 1 FROM listify.TeamMembers WHERE userID = @userID AND teamID = @teamID)
     BEGIN
         ROLLBACK;
-        THROW 50072, 'Only team leaders can update sections.',1;
+        THROW 50073, 'User is not part of the project team.', 1;
     END
 
     UPDATE listify.Sections
-    SET sectionName = COALESCE(@newSectionName,sectionName),
+    SET sectionName = COALESCE(@newSectionName, sectionName),
         updatedAt = GETDATE()
     WHERE sectionID = @sectionID;
 

@@ -1,28 +1,29 @@
-
 CREATE PROCEDURE listify.uspUpdateTeamDetails
-    @teamID INT,
-    @teamLeaderID INT, 
+    @userID INT,
+    @teamID INT, 
     @newTeamName VARCHAR(100) = NULL
 AS
 BEGIN
     BEGIN TRANSACTION;
 
-    DECLARE @isTeamLeader BIT;
+    DECLARE @isTeamMember BIT;
 
-    SELECT @isTeamLeader = isTeamLeader
+
+    SELECT @isTeamMember = 1
     FROM listify.TeamMembers
-    WHERE userID = @teamLeaderID AND teamID = @teamID;
+    WHERE userID = @userID AND teamID = @teamID;
 
-    IF @isTeamLeader <> 1
+    IF @isTeamMember IS NULL
     BEGIN
         ROLLBACK;
-        THROW 50086, 'Only team leaders can update teams.',1;
+        THROW 50087, 'User is not a member of the team.', 1;
     END
+
 
     UPDATE listify.Teams
     SET 
-        teamName = COALESCE(@newTeamName, teamName),  
-        updatedAt = GETDATE()  
+        teamName = COALESCE(@newTeamName, teamName),
+        updatedAt = GETDATE()
     WHERE teamID = @teamID;
 
     COMMIT TRANSACTION;

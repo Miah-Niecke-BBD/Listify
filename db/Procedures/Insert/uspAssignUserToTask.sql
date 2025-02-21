@@ -1,8 +1,6 @@
-
 CREATE PROCEDURE listify.uspAssignUserToTask
     @userID INT,          
-    @taskID INT,              
-    @teamLeaderID INT      
+    @taskID INT               
 AS
 BEGIN
     DECLARE @teamID INT, @projectID INT, @taskSectionID INT;
@@ -22,41 +20,37 @@ BEGIN
         IF @taskSectionID IS NULL
         BEGIN
             ROLLBACK;
-            THROW 50034,'Task does not exist in the given section and project.',1;
+            THROW 50034, 'Task does not exist in the given section and project.', 1;
         END;
 
-        IF NOT EXISTS (
-            SELECT 1 FROM listify.TeamMembers WHERE userID = @teamLeaderID AND teamID = @teamID AND isTeamLeader = 1
-        )
-        BEGIN
-            ROLLBACK;
-            THROW 50037, 'Only team leaders can assign users to tasks',1;
-        END;
-
+       
         IF NOT EXISTS (
             SELECT 1 FROM listify.TeamMembers WHERE userID = @userID AND teamID = @teamID
         )
         BEGIN
             ROLLBACK;
-            THROW 50039, 'User is not a member of this team',1;
+            THROW 50039, 'User is not a member of this team', 1;
         END;
 
+       
         IF NOT EXISTS (
             SELECT 1 FROM listify.ProjectAssignees WHERE userID = @userID AND projectID = @projectID
         )
         BEGIN
             ROLLBACK;
-            THROW 50040, 'User is not assigned to this project',1;
+            THROW 50040, 'User is not assigned to this project', 1;
         END;
 
+       
         IF EXISTS (
             SELECT 1 FROM listify.TaskAssignees WHERE userID = @userID AND taskID = @taskID
         )
         BEGIN
             ROLLBACK;
-            THROW  50041,'User is already assigned to this task',1;
+            THROW 50041, 'User is already assigned to this task', 1;
         END;
 
+        
         INSERT INTO listify.TaskAssignees (userID, taskID)
         VALUES (@userID, @taskID);
 
