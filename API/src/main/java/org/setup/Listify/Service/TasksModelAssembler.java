@@ -9,7 +9,6 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Component
@@ -17,8 +16,8 @@ public class TasksModelAssembler implements RepresentationModelAssembler<Tasks, 
     @Override
     public EntityModel<Tasks> toModel(Tasks task) {
         return EntityModel.of(task,
-                linkTo(methodOn(TasksController.class).one(task.getTaskID())).withSelfRel(),
-                linkTo(methodOn(TasksController.class).all()).withRel("tasks"));
+                linkTo(methodOn(TasksController.class).getTaskById(task.getTaskID())).withSelfRel(),
+                linkTo(methodOn(TasksController.class).getAllTasks()).withRel("tasks"));
     }
 
     @Override
@@ -28,6 +27,6 @@ public class TasksModelAssembler implements RepresentationModelAssembler<Tasks, 
                 .toList();
 
         return CollectionModel.of(tasksModel,
-                linkTo(methodOn(TasksController.class).all()).withSelfRel());
+                linkTo(methodOn(TasksController.class).getAllTasks()).withSelfRel());
     }
 }
