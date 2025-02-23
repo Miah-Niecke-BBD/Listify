@@ -3,6 +3,7 @@ package org.setup.Listify.Model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "TaskDependencies", schema = "listify")
 public class TaskDependencies {
 
     @Id
@@ -35,9 +36,6 @@ public class TaskDependencies {
         return taskDependencyID;
     }
 
-    public void setTaskDependencyID(Long taskDependencyID) {
-        this.taskDependencyID = taskDependencyID;
-    }
 
     public Long getTaskID() {
         return taskID;
