@@ -151,8 +151,5 @@ public class Tasks {
         return taskID;
     }
 
-    public void setTaskID(Long taskID) {
-        this.taskID = taskID;
-    }
 }
 
