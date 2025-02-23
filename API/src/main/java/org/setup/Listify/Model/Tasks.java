@@ -23,7 +23,7 @@ public class Tasks {
     @Column(name = "taskPriority", nullable = true)
     private Long taskPriority;
     @Column(name = "taskPosition", nullable = false)
-    private int taskPosition;
+    private Integer taskPosition;
     @Column(name = "dateCompleted", nullable = true)
     private LocalDateTime dateCompleted;
     @Column(name = "dueDate", nullable = true)
@@ -36,7 +36,7 @@ public class Tasks {
     protected Tasks() {
     }
 
-    public Tasks(Long taskID, Long sectionID, Long parentTaskID, String taskName, String taskDescription, Long taskPriority, int taskPosition, LocalDateTime dateCompleted, LocalDateTime dueDate, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Tasks(Long taskID, Long sectionID, Long parentTaskID, String taskName, String taskDescription, Long taskPriority, Integer taskPosition, LocalDateTime dateCompleted, LocalDateTime dueDate, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.taskID = taskID;
         this.sectionID = sectionID;
         this.parentTaskID = parentTaskID;
@@ -99,11 +99,11 @@ public class Tasks {
         this.dateCompleted = dateCompleted;
     }
 
-    public int getTaskPosition() {
+    public Integer getTaskPosition() {
         return taskPosition;
     }
 
-    public void setTaskPosition(int taskPosition) {
+    public void setTaskPosition(Integer  taskPosition) {
         this.taskPosition = taskPosition;
     }
 

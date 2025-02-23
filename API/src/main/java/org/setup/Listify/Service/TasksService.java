@@ -54,7 +54,7 @@ public class TasksService {
             existingTask.setTaskPriority(updatedTask.getTaskPriority());
         }
 
-        if (updatedTask.getTaskPosition() != 0) {
+        if (updatedTask.getTaskPosition() != null) {
             existingTask.setTaskPosition(updatedTask.getTaskPosition());
         }
 
