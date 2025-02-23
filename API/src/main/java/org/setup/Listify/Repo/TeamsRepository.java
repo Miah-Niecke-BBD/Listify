@@ -1,7 +1,9 @@
 package org.setup.Listify.Repo;
 
+import org.setup.Listify.Model.TeamProjects;
 import org.setup.Listify.Model.Teams;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 
@@ -19,4 +21,9 @@ public interface TeamsRepository extends JpaRepository<Teams, Long> {
     @Procedure("listify.uspUpdateTeamDetails")
     void updateTeamDetails(@Param("teamID") Long teamID, @Param("teamLeaderID") Long teamLeaderID, @Param("newTeamName") String newTeamName);
 
+    @Query(value = "SELECT * FROM listify.vTeamProjects WHERE teamID=?1", nativeQuery = true)
+    List<TeamProjects> findProjectsByTeamID(Long teamID);
+
+    @Query(value = "SELECT * FROM Teams ORDER BY teamID DESC LIMIT 1", nativeQuery = true)
+    Teams findTopByOrderByTeamIDDesc();
 }
