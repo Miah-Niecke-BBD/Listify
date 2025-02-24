@@ -1,4 +1,4 @@
-CREATE PROCEDURE uspDeleteUserFromTeam
+CREATE PROCEDURE listify.uspDeleteUserFromTeam
 @userID INT,
 @teamID INT,
 @teamLeaderID INT

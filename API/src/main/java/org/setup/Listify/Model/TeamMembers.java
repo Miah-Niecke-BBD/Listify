@@ -3,6 +3,7 @@ package org.setup.Listify.Model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "TeamMembers", schema = "listify")
 public class TeamMembers {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
