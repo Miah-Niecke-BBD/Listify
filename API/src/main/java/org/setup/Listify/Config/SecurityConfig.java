@@ -13,16 +13,16 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/login", "/index").permitAll()  // Allow public access to login page
-                        .anyRequest().authenticated()  // Require authentication for all other requests
+                        .requestMatchers("/", "/login", "/index").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/login")  // Custom login page URL
-                        .permitAll()  // Allow public access to login page
+                        .loginPage("/login")
+                        .permitAll()
                 )
                 .oauth2Login(oauth2 -> oauth2
-                        .defaultSuccessUrl("/home", true)  // Redirect to /home after successful login
-                        .failureUrl("/login?error=true")  // Redirect to login page on failure
+                        .defaultSuccessUrl("/home", true)
+                        .failureUrl("/login?error=true")
                 );
 
         return http.build();
