@@ -12,8 +12,5 @@ public class ListifyApplication {
 		SpringApplication.run(ListifyApplication.class, args);
 	}
 
-	@Bean
-	public PhysicalNamingStrategy physicalNamingStrategy() {
-		return new org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl();
-	}
+
 }
