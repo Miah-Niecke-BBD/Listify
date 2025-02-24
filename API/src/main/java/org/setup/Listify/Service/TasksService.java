@@ -33,41 +33,40 @@ public class TasksService {
     }
 
 
-    public Tasks saveTask(Tasks newTask) {
-        return repository.save(newTask);
+    public Tasks getTaskByNameAndPosition(int sectionID, String taskName, byte taskPosition) {
+        return repository.findBySectionIDAndTaskNameAndTaskPosition(sectionID, taskName, taskPosition);
     }
 
 
-    public Tasks updateTask(Long id, Tasks updatedTask) {
-        Tasks existingTask = repository.findById(id)
-                .orElseThrow(() -> new TaskNotFoundException(id));
+    public void createTask(int teamLeaderID, int projectID, int sectionID,
+                           String taskName, String taskDescription,
+                           byte taskPriority, byte taskPosition) {
 
-        if (updatedTask.getTaskName() != null && !updatedTask.getTaskName().isEmpty()) {
-            existingTask.setTaskName(updatedTask.getTaskName());
-        }
+        repository.createTask(teamLeaderID, projectID,
+                sectionID, taskName, taskDescription,
+                taskPriority, taskPosition);
+    }
 
-        if (updatedTask.getTaskDescription() != null && !updatedTask.getTaskDescription().isEmpty()) {
-            existingTask.setTaskDescription(updatedTask.getTaskDescription());
-        }
+    public void createSubTask(int teamLeaderID, int parentTaskID, String taskName, String taskDescription, int sectionID, LocalDateTime dueDate) {
+        repository.createSubTask(teamLeaderID, parentTaskID, taskName, taskDescription, sectionID, dueDate);
+    }
 
-        if (updatedTask.getTaskPriority() != null) {
-            existingTask.setTaskPriority(updatedTask.getTaskPriority());
-        }
 
-        if (updatedTask.getTaskPosition() != null) {
-            existingTask.setTaskPosition(updatedTask.getTaskPosition());
-        }
+    public void updateTaskDetails(int taskID, int teamLeaderID, String newTaskName,
+                                  String newTaskDescription, byte newTaskPriority,
+                                  LocalDateTime newDate) {
 
-        if (updatedTask.getDateCompleted() != null) {
-            existingTask.setDateCompleted(updatedTask.getDateCompleted());
-        }
+        repository.updateTaskDetails(taskID, teamLeaderID, newTaskName,
+                newTaskDescription, newTaskPriority, newDate);
+    }
 
-        if (updatedTask.getDueDate() != null) {
-            existingTask.setDueDate(updatedTask.getDueDate());
-        }
 
-        existingTask.setUpdatedAt(LocalDateTime.now());
+    public void updateTaskPosition (int teamLeaderID, int taskID, int newTaskPosition, int sectionID) {
+        repository.updateTaskPosition(teamLeaderID, taskID, newTaskPosition, sectionID);
+    }
 
-        return repository.save(existingTask);
+
+    public void deleteTaskById(Long id, int teamLeaderID) {
+        repository.deleteTasksById(id.intValue(), teamLeaderID);
     }
 }
