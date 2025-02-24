@@ -24,4 +24,12 @@ public class TaskDependenciesService {
         return repository.findById(taskDependencyID)
                 .orElseThrow(() -> new TaskDependencyNotFoundException(taskDependencyID));
     }
+
+    public void newTaskDependency(int teamLeaderID, int taskID, int dependentTaskID) {
+        repository.newTaskDependency(teamLeaderID, taskID, dependentTaskID);
+    }
+
+    public void deleteTaskDependencyByDependencyId(Long taskDependencyID, int taskID, int teamLeaderID) {
+        repository.deleteTaskDependencyByDependencyID(taskDependencyID.intValue(), taskID, teamLeaderID);
+    }
 }
