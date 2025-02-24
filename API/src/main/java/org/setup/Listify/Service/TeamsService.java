@@ -1,16 +1,17 @@
 package org.setup.Listify.Service;
 
+import org.setup.Listify.Exception.ListNotFoundException;
+import org.setup.Listify.Exception.TeamMemberNotFoundException;
+import org.setup.Listify.Exception.TeamNotFoundException;
 import org.setup.Listify.Model.TeamMembers;
 import org.setup.Listify.Model.TeamProjects;
 import org.setup.Listify.Model.Teams;
 import org.setup.Listify.Repo.TeamMembersRepository;
 import org.setup.Listify.Repo.TeamsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TeamsService {
@@ -20,30 +21,59 @@ public class TeamsService {
     private TeamMembersRepository teamMembersRepository;
 
     public List<Teams> getAllTeams() {
-        return teamsRepository.findAll();
+        List<Teams> teams = teamsRepository.findAll();
+
+        if (teams.isEmpty()) {
+            throw new ListNotFoundException("teams");
+        }
+
+        return teams;
     }
 
     public List<TeamMembers> getAllTeamMembers() {
-        return teamMembersRepository.findAll();
+        List<TeamMembers> teamMembers = teamMembersRepository.findAll();
+
+        if (teamMembers.isEmpty()) {
+            throw new ListNotFoundException("team members");
+        }
+
+        return teamMembers;
     }
 
-    public Optional<Teams> getTeamById(Long teamID) {
-        return teamsRepository.findById(teamID);
+    public Teams getTeamById(Long teamID) {
+        return teamsRepository.findById(teamID)
+                .orElseThrow(() -> new TeamNotFoundException(teamID));
     }
 
-    public Optional<TeamMembers> getByTeamMembersId(Long teamID) {
-        return teamMembersRepository.findById(teamID);
+    public TeamMembers getByTeamMembersId(Long userID) {
+        return teamMembersRepository.findById(userID)
+                .orElseThrow(() -> new TeamMemberNotFoundException(userID));
     }
 
     public List<TeamMembers> getTeamMembersByTeamId(Long teamID) {
-        return teamMembersRepository.findByTeamID(teamID);
+        getTeamById(teamID);
+        List<TeamMembers> teamMembers = teamMembersRepository.findByTeamID(teamID);
+
+        if (teamMembers.isEmpty()) {
+            throw new ListNotFoundException("team members for team " + teamID);
+        }
+
+        return teamMembers;
     }
 
     public List<TeamProjects> getProjectsByTeamID(Long teamID) {
-        return teamsRepository.findProjectsByTeamID(teamID);
+        getTeamById(teamID);
+        List<TeamProjects> teamProjects = teamsRepository.findProjectsByTeamID(teamID);
+
+        if(teamProjects.isEmpty()) {
+            throw new ListNotFoundException("team projects for team " + teamID);
+        }
+
+        return teamProjects;
     }
 
     public Long addTeam(Long userID, String teamName) {
+        getByTeamMembersId(userID);
         teamsRepository.createTeam(userID, teamName);
 
         Teams lastCreatedTeam = teamsRepository.findTopByOrderByTeamIDDesc();
@@ -51,22 +81,27 @@ public class TeamsService {
     }
 
     public void assignMemberToTeam(Long teamLeaderID, Long userID, Long teamID) {
-        teamMembersRepository.assignMemberToTeam(teamLeaderID, userID, teamLeaderID);
+        getTeamById(teamID);
+        teamMembersRepository.assignMemberToTeam(teamLeaderID, userID, teamID);
     }
 
     public void deleteTeam(Long teamID, Long teamLeaderID) {
+        getTeamById(teamID);
         teamsRepository.deleteTeam(teamID, teamLeaderID);
     }
 
     public void deleteMemberFromTeam(Long userID, Long teamID, Long teamLeaderID) {
+        getTeamById(teamID);
         teamMembersRepository.deleteMemberFromTeam(userID, teamID, teamLeaderID);
     }
 
     public void updateTeamDetails(Long teamID, Long teamLeaderID, String newTeamName) {
+        getTeamById(teamID);
         teamsRepository.updateTeamDetails(teamID, teamLeaderID, newTeamName);
     }
 
     public void updateTeamLeader(Long teamLeaderID, Long teamID, Long newTeamLeaderID) {
+        getTeamById(teamID);
         teamMembersRepository.updateTeamLeader(teamLeaderID, teamID, newTeamLeaderID);
     }
 

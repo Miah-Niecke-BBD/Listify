@@ -1,5 +1,5 @@
 
-CREATE PROCEDURE uspCreateSection
+CREATE PROCEDURE listify.uspCreateSection
     @teamLeaderID INT,              
     @projectID INT,           
     @sectionName VARCHAR(100), 
