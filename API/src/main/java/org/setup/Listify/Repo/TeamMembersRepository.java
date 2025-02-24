@@ -19,4 +19,10 @@ public interface TeamMembersRepository extends JpaRepository<TeamMembers, Long> 
     void updateTeamLeader(@Param("teamLeaderID") Long teamLeaderID, @Param("teamID") Long teamID, @Param("newTeamLeaderID") Long newTeamLeaderID);
 
     List<TeamMembers> findByTeamID(Long teamID);
+
+    List<TeamMembers> findByUserID(Long UserID);
+
+    boolean existsByTeamIDAndUserIDAndIsTeamLeaderTrue(Long teamID, Long userID);
+
+    boolean existsByTeamIDAndUserID(Long teamID, Long userID);
 }

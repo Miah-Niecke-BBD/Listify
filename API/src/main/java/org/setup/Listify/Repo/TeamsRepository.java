@@ -17,11 +17,11 @@ public interface TeamsRepository extends JpaRepository<Teams, Long> {
     void deleteTeam(@Param("teamID") Long teamID, @Param("teamLeaderID") Long teamLeaderID);
 
     @Procedure("listify.uspUpdateTeamDetails")
-    void updateTeamDetails(@Param("teamID") Long teamID, @Param("teamLeaderID") Long teamLeaderID, @Param("newTeamName") String newTeamName);
+    void updateTeamDetails(@Param("userID") Long userID, @Param("teamID") Long teamID, @Param("newTeamName") String newTeamName);
 
     @Query(value = "SELECT * FROM listify.vTeamProjects WHERE teamID=?1", nativeQuery = true)
     List<TeamProjects> findProjectsByTeamID(Long teamID);
 
-    @Query(value = "SELECT * FROM Teams ORDER BY teamID DESC LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT TOP 1 * FROM listify.Teams ORDER BY teamID DESC", nativeQuery = true)
     Teams findTopByOrderByTeamIDDesc();
 }
