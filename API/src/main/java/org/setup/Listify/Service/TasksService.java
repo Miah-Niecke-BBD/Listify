@@ -1,5 +1,7 @@
 package org.setup.Listify.Service;
 
+import org.setup.Listify.Exception.ListNotFoundException;
+import org.setup.Listify.Exception.SectionNotFoundException;
 import org.setup.Listify.Model.Tasks;
 import org.setup.Listify.Repo.TasksRepository;
 import org.setup.Listify.Exception.TaskNotFoundException;
@@ -18,7 +20,11 @@ public class TasksService {
 
 
     public List<Tasks> getAllTasks() {
-        return repository.findAll();
+        List<Tasks> tasks = repository.findAll();
+        if (tasks.isEmpty()) {
+            throw new ListNotFoundException("tasks");
+        }
+        return tasks;
     }
 
 
@@ -29,7 +35,11 @@ public class TasksService {
 
 
     public List<Tasks> getTaskBySectionId(Long sectionId) {
-        return repository.findTasksBySectionID(sectionId);
+        List<Tasks> tasksInSection = repository.findTasksBySectionID(sectionId);
+        if (tasksInSection.isEmpty()) {
+            throw new SectionNotFoundException(sectionId);
+        }
+        return tasksInSection;
     }
 
 
@@ -38,17 +48,23 @@ public class TasksService {
     }
 
 
-    public void createTask(int teamLeaderID, int projectID, int sectionID,
+    public Long createTask(int teamLeaderID, int projectID, int sectionID,
                            String taskName, String taskDescription,
                            byte taskPriority, byte taskPosition) {
 
         repository.createTask(teamLeaderID, projectID,
                 sectionID, taskName, taskDescription,
                 taskPriority, taskPosition);
+
+        Tasks newlyAddedTask = repository.findTopOrderByTaskIDDesc();
+        return newlyAddedTask != null ? newlyAddedTask.getTaskID() : null;
     }
 
-    public void createSubTask(int teamLeaderID, int parentTaskID, String taskName, String taskDescription, int sectionID, LocalDateTime dueDate) {
+    public Long createSubTask(int teamLeaderID, int parentTaskID, String taskName, String taskDescription, int sectionID, LocalDateTime dueDate) {
         repository.createSubTask(teamLeaderID, parentTaskID, taskName, taskDescription, sectionID, dueDate);
+
+        Tasks newlyAddedTask = repository.findTopOrderByTaskIDDesc();
+        return newlyAddedTask != null ? newlyAddedTask.getTaskID() : null;
     }
 
 

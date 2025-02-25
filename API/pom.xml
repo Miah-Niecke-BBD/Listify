@@ -82,7 +82,6 @@
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
-					<compilerArgument>-parameters</compilerArgument>
 					<compilerArgs>
 						<arg>-parameters</arg>
 					</compilerArgs>
