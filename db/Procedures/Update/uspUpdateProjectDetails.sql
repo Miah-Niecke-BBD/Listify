@@ -1,7 +1,6 @@
-
 CREATE PROCEDURE listify.uspUpdateProjectDetails
     @projectID INT,
-    @teamLeaderID INT,
+    @userID INT,
     @newProjectName VARCHAR(100) = NULL,
     @newProjectDescription VARCHAR(500) = NULL
 AS
@@ -9,7 +8,6 @@ BEGIN
     BEGIN TRANSACTION;
 
     DECLARE @teamID INT;
-    DECLARE @isTeamLeader BIT;
 
     SELECT @teamID = teamID
     FROM listify.Projects
@@ -18,17 +16,13 @@ BEGIN
     IF @teamID IS NULL
     BEGIN
         ROLLBACK;
-        THROW 50062, 'Project does not exist.',1;
+        THROW 50062, 'Project does not exist.', 1;
     END
 
-    SELECT @isTeamLeader = isTeamLeader
-    FROM listify.TeamMembers
-    WHERE userID = @teamLeaderID AND teamID = @teamID;
-
-    IF @isTeamLeader <> 1
+    IF NOT EXISTS (SELECT 1 FROM listify.TeamMembers WHERE userID = @userID AND teamID = @teamID)
     BEGIN
         ROLLBACK;
-        THROW 50067, 'Only team leaders can update projects.',1;
+        THROW 50068, 'User is not part of the project team.', 1;
     END
 
     UPDATE listify.Projects
@@ -40,4 +34,6 @@ BEGIN
 
     COMMIT TRANSACTION;
 END;
+
+
 

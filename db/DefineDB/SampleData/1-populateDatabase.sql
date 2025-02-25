@@ -1,5 +1,3 @@
-USE ListifyDB
-
 INSERT INTO [listify].[Users] ([gitHubID], [createdAt], [updatedAt])
 VALUES 
   ('user1_github', '2023-01-15', '2023-01-15'),
