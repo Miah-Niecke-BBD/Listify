@@ -29,7 +29,7 @@ public class TaskDependenciesService {
         repository.newTaskDependency(teamLeaderID, taskID, dependentTaskID);
     }
 
-    public void deleteTaskDependencyByDependencyId(Long taskDependencyID, int taskID, int teamLeaderID) {
-        repository.deleteTaskDependencyByDependencyID(taskDependencyID.intValue(), taskID, teamLeaderID);
+    public void deleteTaskDependencyByDependencyId(int taskID, Long taskDependencyID, int teamLeaderID) {
+        repository.deleteTaskDependency(taskID, taskDependencyID.intValue(), teamLeaderID);
     }
 }

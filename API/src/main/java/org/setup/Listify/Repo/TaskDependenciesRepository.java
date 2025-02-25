@@ -15,8 +15,8 @@ public interface TaskDependenciesRepository extends JpaRepository<TaskDependenci
 
 
     @Procedure("listify.uspDeleteTaskDependency")
-    void deleteTaskDependencyByDependencyID(
-            @Param("taskDependencyID") int taskDependencyID,
+    void deleteTaskDependency(
             @Param("taskID") int taskID,
+            @Param("taskDependencyID") int taskDependencyID,
             @Param("teamLeaderID") int teamLeaderID);
 }

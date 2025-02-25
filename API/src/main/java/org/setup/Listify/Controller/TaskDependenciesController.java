@@ -44,16 +44,18 @@ public class TaskDependenciesController {
         taskDependenciesService.newTaskDependency(teamLeaderID, taskID, dependentTaskID);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Map.of("message", "Task created successfully"));
+                .body(Map.of("message", "Task dependency created successfully"));
     }
 
-    @DeleteMapping("/tasks/dependecies/{taskDependencyID}")
+    @DeleteMapping("/tasks/dependencies/{dependentTaskID}")
     @Transactional
-    public ResponseEntity<?> deleteTaskDependencyByDependencyId(@PathVariable Long taskDependencyID,
+    public ResponseEntity<?> deleteTaskDependencyByDependencyId(@PathVariable Long dependentTaskID,
                                                                 @RequestParam int taskID,
                                                                 @RequestParam int teamLeaderID) {
-        taskDependenciesService.deleteTaskDependencyByDependencyId(taskDependencyID, taskID, teamLeaderID);
+
+        taskDependenciesService.deleteTaskDependencyByDependencyId(taskID, dependentTaskID, teamLeaderID);
+
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                .body(Map.of("message", "Task Dependency with id: "+ taskDependencyID +" has been successfully deleted"));
+                .body(Map.of("message", "Task Dependency with id: "+ dependentTaskID +" has been successfully deleted"));
     }
 }
