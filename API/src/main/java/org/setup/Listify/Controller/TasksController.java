@@ -136,7 +136,7 @@ public class TasksController {
 
     @DeleteMapping("/tasks/{id}")
     @Transactional
-    ResponseEntity<?> deleteTask(@PathVariable Long id, @RequestParam Integer teamLeaderID) {
+    ResponseEntity<?> deleteTask(@PathVariable Long id, @RequestParam(required = false) Integer teamLeaderID) {
         if (teamLeaderID == null) {
             ErrorResponse errorResponse = new ErrorResponse("Team Leader ID is required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);

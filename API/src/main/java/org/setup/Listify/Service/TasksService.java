@@ -43,11 +43,6 @@ public class TasksService {
     }
 
 
-    public Tasks getTaskByNameAndPosition(int sectionID, String taskName, byte taskPosition) {
-        return repository.findBySectionIDAndTaskNameAndTaskPosition(sectionID, taskName, taskPosition);
-    }
-
-
     public Long createTask(int teamLeaderID, int projectID, int sectionID,
                            String taskName, String taskDescription,
                            byte taskPriority, byte taskPosition) {

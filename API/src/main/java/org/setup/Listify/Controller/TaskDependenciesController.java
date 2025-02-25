@@ -1,10 +1,12 @@
 package org.setup.Listify.Controller;
 
+import org.setup.Listify.Exception.ErrorResponse;
 import org.setup.Listify.Model.TaskDependencies;
 import org.setup.Listify.Assembler.TaskDependenciesModelAssembler;
 import org.setup.Listify.Service.TaskDependenciesService;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,20 +40,32 @@ public class TaskDependenciesController {
 
     @PostMapping("/tasks/dependencies")
     @Transactional
-    public ResponseEntity<?> newTaskDependency(@RequestParam int teamLeaderID,
-                                            @RequestParam int taskID,
-                                            @RequestParam int dependentTaskID) {
-        taskDependenciesService.newTaskDependency(teamLeaderID, taskID, dependentTaskID);
+    public ResponseEntity<?> newTaskDependency(@RequestParam(required = false) Integer teamLeaderID,
+                                            @RequestParam(required = false) Integer taskID,
+                                            @RequestParam(required = false) Integer dependentTaskID) {
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Map.of("message", "Task dependency created successfully"));
+        if (teamLeaderID == null || taskID == null || dependentTaskID == null) {
+            ErrorResponse errorResponse = new ErrorResponse("Missing required parameter(s). Please ensure all required parameters are provided.",
+                    HttpStatus.BAD_REQUEST.value());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+
+        Long newTaskDependencyID = taskDependenciesService.newTaskDependency(teamLeaderID, taskID, dependentTaskID);
+        TaskDependencies newTaskDependency = taskDependenciesService.getTaskDependencyById(newTaskDependencyID);
+        EntityModel<TaskDependencies> entityModel = assembler.toModel(newTaskDependency);
+        return ResponseEntity.created((entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()))
+                .body(entityModel);
     }
 
     @DeleteMapping("/tasks/dependencies/{dependentTaskID}")
     @Transactional
     public ResponseEntity<?> deleteTaskDependencyByDependencyId(@PathVariable Long dependentTaskID,
-                                                                @RequestParam int taskID,
-                                                                @RequestParam int teamLeaderID) {
+                                                                @RequestParam(required = false) Integer taskID,
+                                                                @RequestParam(required = false) Integer teamLeaderID) {
+        if (teamLeaderID == null || taskID == null) {
+            ErrorResponse errorResponse = new ErrorResponse("Task ID and Team Leader ID are required.", HttpStatus.BAD_REQUEST.value());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
 
         taskDependenciesService.deleteTaskDependencyByDependencyId(taskID, dependentTaskID, teamLeaderID);
 

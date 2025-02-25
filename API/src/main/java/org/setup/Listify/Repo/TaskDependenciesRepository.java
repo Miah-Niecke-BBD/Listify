@@ -2,10 +2,14 @@ package org.setup.Listify.Repo;
 
 import org.setup.Listify.Model.TaskDependencies;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 
 public interface TaskDependenciesRepository extends JpaRepository<TaskDependencies, Long> {
+
+    @Query(value = "SELECT TOP 1 * FROM listify.TaskDependencies ORDER BY taskDependencyID DESC", nativeQuery = true)
+    TaskDependencies findTopOrderByTaskIDDesc();
 
     @Procedure("listify.uspAssignTaskDependency")
     void newTaskDependency(

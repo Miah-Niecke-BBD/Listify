@@ -1,5 +1,6 @@
 package org.setup.Listify.Service;
 
+import org.setup.Listify.Exception.ListNotFoundException;
 import org.setup.Listify.Model.TaskDependencies;
 import org.setup.Listify.Repo.TaskDependenciesRepository;
 import org.setup.Listify.Exception.TaskDependencyNotFoundException;
@@ -17,7 +18,11 @@ public class TaskDependenciesService {
     }
 
     public List<TaskDependencies> getAllTaskDependencies() {
-        return repository.findAll();
+        List<TaskDependencies> taskDependencies = repository.findAll();
+        if (taskDependencies.isEmpty()) {
+            throw new ListNotFoundException("Task Dependencies");
+        }
+        return taskDependencies;
     }
 
     public TaskDependencies getTaskDependencyById(Long taskDependencyID) {
@@ -25,8 +30,11 @@ public class TaskDependenciesService {
                 .orElseThrow(() -> new TaskDependencyNotFoundException(taskDependencyID));
     }
 
-    public void newTaskDependency(int teamLeaderID, int taskID, int dependentTaskID) {
+    public Long newTaskDependency(int teamLeaderID, int taskID, int dependentTaskID) {
         repository.newTaskDependency(teamLeaderID, taskID, dependentTaskID);
+
+        TaskDependencies latestTaskDependency = repository.findTopOrderByTaskIDDesc();
+        return latestTaskDependency != null ? latestTaskDependency.getTaskDependencyID() : null;
     }
 
     public void deleteTaskDependencyByDependencyId(int taskID, Long taskDependencyID, int teamLeaderID) {
