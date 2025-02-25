@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome</title>
+    <style>
+        .container {
+            display: flex;
+        }
+        .sidenav {
+            width: 250px;
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-right: 1px solid #ddd;
+        }
+        .sidenav h2 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+        .sidenav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidenav ul li {
+            margin-bottom: 10px;
+            position: relative;
+        }
+        .team-button {
+            width: 100%;
+            text-align: left;
+            padding: 8px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .team-button:hover {
+            background: #0056b3;
+        }
+        .dropdown {
+            display: none;
+            list-style-type: none;
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        .dropdown li {
+            padding: 5px 0;
+        }
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="content">
+        <div th:if="${accessToken != null}">
+            <p><strong>GitHub Access Token:</strong> <span th:text="${accessToken}"></span></p>
+        </div>
+        <p class="row"><span th:text="${user.getAttribute('email')}"></span></p>
+    </div>
+</div>
+
+</body>
+</html>
