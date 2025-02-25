@@ -5,11 +5,13 @@ import org.setup.Listify.Service.TaskAssigneesModelAssembler;
 import org.setup.Listify.Service.TaskAssigneesService;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class TaskAssigneesController {
@@ -42,6 +44,27 @@ public class TaskAssigneesController {
                 .getTasksAssignedToSpecificUser(id);
 
         return assembler.toCollectionModel(tasksAssignedToUser);
+    }
+
+    @PostMapping("/tasks/assigned")
+    @Transactional
+    public ResponseEntity<?> assignTask(@RequestParam int userID,
+                                        @RequestParam int taskID) {
+        taskAssigneesService.assignTaskToUser(userID, taskID);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("message", "Task: "+ taskID+ " is successfully assigned to User: "+ userID,
+                        "status", HttpStatus.CREATED));
+    }
+
+    @DeleteMapping("/tasks/assigned/{taskID}")
+    @Transactional
+    public ResponseEntity<?> deleteTaskAssignment(@PathVariable Long taskID,
+                                                  @RequestParam int userID,
+                                                  @RequestParam int teamLeaderID) {
+        taskAssigneesService.deleteUserFromTask(userID, taskID.intValue(), teamLeaderID);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(Map.of("message", "Task with id: "+ taskID +" is no longer assigned to user "+userID,
+                        "status", HttpStatus.NO_CONTENT));
     }
 
 

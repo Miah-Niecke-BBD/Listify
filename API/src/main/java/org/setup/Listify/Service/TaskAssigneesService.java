@@ -28,4 +28,12 @@ public class TaskAssigneesService {
     public List<TaskAssignees> getTasksAssignedToSpecificUser(Long userID) {
         return repository.findAssignedTasksByUserID(userID);
     }
+
+    public void assignTaskToUser(int userID, int taskID) {
+        repository.assignTaskToUser(userID, taskID);
+    }
+
+    public void deleteUserFromTask(int userID, int taskID, int teamLeaderID) {
+        repository.deleteUserFromTask(userID, taskID, teamLeaderID);
+    }
 }
