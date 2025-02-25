@@ -1,4 +1,4 @@
-package org.setup.Listify.exceptions;
+package org.setup.Listify.Exception;
 
 public class TaskDependencyNotFoundException extends RuntimeException {
 

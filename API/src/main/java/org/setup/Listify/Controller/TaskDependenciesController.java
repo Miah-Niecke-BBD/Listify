@@ -1,7 +1,7 @@
 package org.setup.Listify.Controller;
 
 import org.setup.Listify.Model.TaskDependencies;
-import org.setup.Listify.Service.TaskDependenciesModelAssembler;
+import org.setup.Listify.Assembler.TaskDependenciesModelAssembler;
 import org.setup.Listify.Service.TaskDependenciesService;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;

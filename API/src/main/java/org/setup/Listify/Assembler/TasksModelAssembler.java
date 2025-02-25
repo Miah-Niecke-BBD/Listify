@@ -1,4 +1,4 @@
-package org.setup.Listify.Service;
+package org.setup.Listify.Assembler;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 

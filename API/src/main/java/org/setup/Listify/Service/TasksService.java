@@ -2,7 +2,7 @@ package org.setup.Listify.Service;
 
 import org.setup.Listify.Model.Tasks;
 import org.setup.Listify.Repo.TasksRepository;
-import org.setup.Listify.exceptions.TaskNotFoundException;
+import org.setup.Listify.Exception.TaskNotFoundException;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;

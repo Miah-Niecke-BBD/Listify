@@ -2,7 +2,7 @@ package org.setup.Listify.Service;
 
 import org.setup.Listify.Model.TaskDependencies;
 import org.setup.Listify.Repo.TaskDependenciesRepository;
-import org.setup.Listify.exceptions.TaskDependencyNotFoundException;
+import org.setup.Listify.Exception.TaskDependencyNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

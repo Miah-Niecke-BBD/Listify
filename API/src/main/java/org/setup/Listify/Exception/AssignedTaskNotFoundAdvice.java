@@ -1,4 +1,4 @@
-package org.setup.Listify.exceptions;
+package org.setup.Listify.Exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;

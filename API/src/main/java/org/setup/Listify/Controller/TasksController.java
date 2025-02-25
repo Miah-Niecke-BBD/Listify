@@ -2,7 +2,7 @@ package org.setup.Listify.Controller;
 
 import org.setup.Listify.Model.Tasks;
 import org.setup.Listify.Service.TasksService;
-import org.setup.Listify.Service.TasksModelAssembler;
+import org.setup.Listify.Assembler.TasksModelAssembler;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -11,8 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
