@@ -25,4 +25,7 @@ public interface TaskAssigneesRepository extends JpaRepository<TaskAssignees, Lo
             @Param("taskID") int taskID,
             @Param("teamLeaderID") int teamLeaderID
     );
+
+    @Query(value = "SELECT TOP 1 * FROM listify.TaskAssignees ORDER BY taskAssigneeID DESC", nativeQuery = true)
+    TaskAssignees findTopOrderByTaskIDDesc();
 }

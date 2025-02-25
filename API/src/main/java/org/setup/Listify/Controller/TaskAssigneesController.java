@@ -1,10 +1,12 @@
 package org.setup.Listify.Controller;
 
+import org.setup.Listify.Exception.ErrorResponse;
 import org.setup.Listify.Model.TaskAssignees;
 import org.setup.Listify.Assembler.TaskAssigneesModelAssembler;
 import org.setup.Listify.Service.TaskAssigneesService;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,20 +50,32 @@ public class TaskAssigneesController {
 
     @PostMapping("/tasks/assigned")
     @Transactional
-    public ResponseEntity<?> assignTask(@RequestParam int userID,
-                                        @RequestParam int taskID) {
-        taskAssigneesService.assignTaskToUser(userID, taskID);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Map.of("message", "Task: "+ taskID+ " is successfully assigned to User: "+ userID,
-                        "status", HttpStatus.CREATED));
+    public ResponseEntity<?> assignTask(@RequestParam(required = false) Integer userID,
+                                        @RequestParam(required = false) Integer taskID) {
+        if (userID == null || taskID == null) {
+            ErrorResponse errorResponse = new ErrorResponse("User ID and Task ID are required.", HttpStatus.BAD_REQUEST.value());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+        Long newAssignedTaskID = taskAssigneesService.assignTaskToUser(userID, taskID);
+        TaskAssignees newTaskAssignee = taskAssigneesService.getAssignedTaskById(newAssignedTaskID);
+        EntityModel<TaskAssignees> entityModel = assembler.toModel(newTaskAssignee);
+
+        return ResponseEntity.created((entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()))
+                .body(entityModel);
     }
 
     @DeleteMapping("/tasks/assigned/{taskID}")
     @Transactional
     public ResponseEntity<?> deleteTaskAssignment(@PathVariable Long taskID,
-                                                  @RequestParam int userID,
-                                                  @RequestParam int teamLeaderID) {
+                                                  @RequestParam(required = false) Integer userID,
+                                                  @RequestParam(required = false) Integer teamLeaderID) {
+        if (teamLeaderID == null || userID == null) {
+            ErrorResponse errorResponse = new ErrorResponse("User ID and Team Leader ID are required.", HttpStatus.BAD_REQUEST.value());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+
         taskAssigneesService.deleteUserFromTask(userID, taskID.intValue(), teamLeaderID);
+
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(Map.of("message", "Task with id: "+ taskID +" is no longer assigned to user "+userID,
                         "status", HttpStatus.NO_CONTENT));

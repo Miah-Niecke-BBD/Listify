@@ -97,8 +97,8 @@ public class TasksController {
                                  @RequestParam String newTaskDescription,
                                  @RequestParam Byte newTaskPriority,
                                  @RequestParam LocalDateTime newDueDate) {
-        if (id == null || teamLeaderID == null) {
-            ErrorResponse errorResponse = new ErrorResponse("Task ID and Team Leader ID are required.", HttpStatus.BAD_REQUEST.value());
+        if (teamLeaderID == null) {
+            ErrorResponse errorResponse = new ErrorResponse("Team Leader ID is required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
 
