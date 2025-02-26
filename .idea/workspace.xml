@@ -4,7 +4,93 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="38b32f3d-8611-4e24-970b-e0f107c92c96" name="Changes" comment="Project and Sections API" />
+    <list default="true" id="38b32f3d-8611-4e24-970b-e0f107c92c96" name="Changes" comment="Project and Sections API">
+      <change afterPath="$PROJECT_DIR$/API/.gitattributes" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/.mvn/wrapper/maven-wrapper.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Assembler/TeamMembersAssembler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Assembler/TeamProjectsAssembler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Assembler/TeamsAssembler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Assembler/UserAssembler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Config/SecurityConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Controller/GitHubOAuthController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Controller/TeamsController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Exception/DuplicateUserException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Exception/ErrorResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Exception/ListNotFoundException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Exception/NotTeamLeaderException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Exception/TeamMemberAlreadyExistsException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Exception/TeamMemberNotFoundException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Exception/TeamNotFoundException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Exception/UserNotFoundException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Model/TeamProjects.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Repo/TeamMembersRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Repo/TeamsRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Repo/UsersRepo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Service/TeamCalendarService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Service/TeamsService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Service/UserService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/test/java/org/setup/Listify/UsersRepoTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/DatabaseDocs.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/DefineDB/DatabaseSetup/1-createDatabase.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/DefineDB/SampleData/1-populateDatabase.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/DefineDB/SampleData/2-addMarketingTeam.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/DefineDB/SampleData/3-addProjectInDevTeam.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/ERD_Listify.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Functions/CheckUserExists.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Functions/GetTeamLeaderForProject.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Functions/GetTeamLeaderForSection.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Functions/GetTeamLeaderForTasks.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Functions/TotalUserTask.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Delete/uspDeleteProject.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Delete/uspDeleteSection.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Delete/uspDeleteTask.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Delete/uspDeleteTaskDependency.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Delete/uspDeleteTeam.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Delete/uspDeleteUser.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Delete/uspDeleteUserFromProject.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Delete/uspDeleteUserFromTask.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Delete/uspDeleteUserFromTeam.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Insert/uspAssignTaskDependency.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Insert/uspAssignUserToProject.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Insert/uspAssignUserToTask.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Insert/uspAssignUserToTeam.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Insert/uspCreateMyProjectsTeam.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Insert/uspCreateProject.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Insert/uspCreateSection.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Insert/uspCreateSubTask.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Insert/uspCreateTask.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Insert/uspCreateTeam.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Insert/uspCreateUser.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Update/uspUpdateProjectDetails.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Update/uspUpdateSectionDetails.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Update/uspUpdateSectionPosition.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Update/uspUpdateTaskDetails.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Update/uspUpdateTaskPosition.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Update/uspUpdateTeamDetails.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Procedures/Update/uspUpdateTeamLeader.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Views/OverdueProjectTasks.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Views/ProjectCompletedTasks.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Views/ProjectSections.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Views/ProjectUncompletedTasks.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Views/SectionTasks.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Views/TeamProjects.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Views/UserAssignedTasks.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Views/UserTeamProjectTasks.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Views/UserTeamProjects.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db/Views/UserTeams.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/setup/Listify/Exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/API/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/ListifyApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/ListifyApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Model/Projects.java" beforeDir="false" afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Model/Projects.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Model/Sections.java" beforeDir="false" afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Model/Sections.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Model/TeamMembers.java" beforeDir="false" afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Model/TeamMembers.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Model/Teams.java" beforeDir="false" afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Model/Teams.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Model/Users.java" beforeDir="false" afterPath="$PROJECT_DIR$/API/src/main/java/org/setup/Listify/Model/Users.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/API/src/main/resources/application.properties" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -12,6 +98,7 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="ROOT_SYNC" value="SYNC" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -45,7 +132,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;Spring Boot.ListifyApplication.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Func&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Merging Func&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/bbdnet3388/Documents/Listify/Listify/newListify/API&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
@@ -82,7 +169,7 @@
       <option name="presentableId" value="Default" />
       <updated>1740543424084</updated>
       <workItem from="1740543425220" duration="2605000" />
-      <workItem from="1740546187065" duration="1896000" />
+      <workItem from="1740546187065" duration="2542000" />
     </task>
     <servers />
   </component>

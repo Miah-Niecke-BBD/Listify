@@ -1,41 +1,32 @@
 package org.setup.Listify.Model;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
 @Entity
-<<<<<<< HEAD
-public class Teams {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int teamID;
-=======
-@Table(name = "Teams", schema = "listify")
-public class Teams {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+@Table(name="vTeamProjects", schema="listify")
+public class TeamProjects {
+
     private Long teamID;
->>>>>>> 632ef0892c82a4376c1d1519df00589b2370102c
     @Column(name = "teamName", nullable = false, length = 100)
     private String teamName;
-    @Column(name = "createdAt", nullable = false)
+    @Id
+    private Long projectID;
+    @Column(name="projectDescription", nullable = false, length = 500)
+    private String projectDescription;
+    @Column(name = "projectCreatedAt", nullable = false)
     private LocalDateTime createdAt;
-<<<<<<< HEAD
-    @Column(name = "UpdatedAt", nullable = true)
-=======
-    @Column(name = "updatedAt", nullable = true)
->>>>>>> 632ef0892c82a4376c1d1519df00589b2370102c
+    @Column(name = "projectUpdatedAt", nullable = true)
     private LocalDateTime updatedAt;
 
-    protected Teams () {}
+    protected TeamProjects () {}
 
-<<<<<<< HEAD
-    public Teams(int teamID, String teamName, LocalDateTime createdAt, LocalDateTime updatedAt) {
-=======
-    public Teams(Long teamID, String teamName, LocalDateTime createdAt, LocalDateTime updatedAt) {
->>>>>>> 632ef0892c82a4376c1d1519df00589b2370102c
+    public TeamProjects(Long teamID, String teamName, Long projectID, String projectDescription, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.teamID = teamID;
         this.teamName = teamName;
+        this.projectID = projectID;
+        this.projectDescription = projectDescription;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -45,24 +36,18 @@ public class Teams {
         return "Team{" +
                 "teamID=" + teamID +
                 ", teamName='" + teamName + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
+                "projectID=" + projectID +
+                "projectDescription=" + projectDescription +
+                ", projectCreatedAt=" + createdAt +
+                ", projectUpdatedAt=" + updatedAt +
                 '}';
     }
 
-<<<<<<< HEAD
-    public int getTeamID() {
-        return teamID;
-    }
-
-    public void setTeamID(int teamID) {
-=======
     public Long getTeamID() {
         return teamID;
     }
 
     public void setTeamID(Long teamID) {
->>>>>>> 632ef0892c82a4376c1d1519df00589b2370102c
         this.teamID = teamID;
     }
 
@@ -72,6 +57,22 @@ public class Teams {
 
     public void setTeamName(String teamName) {
         this.teamName = teamName;
+    }
+
+    public Long getProjectID() {
+        return projectID;
+    }
+
+    public void setProjectID(Long projectID) {
+        this.projectID = projectID;
+    }
+
+    public String getProjectDescription() {
+        return projectDescription;
+    }
+
+    public void setProjectDescription(String projectDescription) {
+        this.projectDescription = projectDescription;
     }
 
     public LocalDateTime getCreatedAt() {

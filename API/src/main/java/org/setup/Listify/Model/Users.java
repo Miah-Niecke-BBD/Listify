@@ -5,6 +5,10 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+<<<<<<< HEAD
+=======
+@Table(name = "Users", schema = "Listify")
+>>>>>>> 632ef0892c82a4376c1d1519df00589b2370102c
 public class Users {
 
     @Id
@@ -17,7 +21,11 @@ public class Users {
     @Column(name = "updatedAt", nullable = true)
     private LocalDateTime updatedAt;
 
+<<<<<<< HEAD
     protected Users() {
+=======
+    public Users() {
+>>>>>>> 632ef0892c82a4376c1d1519df00589b2370102c
     }
 
     public Users(int userID, String gitHubID, LocalDateTime createdAt, LocalDateTime updatedAt) {
