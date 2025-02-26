@@ -43,13 +43,14 @@ public class UserService {
         return user;
     }
 
-    public void deleteUserByUserID(Integer userID) {
+    public void deleteUserByUserID(Long userID) {
         if (!usersRepo.existsByUserID(userID)) {
             throw new UserNotFoundException(
                     String.format("User with GitHub ID '%s' not found", userID));
         }
         usersRepo.deleteUserByUserID(userID);
     }
+
 
     public boolean userExistsByGitHubID(String gitHubID) {
         return usersRepo.existsByGitHubID(gitHubID);
