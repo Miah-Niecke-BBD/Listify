@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 package org.setup.Listify.Exception;
 
 
@@ -32,7 +31,7 @@ public class ProjectAlreadyExistsException {
     }
 }
 
-=======
+ 
 package org.setup.Listify.Exception;
 
 
@@ -65,4 +64,3 @@ public class ProjectAlreadyExistsException {
     }
 }
 
->>>>>>> Stashed changes
