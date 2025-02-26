@@ -60,7 +60,9 @@ public interface TasksRepository extends JpaRepository<Tasks, Long> {
     @Query(value = "SELECT TOP 1 * FROM listify.Tasks ORDER BY taskID DESC", nativeQuery = true)
     Tasks findTopOrderByTaskIDDesc();
 
+    @Query("SELECT t FROM Tasks t WHERE t.parentTaskID = :parentTaskID")
+    List<Tasks> getAllSubtasksOfTask(Long parentTaskID);
 
-    @Query("SELECT t FROM Tasks t WHERE t.sectionID = :sectionID AND t.taskName = :taskName AND t.taskPosition = :taskPosition")
-    Tasks findBySectionIDAndTaskNameAndTaskPosition(int sectionID, String taskName, byte taskPosition);
+    @Query("SELECT t FROM Tasks t WHERE t.taskID = (SELECT td.dependentTaskID FROM TaskDependencies td WHERE td.taskID = :taskID)")
+    Tasks findDependentTaskByTaskID(@Param("taskID") Long taskID);
 }

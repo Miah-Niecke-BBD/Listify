@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/tasks/dependencies")
 public class TaskDependenciesController {
 
     private final TaskDependenciesService taskDependenciesService;
@@ -26,19 +27,19 @@ public class TaskDependenciesController {
         this.assembler = assembler;
     }
 
-    @GetMapping("/tasks/dependencies")
+    @GetMapping
     public CollectionModel<EntityModel<TaskDependencies>> getAllTaskDependencies() {
         List<TaskDependencies> taskDependencies = taskDependenciesService.getAllTaskDependencies();
         return assembler.toCollectionModel(taskDependencies);
     }
 
-    @GetMapping("tasks/dependencies/{id}")
+    @GetMapping("/{id}")
     public EntityModel<TaskDependencies> getTaskDependenciesById(@PathVariable Long id) {
         TaskDependencies taskDependency = taskDependenciesService.getTaskDependencyById(id);
         return assembler.toModel(taskDependency);
     }
 
-    @PostMapping("/tasks/dependencies")
+    @PostMapping
     @Transactional
     public ResponseEntity<?> newTaskDependency(@RequestParam(required = false) Integer teamLeaderID,
                                             @RequestParam(required = false) Integer taskID,
@@ -57,7 +58,7 @@ public class TaskDependenciesController {
                 .body(entityModel);
     }
 
-    @DeleteMapping("/tasks/dependencies/{dependentTaskID}")
+    @DeleteMapping("/{dependentTaskID}")
     @Transactional
     public ResponseEntity<?> deleteTaskDependencyByDependencyId(@PathVariable Long dependentTaskID,
                                                                 @RequestParam(required = false) Integer taskID,
