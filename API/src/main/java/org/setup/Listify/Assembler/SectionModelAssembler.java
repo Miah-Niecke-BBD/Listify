@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 package org.setup.Listify.Assembler;
 
 import org.setup.Listify.Model.Sections;
@@ -19,7 +18,7 @@ public class SectionModelAssembler {
                 .collect(Collectors.toList());
     }
 }
-=======
+
 package org.setup.Listify.Assembler;
 
 import org.setup.Listify.Model.Sections;
@@ -40,4 +39,3 @@ public class SectionModelAssembler {
                 .collect(Collectors.toList());
     }
 }
->>>>>>> Stashed changes
