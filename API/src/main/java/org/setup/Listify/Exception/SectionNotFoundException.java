@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 package org.setup.Listify.Exception;
 
 public class SectionNotFoundException extends RuntimeException {
@@ -6,7 +5,6 @@ public class SectionNotFoundException extends RuntimeException {
         super(message);
     }
 }
-=======
 package org.setup.Listify.Exception;
 
 public class SectionNotFoundException extends RuntimeException {
@@ -14,4 +12,3 @@ public class SectionNotFoundException extends RuntimeException {
         super(message);
     }
 }
->>>>>>> Stashed changes
