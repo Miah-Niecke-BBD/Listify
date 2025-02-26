@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 package org.setup.Listify.Repository;
 
 import org.setup.Listify.Model.Sections;
@@ -25,7 +24,7 @@ public interface SectionRepository extends JpaRepository<Sections, Long> {
 
     @Procedure(procedureName = "uspUpdateSectionPosition")
     void updateSectionPosition(Long sectionID, String sectionName, int sectionPosition, Date updatedAt);
-=======
+
 package org.setup.Listify.Repository;
 
 import org.setup.Listify.Model.Sections;
@@ -52,5 +51,4 @@ public interface SectionRepository extends JpaRepository<Sections, Long> {
 
     @Procedure(procedureName = "uspUpdateSectionPosition")
     void updateSectionPosition(Long sectionID, String sectionName, int sectionPosition, Date updatedAt);
->>>>>>> Stashed changes
 }
