@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 package org.setup.Listify.Assembler;
 
 import org.setup.Listify.Exception.ProjectNotFoundException;
@@ -45,7 +44,6 @@ public class Advise {
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
-=======
 package org.setup.Listify.Assembler;
 
 import org.setup.Listify.Exception.ProjectNotFoundException;
@@ -92,4 +90,3 @@ public class Advise {
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
->>>>>>> Stashed changes
