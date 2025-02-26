@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
-<<<<<<< Updated upstream
 import java.util.Optional;
-=======
->>>>>>> Stashed changes
 
 @Service
 public class SectionService {
