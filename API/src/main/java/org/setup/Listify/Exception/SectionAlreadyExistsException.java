@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 package org.setup.Listify.Exception;
 
 public class SectionAlreadyExistsException extends RuntimeException {
@@ -5,3 +6,12 @@ public class SectionAlreadyExistsException extends RuntimeException {
         super(message);
     }
 }
+=======
+package org.setup.Listify.Exception;
+
+public class SectionAlreadyExistsException extends RuntimeException {
+    public SectionAlreadyExistsException(String message) {
+        super(message);
+    }
+}
+>>>>>>> Stashed changes

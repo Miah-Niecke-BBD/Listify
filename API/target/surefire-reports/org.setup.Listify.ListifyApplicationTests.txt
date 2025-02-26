@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: org.setup.Listify.ListifyApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.906 s -- in org.setup.Listify.ListifyApplicationTests
