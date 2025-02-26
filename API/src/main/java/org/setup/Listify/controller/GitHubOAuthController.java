@@ -1,55 +1,39 @@
-
 package org.setup.Listify.controller;
 
-import org.setup.Listify.assembler.UserAssembler;
 import org.setup.Listify.model.Users;
-import org.setup.Listify.exception.UserNotFoundException;
 import org.setup.Listify.service.UserService;
+import org.setup.Listify.handler.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.web.bind.annotation.*;
-
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/home")
 public class GitHubOAuthController {
 
-    private final UserService userService;
-    private final UserAssembler userAssembler;
-
     @Autowired
-    public GitHubOAuthController(UserService userService, UserAssembler userAssembler) {
-        this.userService = userService;
-        this.userAssembler = userAssembler;
-    }
+    private UserService userService;
 
     @GetMapping("/home")
-    public EntityModel<Users> getAuthenticatedUser(@AuthenticationPrincipal OAuth2User principal) {
-        try {
-            if (principal == null) {
-                throw new UserNotFoundException("User is not authenticated.");
+    public ResponseEntity<?> showHomePage(@AuthenticationPrincipal OAuth2User principal) {
+        if (principal != null) {
+            Integer id = principal.getAttribute("id");
+            String gitHubID = id.toString();
+
+            if (!userService.userExistsByGitHubID(gitHubID)) {
+                userService.createUser(gitHubID);
             }
 
-            String githubId = principal.getAttribute("id");
-
-            if(!userService.userExistsByGitHubID(githubId))
-            {
-
-                Users user = userService.createUser(githubId);
-                return userAssembler.toModel(user);
-            }else
-            {
-                Users user = userService.getUserByGitHubID(githubId);
-                return userAssembler.toModel(user);
-            }
+            Users user = userService.getUserByGitHubID(gitHubID);
+            String jwtToken = JwtTokenUtil.generateToken(principal.getName());
 
 
-        } catch (UserNotFoundException ex) {
-            throw new RuntimeException("Error: Unable to fetch user information - " + ex.getMessage());
-        } catch (Exception ex) {
-            throw new RuntimeException("Unexpected error occurred: " + ex.getMessage());
+            return ResponseEntity.ok()
+                    .body("{\"token\":\"" + jwtToken + "\"}");
         }
+
+        return ResponseEntity.status(401).body("Unauthorized");
     }
 }
