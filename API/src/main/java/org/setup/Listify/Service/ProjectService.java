@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 package org.setup.Listify.Service;
 
 import org.setup.Listify.Model.Projects;
@@ -77,7 +76,6 @@ public class ProjectService {
         }
     }
 }
-=======
 package org.setup.Listify.Service;
 
 import org.setup.Listify.Model.Projects;
@@ -160,4 +158,3 @@ public class ProjectService {
         }
     }
 }
->>>>>>> Stashed changes
