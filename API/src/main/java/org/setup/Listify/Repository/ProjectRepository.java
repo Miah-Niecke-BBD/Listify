@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 package org.setup.Listify.Repository;
 
 import org.setup.Listify.Model.Projects;
@@ -22,7 +21,6 @@ public interface ProjectRepository extends JpaRepository<Projects, Long> {
     void updateProject(Long projectID, String projectName, String projectDescription, String updatedAt);
 
 }
-=======
 package org.setup.Listify.Repository;
 
 import org.setup.Listify.Model.Projects;
@@ -46,4 +44,3 @@ public interface ProjectRepository extends JpaRepository<Projects, Long> {
     void updateProject(Long projectID, String projectName, String projectDescription, String updatedAt);
 
 }
->>>>>>> Stashed changes
