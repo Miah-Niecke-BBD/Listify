@@ -1,30 +1,45 @@
-
 package org.setup.Listify.config;
+
+import org.setup.Listify.handler.JwtAuthenticationFilter;
+import org.setup.Listify.handler.OAuth2AuthenticationSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final OAuth2AuthenticationSuccessHandler successHandler;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(OAuth2AuthenticationSuccessHandler successHandler, JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.successHandler = successHandler;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/login", "/index").permitAll()
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                        .requestMatchers("/login").permitAll()
                         .anyRequest().authenticated()
                 )
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .permitAll()
-                )
                 .oauth2Login(oauth2 -> oauth2
-                        .defaultSuccessUrl("/home", true)
-                        .failureUrl("/login?error=true")
-                );
+                        .successHandler(successHandler)
+                        .defaultSuccessUrl("/home")
+                        .failureUrl("/error")
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/")
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)  // Add JWT filter before normal authentication filter
+                .csrf(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
