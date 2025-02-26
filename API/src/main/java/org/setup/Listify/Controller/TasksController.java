@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/tasks")
 public class TasksController {
 
     private final TasksService tasksService;
@@ -27,25 +28,25 @@ public class TasksController {
         this.assembler = assembler;
     }
 
-    @GetMapping("/tasks")
+    @GetMapping
     public CollectionModel<EntityModel<Tasks>> getAllTasks() {
         List<Tasks> tasks = tasksService.getAllTasks();
         return assembler.toCollectionModel(tasks);
     }
 
-    @GetMapping("/tasks/{id}")
+    @GetMapping("/{id}")
     public EntityModel<Tasks> getTaskById(@PathVariable Long id) {
         Tasks task = tasksService.getTaskById(id);
         return assembler.toModel(task);
     }
 
-    @GetMapping("/tasks/section/{sectionId}")
+    @GetMapping("/section/{sectionId}")
     public CollectionModel<EntityModel<Tasks>> getTaskBySectionId(@PathVariable Long sectionId) {
         List<Tasks> tasksList = tasksService.getTaskBySectionId(sectionId);
         return assembler.toCollectionModel(tasksList);
     }
 
-    @PostMapping("/tasks")
+    @PostMapping
     @Transactional
     public ResponseEntity<?> newTask(@RequestParam(required = false) Integer teamLeaderID,
                                      @RequestParam(required = false) Integer projectID,
@@ -67,7 +68,7 @@ public class TasksController {
                 .body(entityModel);
     }
 
-    @PostMapping("/tasks/subtask/{parentTaskID}")
+    @PostMapping("/subtask/{parentTaskID}")
     @Transactional
     public ResponseEntity<?> newSubTask(@PathVariable Long parentTaskID,
                                         @RequestParam(required = false) Integer teamLeaderID,
@@ -89,7 +90,7 @@ public class TasksController {
                 .body(entityModel);
     }
 
-    @PutMapping("/tasks/{id}")
+    @PutMapping("/{id}")
     @Transactional
     ResponseEntity<?> updateTask(@PathVariable Long id,
                                  @RequestParam Integer teamLeaderID,
@@ -112,7 +113,7 @@ public class TasksController {
     }
 
 
-    @PutMapping("/tasks/{id}/position")
+    @PutMapping("/{id}/position")
     @Transactional
     ResponseEntity<?> updateTaskPosition(@PathVariable Long id,
                                          @RequestParam(required = false) Integer teamLeaderID,
@@ -134,7 +135,7 @@ public class TasksController {
     }
 
 
-    @DeleteMapping("/tasks/{id}")
+    @DeleteMapping("/{id}")
     @Transactional
     ResponseEntity<?> deleteTask(@PathVariable Long id, @RequestParam(required = false) Integer teamLeaderID) {
         if (teamLeaderID == null) {
