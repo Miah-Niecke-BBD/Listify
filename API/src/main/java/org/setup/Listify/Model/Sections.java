@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 package org.setup.Listify.Model;
 
 import jakarta.persistence.*;
@@ -51,7 +50,6 @@ public class Sections {
     }
 
 }
-=======
 package org.setup.Listify.Model;
 
 import jakarta.persistence.*;
@@ -104,4 +102,3 @@ public class Sections {
     }
 
 }
->>>>>>> Stashed changes
