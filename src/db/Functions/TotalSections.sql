@@ -1,9 +1,0 @@
-GO
-CREATE FUNCTION dbo.GetSectionsByProject(@projectID INT)
-RETURNS TABLE
-AS
-RETURN (
-    SELECT sectionID, sectionName, sectionPosition FROM Sections 
-    WHERE projectID = @projectID
-);
-GO

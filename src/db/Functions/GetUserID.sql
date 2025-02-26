@@ -1,8 +1,0 @@
-GO
-CREATE FUNCTION dbo.GetUserByID(@userID INT)
-RETURNS TABLE
-AS
-RETURN (
-    SELECT * FROM Users WHERE userID = @userID
-);
-GO
