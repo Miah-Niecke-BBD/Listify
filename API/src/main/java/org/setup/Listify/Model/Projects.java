@@ -77,24 +77,21 @@ public class Projects {
         return projectDescription;
     }
 
->>>>>>> 632ef0892c82a4376c1d1519df00589b2370102c
+ 
     public void setProjectDescription(String projectDescription) {
         this.projectDescription = projectDescription;
     }
 
-<<<<<<< HEAD
-=======
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
->>>>>>> 632ef0892c82a4376c1d1519df00589b2370102c
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-<<<<<<< HEAD
-=======
+
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
