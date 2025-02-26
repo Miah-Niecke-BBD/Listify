@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 package org.setup.Listify.Model;
 
 import jakarta.persistence.*;
@@ -70,7 +69,6 @@ public class Projects {
         this.updatedAt = updatedAt;
     }
 }
-=======
 package org.setup.Listify.Model;
 
 import jakarta.persistence.*;
@@ -185,4 +183,3 @@ public class Projects {
         this.updatedAt = updatedAt;
     }
 }
->>>>>>> Stashed changes
