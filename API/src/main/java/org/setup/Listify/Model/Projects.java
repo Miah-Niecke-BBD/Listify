@@ -4,11 +4,8 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 632ef0892c82a4376c1d1519df00589b2370102c
 @Entity
+@Table(name = "Projects", schema = "listify")
 public class Projects {
 
     @Id
@@ -25,11 +22,8 @@ public class Projects {
     @Column(name="updatedAt", nullable = false)
     private LocalDateTime updatedAt;
 
-<<<<<<< HEAD
     public Projects() {}
-=======
     protected Projects() {}
->>>>>>> 632ef0892c82a4376c1d1519df00589b2370102c
 
     public Projects(Long projectID, Long teamID, String projectName, String projectDescription, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.projectID = projectID;
@@ -52,41 +46,33 @@ public class Projects {
                 '}';
     }
 
-<<<<<<< HEAD
-=======
     public Long getProjectID() {
         return projectID;
     }
 
->>>>>>> 632ef0892c82a4376c1d1519df00589b2370102c
     public void setProjectID(Long projectID) {
         this.projectID = projectID;
     }
 
-<<<<<<< HEAD
-=======
     public Long getTeamID() {
         return teamID;
     }
 
->>>>>>> 632ef0892c82a4376c1d1519df00589b2370102c
+
     public void setTeamID(Long teamID) {
         this.teamID = teamID;
     }
 
-<<<<<<< HEAD
-=======
+
     public String getProjectName() {
         return projectName;
     }
 
->>>>>>> 632ef0892c82a4376c1d1519df00589b2370102c
     public void setProjectName(String projectName) {
         this.projectName = projectName;
     }
 
-<<<<<<< HEAD
-=======
+
     public String getProjectDescription() {
         return projectDescription;
     }
@@ -113,7 +99,6 @@ public class Projects {
         return updatedAt;
     }
 
->>>>>>> 632ef0892c82a4376c1d1519df00589b2370102c
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
