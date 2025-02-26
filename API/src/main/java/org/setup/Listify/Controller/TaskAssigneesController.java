@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/tasks/assigned")
 public class TaskAssigneesController {
 
     private final TaskAssigneesService taskAssigneesService;
@@ -26,19 +27,19 @@ public class TaskAssigneesController {
         this.assembler = assembler;
     }
 
-    @GetMapping("/tasks/assigned")
+    @GetMapping
     public CollectionModel<EntityModel<TaskAssignees>> getAllAssignedTasks() {
         List<TaskAssignees> assignedTasks = taskAssigneesService.getAllAssignedTasks();
         return assembler.toCollectionModel(assignedTasks);
     }
 
-    @GetMapping("/tasks/assigned/{id}")
+    @GetMapping("/{id}")
     public EntityModel<TaskAssignees> getAssignedTaskById(@PathVariable Long id) {
         TaskAssignees assignedTask = taskAssigneesService.getAssignedTaskById(id);
         return assembler.toModel(assignedTask);
     }
 
-    @GetMapping("/tasks/assigned/user/{id}")
+    @GetMapping("/user/{id}")
     public CollectionModel<EntityModel<TaskAssignees>> getTasksAssignedToSpecificUser(
             @PathVariable Long id) {
 
@@ -48,7 +49,7 @@ public class TaskAssigneesController {
         return assembler.toCollectionModel(tasksAssignedToUser);
     }
 
-    @PostMapping("/tasks/assigned")
+    @PostMapping
     @Transactional
     public ResponseEntity<?> assignTask(@RequestParam(required = false) Integer userID,
                                         @RequestParam(required = false) Integer taskID) {
@@ -64,7 +65,7 @@ public class TaskAssigneesController {
                 .body(entityModel);
     }
 
-    @DeleteMapping("/tasks/assigned/{taskID}")
+    @DeleteMapping("/{taskID}")
     @Transactional
     public ResponseEntity<?> deleteTaskAssignment(@PathVariable Long taskID,
                                                   @RequestParam(required = false) Integer userID,
