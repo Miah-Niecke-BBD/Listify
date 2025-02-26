@@ -1,23 +1,17 @@
 package org.setup.Listify.Model;
 
 import jakarta.persistence.*;
-<<<<<<< HEAD
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Sections", schema = "listify")
-=======
-
 import java.time.LocalDateTime;
 
-@Entity
->>>>>>> 632ef0892c82a4376c1d1519df00589b2370102c
 public class Sections {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long sectionID;
-<<<<<<< HEAD
 
     @Column(name = "projectID", nullable = false)
     private Long projectID;
@@ -37,7 +31,6 @@ public class Sections {
     protected Sections() {}
 
     public Sections(Long sectionID, Long projectID, String sectionName, int sectionPosition, LocalDateTime createdAt, LocalDateTime updatedAt) {
-=======
     @Column(name = "projectID", nullable = false)
     private Long projectID;
     @Column(name = "sectionName", nullable = false, length = 100)
@@ -52,17 +45,13 @@ public class Sections {
     protected Sections() {};
 
     public Sections(Long sectionID, Long projectID, String sectionName, int sectionPosition, LocalDateTime createdAt, LocalDateTime updatesAt) {
->>>>>>> 632ef0892c82a4376c1d1519df00589b2370102c
         this.sectionID = sectionID;
         this.projectID = projectID;
         this.sectionName = sectionName;
         this.sectionPosition = sectionPosition;
         this.createdAt = createdAt;
-<<<<<<< HEAD
         this.updatedAt = updatedAt;
-=======
-        this.updatesAt = updatesAt;
->>>>>>> 632ef0892c82a4376c1d1519df00589b2370102c
+        this.updatesAt = updatesAt;c
     }
 
     @Override
@@ -73,13 +62,11 @@ public class Sections {
                 ", sectionName='" + sectionName + '\'' +
                 ", sectionPosition=" + sectionPosition +
                 ", createdAt=" + createdAt +
-<<<<<<< HEAD
                 ", updatedAt=" + updatedAt +
                 '}';
     }
 
 }
-=======
                 ", updatedAt=" + updatesAt +
                 '}';
     }
@@ -133,4 +120,3 @@ public class Sections {
     }
 }
 
->>>>>>> 632ef0892c82a4376c1d1519df00589b2370102c
