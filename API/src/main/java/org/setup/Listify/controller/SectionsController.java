@@ -1,10 +1,11 @@
 package org.setup.Listify.controller;
 
-import org.setup.Listify.Assembler.SectionsModelAssembler;
+import org.setup.Listify.assembler.SectionsModelAssembler;
+import org.setup.Listify.assembler.TasksModelAssembler;
 import org.setup.Listify.exception.ErrorResponse;
 import org.setup.Listify.model.Sections;
-import org.setup.Listify.Service.SectionsService;
-import org.springframework.data.repository.query.Param;
+import org.setup.Listify.model.Tasks;
+import org.setup.Listify.service.SectionsService;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -22,10 +23,12 @@ public class SectionsController {
 
     private final SectionsService sectionsService;
     private final SectionsModelAssembler assembler;
+    private final TasksModelAssembler tasksAssembler;
 
-    public SectionsController(SectionsService sectionsService, SectionsModelAssembler assembler) {
+    public SectionsController(SectionsService sectionsService, SectionsModelAssembler assembler, TasksModelAssembler tasksAssembler) {
         this.sectionsService = sectionsService;
         this.assembler = assembler;
+        this.tasksAssembler = tasksAssembler;
     }
 
     @GetMapping
@@ -35,9 +38,15 @@ public class SectionsController {
     }
 
     @GetMapping("/{id}")
-    public EntityModel<Sections> getSectionsById(Long id) {
+    public EntityModel<Sections> getSectionsById(@PathVariable Long id) {
         Sections section = sectionsService.getSectionById(id);
         return assembler.toModel(section);
+    }
+
+    @GetMapping("{id}/tasks")
+    public CollectionModel<EntityModel<Tasks>> getTaskBySectionId(@PathVariable Long id) {
+        List<Tasks> tasksList = sectionsService.getTaskBySectionId(id);
+        return tasksAssembler.toCollectionModel(tasksList);
     }
 
     @PostMapping

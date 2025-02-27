@@ -52,12 +52,6 @@ public class TasksController {
         return assembler.toModel(dependentTask);
     }
 
-    @GetMapping("/section/{sectionId}")
-    public CollectionModel<EntityModel<Tasks>> getTaskBySectionId(@PathVariable Long sectionId) {
-        List<Tasks> tasksList = tasksService.getTaskBySectionId(sectionId);
-        return assembler.toCollectionModel(tasksList);
-    }
-
     @PostMapping
     @Transactional
     public ResponseEntity<?> newTask(@RequestParam(required = false) Integer teamLeaderID,

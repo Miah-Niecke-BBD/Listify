@@ -1,10 +1,13 @@
 package org.setup.Listify.repo;
 
 import org.setup.Listify.model.Sections;
+import org.setup.Listify.model.Tasks;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 public interface SectionsRepository extends JpaRepository<Sections, Long> {
 
@@ -28,4 +31,7 @@ public interface SectionsRepository extends JpaRepository<Sections, Long> {
     void deleteSectionById(@Param("teamLeaderID")Integer teamLeaderID,
                            @Param("sectionID") Integer sectionID
     );
+
+    @Query("SELECT t FROM Tasks t WHERE t.sectionID = :id")
+    List<Tasks> findTasksBySectionID(@Param("id") Long id);
 }

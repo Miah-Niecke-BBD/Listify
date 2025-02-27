@@ -19,7 +19,8 @@ public class ProjectsModelAssembler implements RepresentationModelAssembler<Proj
     public EntityModel<Projects> toModel(Projects project) {
         return EntityModel.of(project,
                 linkTo(methodOn(ProjectsController.class).getProjectsById(project.getProjectID())).withSelfRel(),
-                linkTo(methodOn(ProjectsController.class).getAllProjects()).withRel("projects"));
+                linkTo(methodOn(ProjectsController.class).getAllProjects()).withRel("projects"),
+                linkTo(methodOn(ProjectsController.class).getAllSectionsInProject(project.getProjectID())).withRel("sectionsInProject"));
     }
 
     @Override

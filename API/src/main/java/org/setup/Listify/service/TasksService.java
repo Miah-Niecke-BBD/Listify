@@ -35,14 +35,6 @@ public class TasksService {
     }
 
 
-    public List<Tasks> getTaskBySectionId(Long sectionId) {
-        List<Tasks> tasksInSection = repository.findTasksBySectionID(sectionId);
-        if (tasksInSection.isEmpty()) {
-            throw new SectionNotFoundException(sectionId);
-        }
-        return tasksInSection;
-    }
-
     public List<Tasks> getAllSubtasksOfTask(Long parentTaskID) {
         List<Tasks> subtasks = repository.getAllSubtasksOfTask(parentTaskID);
         if (subtasks.isEmpty()) {
