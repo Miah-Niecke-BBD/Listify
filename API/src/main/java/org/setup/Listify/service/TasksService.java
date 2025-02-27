@@ -2,6 +2,7 @@ package org.setup.Listify.service;
 
 import org.setup.Listify.exception.ListNotFoundException;
 import org.setup.Listify.exception.SectionNotFoundException;
+import org.setup.Listify.exception.TaskDependencyNotFoundException;
 import org.setup.Listify.model.Tasks;
 import org.setup.Listify.repo.TasksRepository;
 import org.setup.Listify.exception.TaskNotFoundException;
@@ -34,12 +35,20 @@ public class TasksService {
     }
 
 
-    public List<Tasks> getTaskBySectionId(Long sectionId) {
-        List<Tasks> tasksInSection = repository.findTasksBySectionID(sectionId);
-        if (tasksInSection.isEmpty()) {
-            throw new SectionNotFoundException(sectionId);
+    public List<Tasks> getAllSubtasksOfTask(Long parentTaskID) {
+        List<Tasks> subtasks = repository.getAllSubtasksOfTask(parentTaskID);
+        if (subtasks.isEmpty()) {
+            throw new ListNotFoundException("subtasks");
         }
-        return tasksInSection;
+        return subtasks;
+    }
+
+    public Tasks getDependentTaskById(Long taskID) {
+        Tasks dependentTask = repository.findDependentTaskByTaskID(taskID);
+        if (dependentTask == null) {
+            throw new TaskDependencyNotFoundException(taskID);
+        }
+        return dependentTask;
     }
 
 
