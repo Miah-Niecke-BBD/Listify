@@ -23,15 +23,6 @@ public class TaskAssignees {
         this.taskID = taskID;
     }
 
-    @Override
-    public String toString() {
-        return "TaskAssignee{" +
-                "taskAssigneeID=" + taskAssigneeID +
-                ", userID=" + userID +
-                ", taskID=" + taskID +
-                '}';
-    }
-
     public Long getTaskAssigneeID() {
         return taskAssigneeID;
     }

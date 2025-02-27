@@ -48,18 +48,6 @@ public class UserTeamProjects {
         this.teamUpdatedAt = teamUpdatedAt;
     }
 
-    @Override
-    public String toString() {
-        return "Team{" +
-                "teamID=" + teamID +
-                ", teamName='" + teamName + '\'' +
-                "projectID=" + projectID +
-                "projectDescription=" + projectDescription +
-                ", projectCreatedAt=" + createdAt +
-                ", projectUpdatedAt=" + updatedAt +
-                '}';
-    }
-
     public Long getUserID() {
         return userID;
     }

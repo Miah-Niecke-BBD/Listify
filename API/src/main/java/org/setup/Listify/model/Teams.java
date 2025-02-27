@@ -25,16 +25,6 @@ public class Teams {
         this.updatedAt = updatedAt;
     }
 
-    @Override
-    public String toString() {
-        return "Team{" +
-                "teamID=" + teamID +
-                ", teamName='" + teamName + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
-
     public Long getTeamID() {
         return teamID;
     }

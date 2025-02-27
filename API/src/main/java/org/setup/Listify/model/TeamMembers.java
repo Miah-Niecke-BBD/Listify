@@ -28,16 +28,6 @@ public class TeamMembers {
         this.isTeamLeader = isTeamLeader;
     }
 
-    @Override
-    public String toString() {
-        return "TeamMember{" +
-                "teamMemberID=" + teamMemberID +
-                ", userID=" + userID +
-                ", teamID=" + teamID +
-                ", isTeamLeader=" + isTeamLeader +
-                '}';
-    }
-
     public Long getTeamMemberID() {
         return teamMemberID;
     }

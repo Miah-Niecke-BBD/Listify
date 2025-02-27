@@ -1,7 +1,7 @@
 package org.setup.Listify.controller;
 
 import org.setup.Listify.exception.ErrorResponse;
-import org.setup.Listify.exception.SuccessResponse;
+import org.setup.Listify.response.SuccessResponse;
 import org.setup.Listify.exception.UserNotFoundException;
 import org.setup.Listify.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

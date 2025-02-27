@@ -33,18 +33,6 @@ public class Projects {
         this.updatedAt = updatedAt;
     }
 
-    @Override
-    public String toString() {
-        return "Project{" +
-                "projectID=" + projectID +
-                ", teamID=" + teamID +
-                ", projectName='" + projectName + '\'' +
-                ", projectDescription='" + projectDescription + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
-
     public Long getProjectID() {
         return projectID;
     }
