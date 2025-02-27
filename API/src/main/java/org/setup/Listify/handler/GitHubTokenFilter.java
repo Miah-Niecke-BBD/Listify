@@ -3,9 +3,9 @@ package org.setup.Listify.handler;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.setup.Listify.service.UserService;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -19,7 +19,6 @@ import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -55,6 +54,7 @@ public class GitHubTokenFilter implements Filter {
             sendUnauthorizedResponse(httpServletResponse, "Unauthorized: No GitHub OAuth token found.");
             return;
         }
+
 
         try {
             validateGitHubToken(gitHubToken);
@@ -113,9 +113,49 @@ public class GitHubTokenFilter implements Filter {
     }
 
     private void authenticateUserWithGitHubToken(String token, HttpServletRequest request) {
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(token, null, null);
-        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        try {
+
+            String githubUserInfo = getGitHubUserInfo(token);
+
+            GitHubUserPrincipal principal = new GitHubUserPrincipal(githubUserInfo);
+
+
+            OAuth2AuthenticationToken authenticationToken = new OAuth2AuthenticationToken(
+                    principal,
+                    null,
+                    "github"
+            );
+
+            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+        } catch (Exception e) {
+
+            throw new BadCredentialsException("GitHub token is invalid or expired.");
+        }
+    }
+
+
+    private String getGitHubUserInfo(String token) {
+        String url = "https://api.github.com/user";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + token);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        try {
+
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+            if (response.getStatusCode() == HttpStatus.OK) {
+                return response.getBody();
+            } else {
+                throw new BadCredentialsException("GitHub token is invalid or expired.");
+            }
+        } catch (Exception e) {
+            throw new BadCredentialsException("GitHub token is invalid or expired.");
+        }
     }
 
     private void sendUnauthorizedResponse(HttpServletResponse response, String message) throws IOException {

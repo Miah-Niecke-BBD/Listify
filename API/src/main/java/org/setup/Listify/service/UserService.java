@@ -1,4 +1,9 @@
 package org.setup.Listify.service;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.core.Authentication;
 import org.setup.Listify.model.Users;
 import org.setup.Listify.exception.DuplicateUserException;
 import org.setup.Listify.exception.UserNotFoundException;
@@ -7,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -55,4 +61,20 @@ public class UserService {
     public boolean userExistsByGitHubID(String gitHubID) {
         return usersRepo.existsByGitHubID(gitHubID);
     }
+
+    public Long getUserIDFromAuthentication(Authentication authentication) {
+        OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
+        OAuth2User oauth2User = oauthToken.getPrincipal();
+
+        String gitHubID = oauth2User.getAttribute("id").toString();
+
+        Optional<Users> user = usersRepo.findByGitHubID(gitHubID);
+
+        if (user.isPresent()) {
+            return user.get().getUserID();
+        } else {
+            throw new RuntimeException("User not found for GitHub ID: " + gitHubID);
+        }
+    }
 }
+

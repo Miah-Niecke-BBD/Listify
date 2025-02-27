@@ -3,6 +3,7 @@ package org.setup.Listify.model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "ProjectAssignees", schema = "listify")
 public class ProjectAssignees {
 
     @Id
@@ -19,15 +20,6 @@ public class ProjectAssignees {
         this.projectAssigneeID = projectAssigneeID;
         this.userID = userID;
         this.projectID = projectID;
-    }
-
-    @Override
-    public String toString() {
-        return "ProjectAssignee{" +
-                "projectAssigneeID=" + projectAssigneeID +
-                ", userID=" + userID +
-                ", projectID=" + projectID +
-                '}';
     }
 
     public Long getProjectAssigneeID() {

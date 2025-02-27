@@ -10,7 +10,7 @@ public class Users {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int userID;
+    private Long userID;
     @Column(name = "githubID", nullable = false, unique = true, length = 1700)
     private String gitHubID;
     @Column(name = "createdAt", nullable = false)
@@ -21,28 +21,18 @@ public class Users {
     public Users() {
     }
 
-    public Users(int userID, String gitHubID, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Users(Long userID, String gitHubID, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.userID = userID;
         this.gitHubID = gitHubID;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    @Override
-    public String toString() {
-        return "Users{" +
-                "userID=" + userID +
-                ", gitHubID='" + gitHubID + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
-
-    public int getUserID() {
+    public Long getUserID() {
         return userID;
     }
 
-    public void setUserID(int userID) {
+    public void setUserID(Long userID) {
         this.userID = userID;
     }
 

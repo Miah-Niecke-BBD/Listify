@@ -50,23 +50,6 @@ public class Tasks {
         this.updatedAt = updatedAt;
     }
 
-    @Override
-    public String toString() {
-        return "Task{" +
-                "taskID=" + taskID +
-                ", sectionID=" + sectionID +
-                ", parentTaskID=" + parentTaskID +
-                ", taskName='" + taskName + '\'' +
-                ", taskDescription='" + taskDescription + '\'' +
-                ", taskPriority=" + taskPriority +
-                ", taskPosition=" + taskPosition +
-                ", dateCompleted=" + dateCompleted +
-                ", dueDate=" + dueDate +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
-
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "Projects", schema = "listify")
 public class Projects {
 
     @Id
@@ -30,18 +31,6 @@ public class Projects {
         this.projectDescription = projectDescription;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-    }
-
-    @Override
-    public String toString() {
-        return "Project{" +
-                "projectID=" + projectID +
-                ", teamID=" + teamID +
-                ", projectName='" + projectName + '\'' +
-                ", projectDescription='" + projectDescription + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
     }
 
     public Long getProjectID() {
