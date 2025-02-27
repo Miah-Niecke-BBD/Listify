@@ -1,4 +1,4 @@
-package org.setup.Listify.exception;
+package org.setup.Listify.response;
 
 public class SuccessResponse {
     private String message;

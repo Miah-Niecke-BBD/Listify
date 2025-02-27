@@ -17,15 +17,6 @@ public class TaskDependencies {
     protected TaskDependencies() {
     }
 
-    @Override
-    public String toString() {
-        return "TaskDependency{" +
-                "taskDependencyID=" + taskDependencyID +
-                ", taskID=" + taskID +
-                ", dependentTaskID=" + dependentTaskID +
-                '}';
-    }
-
     public TaskDependencies(Long taskDependencyID, Long taskID, Long dependentTaskID) {
         this.taskDependencyID = taskDependencyID;
         this.taskID = taskID;
