@@ -34,14 +34,14 @@ public class TaskAssigneesController {
     }
 
     @GetMapping("/{id}")
-    public EntityModel<TaskAssignees> getAssignedTaskById(@PathVariable Long id) {
+    public EntityModel<TaskAssignees> getAssignedTaskById(@PathVariable("id") Long id) {
         TaskAssignees assignedTask = taskAssigneesService.getAssignedTaskById(id);
         return assembler.toModel(assignedTask);
     }
 
     @GetMapping("/user/{id}")
     public CollectionModel<EntityModel<TaskAssignees>> getTasksAssignedToSpecificUser(
-            @PathVariable Long id) {
+            @PathVariable("id") Long id) {
 
         List<TaskAssignees> tasksAssignedToUser = taskAssigneesService
                 .getTasksAssignedToSpecificUser(id);
@@ -51,8 +51,8 @@ public class TaskAssigneesController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<?> assignTask(@RequestParam(required = false) Integer userID,
-                                        @RequestParam(required = false) Integer taskID) {
+    public ResponseEntity<?> assignTask(@RequestParam(name = "userID", required = false) Integer userID,
+                                        @RequestParam(name = "taskID", required = false) Integer taskID) {
         if (userID == null || taskID == null) {
             ErrorResponse errorResponse = new ErrorResponse("User ID and Task ID are required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
@@ -67,9 +67,9 @@ public class TaskAssigneesController {
 
     @DeleteMapping("/{taskID}")
     @Transactional
-    public ResponseEntity<?> deleteTaskAssignment(@PathVariable Long taskID,
-                                                  @RequestParam(required = false) Integer userID,
-                                                  @RequestParam(required = false) Integer teamLeaderID) {
+    public ResponseEntity<?> deleteTaskAssignment(@PathVariable("taskID") Long taskID,
+                                                  @RequestParam(name = "userID", required = false) Integer userID,
+                                                  @RequestParam(name = "teamLeaderID", required = false) Integer teamLeaderID) {
         if (teamLeaderID == null || userID == null) {
             ErrorResponse errorResponse = new ErrorResponse("User ID and Team Leader ID are required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);

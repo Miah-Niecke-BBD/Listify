@@ -38,24 +38,24 @@ public class ProjectsController {
     }
 
     @GetMapping("/{id}")
-    public EntityModel<Projects> getProjectsById(@PathVariable Long id) {
+    public EntityModel<Projects> getProjectsById(@PathVariable("id") Long id) {
         Projects project = projectsService.getProjectById(id);
         return assembler.toModel(project);
     }
 
     @GetMapping("/{id}/sections")
     public CollectionModel<EntityModel<Sections>> getAllSectionsInProject(
-            @PathVariable Long id) {
+            @PathVariable("id") Long id) {
         List<Sections> sections = projectsService.getAllSectionsInProject(id);
         return sectionsAssembler.toCollectionModel(sections);
     }
 
     @PostMapping
     @Transactional
-    public ResponseEntity<?> newProject(@RequestParam(required = false) Integer teamLeaderID,
-                                        @RequestParam(required = false) Integer teamID,
-                                        @RequestParam(required = false) String projectName,
-                                        @RequestParam(required = false) String projectDescription) {
+    public ResponseEntity<?> newProject(@RequestParam(name = "teamLeaderID", required = false) Integer teamLeaderID,
+                                        @RequestParam(name = "teamID", required = false) Integer teamID,
+                                        @RequestParam(name = "projectName", required = false) String projectName,
+                                        @RequestParam(name = "projectDescription", required = false) String projectDescription) {
         if (teamLeaderID == null || teamID == null || projectName == null) {
             ErrorResponse errorResponse = new ErrorResponse("Missing required parameter(s). Please ensure all required parameters are provided.",
                     HttpStatus.BAD_REQUEST.value());
@@ -72,10 +72,10 @@ public class ProjectsController {
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity<?> updateProject(@PathVariable Long id,
-                                           @RequestParam Integer userID,
-                                           @RequestParam String projectName,
-                                           @RequestParam String projectDescription) {
+    public ResponseEntity<?> updateProject(@PathVariable("id") Long id,
+                                           @RequestParam(name = "userID") Integer userID,
+                                           @RequestParam(name = "projectName") String projectName,
+                                           @RequestParam(name = "projectDescription") String projectDescription) {
         if (userID == null) {
             ErrorResponse errorResponse = new ErrorResponse("User ID is required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
@@ -92,8 +92,8 @@ public class ProjectsController {
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity<?> deleteProjectById(@PathVariable Long id,
-                                               @RequestParam(required = false) Integer teamLeaderID) {
+    public ResponseEntity<?> deleteProjectById(@PathVariable("id") Long id,
+                                               @RequestParam(name = "teamLeaderID", required = false) Integer teamLeaderID) {
         if (teamLeaderID == null) {
             ErrorResponse errorResponse = new ErrorResponse("Team Leader ID is required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
