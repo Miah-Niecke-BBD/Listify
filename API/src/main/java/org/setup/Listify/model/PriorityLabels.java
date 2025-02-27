@@ -18,14 +18,6 @@ public class PriorityLabels {
         this.priorityLabelName = priorityLabelName;
     }
 
-    @Override
-    public String toString() {
-        return "PriorityLabel{" +
-                "priorityLabelID=" + priorityLabelID +
-                ", priorityLabelName='" + priorityLabelName + '\'' +
-                '}';
-    }
-
     public Long getPriorityLabelID() {
         return priorityLabelID;
     }
