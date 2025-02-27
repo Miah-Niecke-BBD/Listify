@@ -36,7 +36,7 @@ public interface TeamsRepository extends JpaRepository<Teams, Long> {
             "t.taskID, t.sectionID, t.parentTaskID, t.taskName, t.taskDescription, t.taskPriority, t.taskPosition, t.dateCompleted, t.dueDate, t.createdAt, t.updatedAt " +
             "FROM listify.vUserTeamProjectsTasks v " +
             "INNER JOIN listify.Tasks t ON v.taskID = t.taskID " +
-            "WHERE v.teamID = ?1 AND v.userID = ?2 AND t.dueDate IS NOT NULL", nativeQuery = true)
-    List<Tasks> findTeamsDueTasks(Long teamId, Long userID);
+            "WHERE v.teamID = ?1 AND v.userID = ?2 AND t.dueDate IS NOT NULL AND (?3 IS NULL OR v.projectID = ?3)", nativeQuery = true)
+    List<Tasks> findTeamsDueTasks(Long teamId, Long userID, Long projectID);
 
 }
