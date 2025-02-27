@@ -55,7 +55,6 @@ public class GitHubOAuthController {
 
             HttpSession session = request.getSession(true);
             session.setAttribute("githubToken", gitHubToken);
-            System.out.println("GitHub token set in session: " + gitHubToken);  // Debug log
 
             return ResponseEntity.ok()
                     .body("{\"token\":\"" + gitHubToken + "\"}");
@@ -69,8 +68,6 @@ public class GitHubOAuthController {
         OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(
                 authenticationToken.getAuthorizedClientRegistrationId(),
                 authenticationToken.getName());
-
-        System.out.println("What is the client:" + client);
 
         if (client != null && client.getAccessToken() != null) {
             return client.getAccessToken().getTokenValue();

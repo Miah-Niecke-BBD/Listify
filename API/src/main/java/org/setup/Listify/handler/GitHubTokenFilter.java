@@ -116,19 +116,14 @@ public class GitHubTokenFilter implements Filter {
         try {
 
             String githubUserInfo = getGitHubUserInfo(token);
-
             GitHubUserPrincipal principal = new GitHubUserPrincipal(githubUserInfo);
-
 
             OAuth2AuthenticationToken authenticationToken = new OAuth2AuthenticationToken(
                     principal,
                     null,
                     "github"
             );
-
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
         } catch (Exception e) {
