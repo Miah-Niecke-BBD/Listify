@@ -35,32 +35,32 @@ public class TasksController {
     }
 
     @GetMapping("/{id}")
-    public EntityModel<Tasks> getTaskById(@PathVariable Long id) {
+    public EntityModel<Tasks> getTaskById(@PathVariable("id") Long id) {
         Tasks task = tasksService.getTaskById(id);
         return assembler.toModel(task);
     }
 
     @GetMapping("/subtask/{parentTaskID}")
-    public CollectionModel<EntityModel<Tasks>> getAllSubtasksOfTask(@PathVariable Long parentTaskID) {
+    public CollectionModel<EntityModel<Tasks>> getAllSubtasksOfTask(@PathVariable("parentTaskID") Long parentTaskID) {
         List<Tasks> subtasks = tasksService.getAllSubtasksOfTask(parentTaskID);
         return assembler.toCollectionModel(subtasks);
     }
 
     @GetMapping("dependent/{taskID}")
-    public EntityModel<Tasks> getDependentTaskByTaskId(@PathVariable Long taskID) {
+    public EntityModel<Tasks> getDependentTaskByTaskId(@PathVariable("taskID") Long taskID) {
         Tasks dependentTask = tasksService.getDependentTaskById(taskID);
         return assembler.toModel(dependentTask);
     }
 
     @PostMapping
     @Transactional
-    public ResponseEntity<?> newTask(@RequestParam(required = false) Integer teamLeaderID,
-                                     @RequestParam(required = false) Integer projectID,
-                                     @RequestParam(required = false) Integer sectionID,
-                                     @RequestParam(required = false) String taskName,
-                                     @RequestParam(required = false) String taskDescription,
-                                     @RequestParam(required = false) Byte taskPriority,
-                                     @RequestParam(required = false) Byte taskPosition) {
+    public ResponseEntity<?> newTask(@RequestParam(name = "teamLeader", required = false) Integer teamLeaderID,
+                                     @RequestParam(name = "projectID", required = false) Integer projectID,
+                                     @RequestParam(name = "sectionID", required = false) Integer sectionID,
+                                     @RequestParam(name = "taskName", required = false) String taskName,
+                                     @RequestParam(name = "taskDescription", required = false) String taskDescription,
+                                     @RequestParam(name = "taskPriority", required = false) Byte taskPriority,
+                                     @RequestParam(name = "taskPosition", required = false) Byte taskPosition) {
         if (teamLeaderID == null || projectID == null || sectionID == null || taskName == null || taskPriority == null || taskPosition == null) {
             ErrorResponse errorResponse = new ErrorResponse("Missing required parameter(s). Please ensure all required parameters are provided.",
                     HttpStatus.BAD_REQUEST.value());
@@ -76,12 +76,12 @@ public class TasksController {
 
     @PostMapping("/subtask/{parentTaskID}")
     @Transactional
-    public ResponseEntity<?> newSubTask(@PathVariable Long parentTaskID,
-                                        @RequestParam(required = false) Integer teamLeaderID,
-                                        @RequestParam(required = false) String taskName,
-                                        @RequestParam(required = false) String taskDescription,
-                                        @RequestParam(required = false) Integer sectionID,
-                                        @RequestParam(required = false) LocalDateTime dueDate) {
+    public ResponseEntity<?> newSubTask(@PathVariable("parentTaskID") Long parentTaskID,
+                                        @RequestParam(name = "teamLeaderID", required = false) Integer teamLeaderID,
+                                        @RequestParam(name = "taskName", required = false) String taskName,
+                                        @RequestParam(name = "taskDescription", required = false) String taskDescription,
+                                        @RequestParam(name = "sectionID", required = false) Integer sectionID,
+                                        @RequestParam(name = "dueDate", required = false) LocalDateTime dueDate) {
         if (teamLeaderID == null || sectionID == null || taskName == null || dueDate == null) {
             ErrorResponse errorResponse = new ErrorResponse("Missing required parameter(s). Please ensure all required parameters are provided.",
                     HttpStatus.BAD_REQUEST.value());
@@ -98,12 +98,12 @@ public class TasksController {
 
     @PutMapping("/{id}")
     @Transactional
-    ResponseEntity<?> updateTask(@PathVariable Long id,
-                                 @RequestParam Integer teamLeaderID,
-                                 @RequestParam String newTaskName,
-                                 @RequestParam String newTaskDescription,
-                                 @RequestParam Byte newTaskPriority,
-                                 @RequestParam LocalDateTime newDueDate) {
+    ResponseEntity<?> updateTask(@PathVariable("id") Long id,
+                                 @RequestParam("teamLeaderID") Integer teamLeaderID,
+                                 @RequestParam("newTaskName") String newTaskName,
+                                 @RequestParam("newTaskDescription") String newTaskDescription,
+                                 @RequestParam("newTaskPriority") Byte newTaskPriority,
+                                 @RequestParam("newDueDate") LocalDateTime newDueDate) {
         if (teamLeaderID == null) {
             ErrorResponse errorResponse = new ErrorResponse("Team Leader ID is required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
@@ -121,10 +121,10 @@ public class TasksController {
 
     @PutMapping("/{id}/position")
     @Transactional
-    ResponseEntity<?> updateTaskPosition(@PathVariable Long id,
-                                         @RequestParam(required = false) Integer teamLeaderID,
-                                         @RequestParam(required = false) Integer newTaskPosition,
-                                         @RequestParam(required = false) Integer sectionID) {
+    ResponseEntity<?> updateTaskPosition(@PathVariable("id") Long id,
+                                         @RequestParam(name = "teamLeaderID", required = false) Integer teamLeaderID,
+                                         @RequestParam(name = "newTaskPosition", required = false) Integer newTaskPosition,
+                                         @RequestParam(name = "sectionID", required = false) Integer sectionID) {
         if (teamLeaderID == null || sectionID == null || newTaskPosition == null) {
             ErrorResponse errorResponse = new ErrorResponse("Missing required parameter(s). Please ensure all required parameters are provided.",
                     HttpStatus.BAD_REQUEST.value());
@@ -143,7 +143,7 @@ public class TasksController {
 
     @DeleteMapping("/{id}")
     @Transactional
-    ResponseEntity<?> deleteTask(@PathVariable Long id, @RequestParam(required = false) Integer teamLeaderID) {
+    ResponseEntity<?> deleteTask(@PathVariable("id") Long id, @RequestParam(name = "teamLeaderID", required = false) Integer teamLeaderID) {
         if (teamLeaderID == null) {
             ErrorResponse errorResponse = new ErrorResponse("Team Leader ID is required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);

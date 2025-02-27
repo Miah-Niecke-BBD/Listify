@@ -34,16 +34,16 @@ public class TaskDependenciesController {
     }
 
     @GetMapping("/{id}")
-    public EntityModel<TaskDependencies> getTaskDependenciesById(@PathVariable Long id) {
+    public EntityModel<TaskDependencies> getTaskDependenciesById(@PathVariable("id") Long id) {
         TaskDependencies taskDependency = taskDependenciesService.getTaskDependencyById(id);
         return assembler.toModel(taskDependency);
     }
 
     @PostMapping
     @Transactional
-    public ResponseEntity<?> newTaskDependency(@RequestParam(required = false) Integer teamLeaderID,
-                                            @RequestParam(required = false) Integer taskID,
-                                            @RequestParam(required = false) Integer dependentTaskID) {
+    public ResponseEntity<?> newTaskDependency(@RequestParam(name = "teamLeaderID", required = false) Integer teamLeaderID,
+                                            @RequestParam(name = "taskID", required = false) Integer taskID,
+                                            @RequestParam(name = "dependentTaskID", required = false) Integer dependentTaskID) {
 
         if (teamLeaderID == null || taskID == null || dependentTaskID == null) {
             ErrorResponse errorResponse = new ErrorResponse("Missing required parameter(s). Please ensure all required parameters are provided.",
@@ -60,9 +60,9 @@ public class TaskDependenciesController {
 
     @DeleteMapping("/{dependentTaskID}")
     @Transactional
-    public ResponseEntity<?> deleteTaskDependencyByDependencyId(@PathVariable Long dependentTaskID,
-                                                                @RequestParam(required = false) Integer taskID,
-                                                                @RequestParam(required = false) Integer teamLeaderID) {
+    public ResponseEntity<?> deleteTaskDependencyByDependencyId(@PathVariable("dependentTaskID") Long dependentTaskID,
+                                                                @RequestParam(name = "taskID", required = false) Integer taskID,
+                                                                @RequestParam(name = "teamLeaderID", required = false) Integer teamLeaderID) {
         if (teamLeaderID == null || taskID == null) {
             ErrorResponse errorResponse = new ErrorResponse("Task ID and Team Leader ID are required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
