@@ -38,23 +38,23 @@ public class SectionsController {
     }
 
     @GetMapping("/{id}")
-    public EntityModel<Sections> getSectionsById(@PathVariable Long id) {
+    public EntityModel<Sections> getSectionsById(@PathVariable("id") Long id) {
         Sections section = sectionsService.getSectionById(id);
         return assembler.toModel(section);
     }
 
     @GetMapping("{id}/tasks")
-    public CollectionModel<EntityModel<Tasks>> getTaskBySectionId(@PathVariable Long id) {
+    public CollectionModel<EntityModel<Tasks>> getTaskBySectionId(@PathVariable("id") Long id) {
         List<Tasks> tasksList = sectionsService.getTaskBySectionId(id);
         return tasksAssembler.toCollectionModel(tasksList);
     }
 
     @PostMapping
     @Transactional
-    public ResponseEntity<?> newSection(@RequestParam(required = false) Integer teamLeaderID,
-                                        @RequestParam(required = false) Integer projectID,
-                                        @RequestParam(required = false) String sectionName,
-                                        @RequestParam(required = false) Byte sectionPosition) {
+    public ResponseEntity<?> newSection(@RequestParam(name = "teamLeaderID", required = false) Integer teamLeaderID,
+                                        @RequestParam(name = "projectID", required = false) Integer projectID,
+                                        @RequestParam(name = "sectionName", required = false) String sectionName,
+                                        @RequestParam(name = "sectionPosition", required = false) Byte sectionPosition) {
         if (teamLeaderID == null || projectID == null || sectionPosition == null || sectionName == null) {
             ErrorResponse errorResponse = new ErrorResponse("Missing required parameter(s). Please ensure all required parameters are provided.",
                     HttpStatus.BAD_REQUEST.value());
@@ -70,9 +70,9 @@ public class SectionsController {
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity<?> updateSection(@PathVariable Long id,
-                                           @RequestParam Integer userID,
-                                           @RequestParam String newSectionName) {
+    public ResponseEntity<?> updateSection(@PathVariable("id") Long id,
+                                           @RequestParam("userID") Integer userID,
+                                           @RequestParam("newSectionName") String newSectionName) {
         if (userID == null) {
             ErrorResponse errorResponse = new ErrorResponse("User ID is required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
@@ -89,8 +89,8 @@ public class SectionsController {
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity<?> deleteSectionById(@PathVariable Long id,
-                                               @RequestParam(required = false) Integer teamLeaderID) {
+    public ResponseEntity<?> deleteSectionById(@PathVariable("id") Long id,
+                                               @RequestParam(name = "teamLeaderID", required = false) Integer teamLeaderID) {
         if (teamLeaderID == null) {
             ErrorResponse errorResponse = new ErrorResponse("Team Leader ID is required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
