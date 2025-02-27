@@ -22,15 +22,6 @@ public class ProjectAssignees {
         this.projectID = projectID;
     }
 
-    @Override
-    public String toString() {
-        return "ProjectAssignee{" +
-                "projectAssigneeID=" + projectAssigneeID +
-                ", userID=" + userID +
-                ", projectID=" + projectID +
-                '}';
-    }
-
     public Long getProjectAssigneeID() {
         return projectAssigneeID;
     }

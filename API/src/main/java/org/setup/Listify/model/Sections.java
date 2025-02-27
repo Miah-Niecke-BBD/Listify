@@ -33,18 +33,6 @@ public class Sections {
         this.updatesAt = updatesAt;
     }
 
-    @Override
-    public String toString() {
-        return "Section{" +
-                "sectionID=" + sectionID +
-                ", projectID=" + projectID +
-                ", sectionName='" + sectionName + '\'' +
-                ", sectionPosition=" + sectionPosition +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatesAt +
-                '}';
-    }
-
     public Long getSectionID() {
         return sectionID;
     }

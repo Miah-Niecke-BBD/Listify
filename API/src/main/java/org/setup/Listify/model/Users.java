@@ -28,16 +28,6 @@ public class Users {
         this.updatedAt = updatedAt;
     }
 
-    @Override
-    public String toString() {
-        return "Users{" +
-                "userID=" + userID +
-                ", gitHubID='" + gitHubID + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
-
     public Long getUserID() {
         return userID;
     }
