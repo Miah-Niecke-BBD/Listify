@@ -1,6 +1,6 @@
 package org.setup.Listify.assembler;
 
-import org.setup.Listify.model.TeamProjects;
+import org.setup.Listify.model.UserTeamProjects;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
@@ -13,14 +13,14 @@ import java.util.stream.Collectors;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @Component
-public class TeamProjectsAssembler implements RepresentationModelAssembler<TeamProjects, EntityModel<TeamProjects>> {
+public class TeamProjectsAssembler implements RepresentationModelAssembler<UserTeamProjects, EntityModel<UserTeamProjects>> {
 
     @Override
-    public EntityModel<TeamProjects> toModel(TeamProjects teamProject) {
-        EntityModel<TeamProjects> projectEntityModel = EntityModel.of(teamProject);
+    public EntityModel<UserTeamProjects> toModel(UserTeamProjects teamProject) {
+        EntityModel<UserTeamProjects> projectEntityModel = EntityModel.of(teamProject);
 
         projectEntityModel.add(
-                linkTo(methodOn(TeamsController.class).getProjectsByTeamID(teamProject.getTeamID())).withSelfRel(),
+                linkTo(methodOn(TeamsController.class).getProjectsByTeamIDAndUserID(teamProject.getTeamID(), null)).withSelfRel(),
                 linkTo(methodOn(TeamsController.class).getTeamById(teamProject.getTeamID())).withRel("team"),
                 linkTo(methodOn(TeamsController.class).getTeamMembersByTeamId(teamProject.getTeamID())).withRel("teamMembers")
         );
@@ -28,8 +28,8 @@ public class TeamProjectsAssembler implements RepresentationModelAssembler<TeamP
         return projectEntityModel;
     }
 
-    public CollectionModel<EntityModel<TeamProjects>> toModel(List<TeamProjects> teamProjects, Long teamID) {
-        List<EntityModel<TeamProjects>> projectsEntityModels = teamProjects.stream()
+    public CollectionModel<EntityModel<UserTeamProjects>> toModel(List<UserTeamProjects> userTeamProjects, Long teamID) {
+        List<EntityModel<UserTeamProjects>> projectsEntityModels = userTeamProjects.stream()
                 .map(this::toModel)
                 .collect(Collectors.toList());
 

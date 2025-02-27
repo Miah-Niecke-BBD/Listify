@@ -4,11 +4,13 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.setup.Listify.exception.*;
 import org.setup.Listify.model.TeamMembers;
-import org.setup.Listify.model.TeamProjects;
+import org.setup.Listify.model.UserTeamProjects;
 import org.setup.Listify.model.Teams;
 import org.setup.Listify.repo.TeamMembersRepository;
 import org.setup.Listify.repo.TeamsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,9 +23,11 @@ public class TeamsService {
     private TeamsRepository teamsRepository;
     @Autowired
     private TeamMembersRepository teamMembersRepository;
+    @Autowired
+    UserService userService;
 
-    public List<Teams> getAllTeams() {
-        List<Teams> teams = teamsRepository.findAll();
+    public List<Teams> getAllUserTeams(Long userID) {
+        List<Teams> teams = teamsRepository.findTeamsByUserID(userID);
 
         if (teams.isEmpty()) {
             throw new ListNotFoundException("teams");
@@ -42,13 +46,20 @@ public class TeamsService {
     }
 
     public Teams getTeamById(Long teamID) {
-        return teamsRepository.findById(teamID)
-                .orElseThrow(() -> new TeamNotFoundException(teamID));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Long userID = userService.getUserIDFromAuthentication(authentication);
+
+        Teams team = teamsRepository.getTeamById(teamID, userID);
+
+        if (team == null) {
+            throw new TeamNotFoundException(teamID);
+        }
+
+        return team;
     }
 
     public TeamMembers getByTeamMembersId(Long userID) {
-        return teamMembersRepository.findById(userID)
-                .orElseThrow(() -> new TeamMemberNotFoundException(userID));
+        return teamMembersRepository.findById(userID).orElseThrow(() -> new TeamMemberNotFoundException(userID));
     }
 
     public TeamMembers getTeamMemberByUserId(Long userID) {
@@ -80,15 +91,15 @@ public class TeamsService {
     }
 
 
-    public List<TeamProjects> getProjectsByTeamID(Long teamID) {
+    public List<UserTeamProjects> getProjectsByTeamIDAndUserID(Long teamID, Long userID) {
         getTeamById(teamID);
-        List<TeamProjects> teamProjects = teamsRepository.findProjectsByTeamID(teamID);
+        List<UserTeamProjects> userTeamProjects = teamsRepository.findProjectsByTeamIDAndUserID(teamID, userID);
 
-        if (teamProjects.isEmpty()) {
+        if (userTeamProjects.isEmpty()) {
             throw new ListNotFoundException("team projects for team " + teamID);
         }
 
-        return teamProjects;
+        return userTeamProjects;
     }
 
     public Long addTeam(Long userID, String teamName) {

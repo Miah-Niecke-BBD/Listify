@@ -4,16 +4,19 @@ import org.setup.Listify.assembler.TeamMembersAssembler;
 import org.setup.Listify.assembler.TeamProjectsAssembler;
 import org.setup.Listify.exception.ErrorResponse;
 import org.setup.Listify.model.TeamMembers;
-import org.setup.Listify.model.TeamProjects;
+import org.setup.Listify.model.UserTeamProjects;
 import org.setup.Listify.model.Teams;
 import org.setup.Listify.service.TeamsService;
 import org.setup.Listify.assembler.TeamsAssembler;
+import org.setup.Listify.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +29,9 @@ public class TeamsController {
     private TeamsService teamService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private TeamsAssembler teamsAssembler;
 
     @Autowired
@@ -36,13 +42,16 @@ public class TeamsController {
 
     @GetMapping
     public CollectionModel<EntityModel<Teams>> getAllTeams() {
-        List<EntityModel<Teams>> teams = teamService.getAllTeams().stream().map(teamsAssembler::toModel).collect(Collectors.toList());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Long userID = userService.getUserIDFromAuthentication(authentication);
+        List<EntityModel<Teams>> teams = teamService.getAllUserTeams(userID).stream().map(teamsAssembler::toModel).collect(Collectors.toList());
 
         return CollectionModel.of(teams);
     }
 
     @PostMapping
-    public ResponseEntity<Object> addTeam(@RequestParam("userID") Long userID, @RequestParam("teamName") String teamName) {
+    public ResponseEntity<Object> addTeam(Authentication authentication, @RequestParam("teamName") String teamName) {
+        Long userID = userService.getUserIDFromAuthentication(authentication);
         if (teamName == null || userID == null) {
             ErrorResponse errorResponse = new ErrorResponse("Team name and User ID are required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
@@ -61,7 +70,8 @@ public class TeamsController {
     }
 
     @DeleteMapping("/{teamID}")
-    public ResponseEntity<Object> deleteTeam(@PathVariable("teamID") Long teamID, @RequestParam("teamLeaderID") Long teamLeaderID) {
+    public ResponseEntity<Object> deleteTeam(@PathVariable("teamID") Long teamID, Authentication authentication) {
+        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
         if (teamID == null || teamLeaderID == null) {
             ErrorResponse errorResponse = new ErrorResponse("Team ID and Team Leader ID are required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
@@ -73,7 +83,8 @@ public class TeamsController {
     }
 
     @PutMapping("/{teamID}")
-    public ResponseEntity<Object> updateTeam(@RequestParam("userID") Long userID, @PathVariable("teamID") Long teamID, @RequestParam("newTeamName") String newTeamName) {
+    public ResponseEntity<Object> updateTeam(Authentication authentication, @PathVariable("teamID") Long teamID, @RequestParam("newTeamName") String newTeamName) {
+        Long userID = userService.getUserIDFromAuthentication(authentication);
         if (teamID == null || userID == null) {
             ErrorResponse errorResponse = new ErrorResponse("Team ID and Team Leader ID are required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
@@ -88,6 +99,7 @@ public class TeamsController {
         return ResponseEntity.status(HttpStatus.OK).body(entityModel);
     }
 
+    //To be deleted
     @GetMapping("/members")
     public CollectionModel<EntityModel<TeamMembers>> getAllTeamMembers() {
         List<TeamMembers> teamMembers = teamService.getAllTeamMembers();
@@ -104,15 +116,18 @@ public class TeamsController {
     }
 
     @GetMapping("/{teamID}/projects")
-    public CollectionModel<EntityModel<TeamProjects>> getProjectsByTeamID(@PathVariable("teamID") Long teamID) {
-        List<TeamProjects> teamProjectsList = teamService.getProjectsByTeamID(teamID);
+    public CollectionModel<EntityModel<UserTeamProjects>> getProjectsByTeamIDAndUserID(@PathVariable("teamID") Long teamID, Authentication authentication) {
 
-        return teamProjectsAssembler.toModel(teamProjectsList, teamID);
+        Long userID = userService.getUserIDFromAuthentication(authentication);
+        System.out.println(userID);
+        List<UserTeamProjects> userTeamProjectsList = teamService.getProjectsByTeamIDAndUserID(teamID, userID);
+
+        return teamProjectsAssembler.toModel(userTeamProjectsList, teamID);
     }
 
     @PostMapping("/{teamID}/assignMember")
-    public ResponseEntity<Object> assignMemberToTeam(@PathVariable("teamID") Long teamID, @RequestParam("teamLeaderID") Long teamLeaderID, @RequestParam("userID") Long userID) {
-
+    public ResponseEntity<Object> assignMemberToTeam(@PathVariable("teamID") Long teamID, Authentication authentication, @RequestParam("userID") Long userID) {
+        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
         if (teamID == null || teamLeaderID == null || userID == null) {
             ErrorResponse errorResponse = new ErrorResponse("Team ID, Team Leader ID, and User ID are required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
@@ -129,7 +144,8 @@ public class TeamsController {
     }
 
     @DeleteMapping("/{teamID}/teamMember")
-    public ResponseEntity<Object> deleteMemberFromTeam(@RequestParam("userID") Long userID, @PathVariable("teamID") Long teamID, @RequestParam("teamLeaderID") Long teamLeaderID) {
+    public ResponseEntity<Object> deleteMemberFromTeam(@RequestParam("userID") Long userID, @PathVariable("teamID") Long teamID, Authentication authentication) {
+        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
 
         if (userID == null || teamID == null || teamLeaderID == null) {
             ErrorResponse errorResponse = new ErrorResponse("User ID, Team ID and Team Leader ID are required.", HttpStatus.BAD_REQUEST.value());
@@ -144,7 +160,8 @@ public class TeamsController {
     }
 
     @PutMapping("/{teamID}/leader")
-    public ResponseEntity<Object> updateTeamLeader(@RequestParam("teamLeaderID") Long teamLeaderID, @PathVariable("teamID") Long teamID, @RequestParam("newTeamLeaderID") Long newTeamLeaderID) {
+    public ResponseEntity<Object> updateTeamLeader(Authentication authentication, @PathVariable("teamID") Long teamID, @RequestParam("newTeamLeaderID") Long newTeamLeaderID) {
+        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
         if (teamID == null || teamLeaderID == null || newTeamLeaderID == null) {
             ErrorResponse errorResponse = new ErrorResponse("Team ID, Team Leader ID and new Team Leader ID are required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
