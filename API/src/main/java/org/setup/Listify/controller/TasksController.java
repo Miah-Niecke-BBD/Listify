@@ -40,10 +40,16 @@ public class TasksController {
         return assembler.toModel(task);
     }
 
-    @GetMapping("/section/{sectionId}")
-    public CollectionModel<EntityModel<Tasks>> getTaskBySectionId(@PathVariable Long sectionId) {
-        List<Tasks> tasksList = tasksService.getTaskBySectionId(sectionId);
-        return assembler.toCollectionModel(tasksList);
+    @GetMapping("/subtask/{parentTaskID}")
+    public CollectionModel<EntityModel<Tasks>> getAllSubtasksOfTask(@PathVariable Long parentTaskID) {
+        List<Tasks> subtasks = tasksService.getAllSubtasksOfTask(parentTaskID);
+        return assembler.toCollectionModel(subtasks);
+    }
+
+    @GetMapping("dependent/{taskID}")
+    public EntityModel<Tasks> getDependentTaskByTaskId(@PathVariable Long taskID) {
+        Tasks dependentTask = tasksService.getDependentTaskById(taskID);
+        return assembler.toModel(dependentTask);
     }
 
     @PostMapping

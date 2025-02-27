@@ -53,10 +53,12 @@ public interface TasksRepository extends JpaRepository<Tasks, Long> {
     @Procedure("listify.uspDeleteTask")
     void deleteTasksById(@Param("taskID") int taskID, @Param("teamLeaderID") int teamLeaderID);
 
-
-    @Query("SELECT t FROM Tasks t WHERE t.sectionID = :id")
-    List<Tasks> findTasksBySectionID(@Param("id") Long id);
-
     @Query(value = "SELECT TOP 1 * FROM listify.Tasks ORDER BY taskID DESC", nativeQuery = true)
     Tasks findTopOrderByTaskIDDesc();
+
+    @Query("SELECT t FROM Tasks t WHERE t.parentTaskID = :parentTaskID")
+    List<Tasks> getAllSubtasksOfTask(Long parentTaskID);
+
+    @Query("SELECT t FROM Tasks t WHERE t.taskID = (SELECT td.dependentTaskID FROM TaskDependencies td WHERE td.taskID = :taskID)")
+    Tasks findDependentTaskByTaskID(@Param("taskID") Long taskID);
 }
