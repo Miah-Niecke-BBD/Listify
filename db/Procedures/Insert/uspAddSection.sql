@@ -26,9 +26,8 @@ BEGIN
         END;
 
         SELECT @maxSectionPosition = MAX(sectionPosition) FROM listify.Sections WHERE projectID = @projectID;
-		PRINT 'Max Section Position: ' + CAST(@maxSectionPosition AS VARCHAR(10));
 
-        IF EXISTS (SELECT 1 FROM listify.Sections WHERE projectID = @projectID AND sectionPosition = @sectionPosition)
+        IF EXISTS (SELECT 1 FROM listify.Sections WHERE projectID = @projectID AND sectionPosition = @sectionPosition OR (sectionPosition > @maxSectionPosition))
         BEGIN
             PRINT 'The input position is already taken. Setting to next available position.';
             SET @sectionPosition = @maxSectionPosition + 1;

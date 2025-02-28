@@ -134,6 +134,9 @@ public class TeamsService {
         getTeamById(teamID);
         isTeamLeader(teamID, teamLeaderID);
         boolean memberExists = teamMembersRepository.existsByTeamIDAndUserID(teamID, userID);
+        if (userID == teamID) {
+            throw new DeleteTeamLeaderException();
+        }
 
         if (!memberExists) {
             throw new TeamMemberAlreadyExistsException("User with ID " + userID + " is not a member of team " + teamID);
