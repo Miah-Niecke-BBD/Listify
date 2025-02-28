@@ -61,4 +61,18 @@ public interface TasksRepository extends JpaRepository<Tasks, Long> {
 
     @Query("SELECT t FROM Tasks t WHERE t.taskID = (SELECT td.dependentTaskID FROM TaskDependencies td WHERE td.taskID = :taskID)")
     Tasks findDependentTaskByTaskID(@Param("taskID") Long taskID);
+
+    @Query(value = "SELECT " +
+            "t.taskID, t.sectionID, t.parentTaskID, t.taskName, t.taskDescription, t.taskPriority, t.taskPosition, t.dateCompleted, t.dueDate, t.createdAt, t.updatedAt " +
+            "FROM listify.vUserTeamProjectsTasks v " +
+            "INNER JOIN listify.Tasks t ON v.taskID = t.taskID " +
+            "WHERE v.userID = ?1 ", nativeQuery = true)
+    List<Tasks> findTasksByUserID(Long userID);
+
+    @Query(value = "SELECT " +
+            "t.taskID, t.sectionID, t.parentTaskID, t.taskName, t.taskDescription, t.taskPriority, t.taskPosition, t.dateCompleted, t.dueDate, t.createdAt, t.updatedAt " +
+            "FROM listify.vUserTeamProjectsTasks v " +
+            "INNER JOIN listify.Tasks t ON v.taskID = t.taskID " +
+            "WHERE v.userID = ?1 AND t.taskID = ?2", nativeQuery = true)
+    Tasks getTaskById(Long userID, Long taskID);
 }

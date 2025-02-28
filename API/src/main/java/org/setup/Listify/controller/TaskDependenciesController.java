@@ -4,11 +4,13 @@ import org.setup.Listify.exception.ErrorResponse;
 import org.setup.Listify.model.TaskDependencies;
 import org.setup.Listify.assembler.TaskDependenciesModelAssembler;
 import org.setup.Listify.service.TaskDependenciesService;
+import org.setup.Listify.service.UserService;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,10 +22,12 @@ import java.util.Map;
 public class TaskDependenciesController {
 
     private final TaskDependenciesService taskDependenciesService;
+    private final UserService userService;
     private final TaskDependenciesModelAssembler assembler;
 
-    public TaskDependenciesController(TaskDependenciesService taskDependenciesService, TaskDependenciesModelAssembler assembler) {
+    public TaskDependenciesController(TaskDependenciesService taskDependenciesService, TaskDependenciesModelAssembler assembler, UserService userService) {
         this.taskDependenciesService = taskDependenciesService;
+        this.userService = userService;
         this.assembler = assembler;
     }
 
@@ -41,9 +45,13 @@ public class TaskDependenciesController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<?> newTaskDependency(@RequestParam(name = "teamLeaderID", required = false) Integer teamLeaderID,
+    public ResponseEntity<?> newTaskDependency(Authentication authentication,
                                             @RequestParam(name = "taskID", required = false) Integer taskID,
                                             @RequestParam(name = "dependentTaskID", required = false) Integer dependentTaskID) {
+
+        Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
+        int teamLeaderIDInt = teamLeaderIDLong.intValue();
+        Integer teamLeaderID = Integer.valueOf(teamLeaderIDInt);
 
         if (teamLeaderID == null || taskID == null || dependentTaskID == null) {
             ErrorResponse errorResponse = new ErrorResponse("Missing required parameter(s). Please ensure all required parameters are provided.",
@@ -62,7 +70,11 @@ public class TaskDependenciesController {
     @Transactional
     public ResponseEntity<?> deleteTaskDependencyByDependencyId(@PathVariable("dependentTaskID") Long dependentTaskID,
                                                                 @RequestParam(name = "taskID", required = false) Integer taskID,
-                                                                @RequestParam(name = "teamLeaderID", required = false) Integer teamLeaderID) {
+                                                                Authentication authentication) {
+        Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
+        int teamLeaderIDInt = teamLeaderIDLong.intValue();
+        Integer teamLeaderID = Integer.valueOf(teamLeaderIDInt);
+
         if (teamLeaderID == null || taskID == null) {
             ErrorResponse errorResponse = new ErrorResponse("Task ID and Team Leader ID are required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
