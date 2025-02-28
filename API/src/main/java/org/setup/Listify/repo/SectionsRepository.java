@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface SectionsRepository extends JpaRepository<Sections, Long> {
 
-    @Procedure("listify.uspCreateSection")
+    @Procedure("listify.uspAddSection")
     void createSection(@Param("teamLeaderID") Integer teamLeaderID,
                        @Param("projectID") Integer projectID,
                        @Param("sectionName") String sectionName,
