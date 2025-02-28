@@ -4,11 +4,14 @@ import org.setup.Listify.exception.ErrorResponse;
 import org.setup.Listify.model.Tasks;
 import org.setup.Listify.service.TasksService;
 import org.setup.Listify.assembler.TasksModelAssembler;
+import org.setup.Listify.service.UserService;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,16 +24,20 @@ import java.util.Map;
 public class TasksController {
 
     private final TasksService tasksService;
+    private final UserService userService;
     private final TasksModelAssembler assembler;
 
-    public TasksController(TasksService tasksService, TasksModelAssembler assembler) {
+    public TasksController(TasksService tasksService, TasksModelAssembler assembler, UserService userService) {
         this.tasksService = tasksService;
+        this.userService = userService;
         this.assembler = assembler;
     }
 
     @GetMapping
     public CollectionModel<EntityModel<Tasks>> getAllTasks() {
-        List<Tasks> tasks = tasksService.getAllTasks();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Long userID = userService.getUserIDFromAuthentication(authentication);
+        List<Tasks> tasks = tasksService.getAllTasks(userID);
         return assembler.toCollectionModel(tasks);
     }
 
@@ -77,11 +84,15 @@ public class TasksController {
     @PostMapping("/subtask/{parentTaskID}")
     @Transactional
     public ResponseEntity<?> newSubTask(@PathVariable("parentTaskID") Long parentTaskID,
-                                        @RequestParam(name = "teamLeaderID", required = false) Integer teamLeaderID,
+                                        Authentication authentication,
                                         @RequestParam(name = "taskName", required = false) String taskName,
                                         @RequestParam(name = "taskDescription", required = false) String taskDescription,
                                         @RequestParam(name = "sectionID", required = false) Integer sectionID,
                                         @RequestParam(name = "dueDate", required = false) LocalDateTime dueDate) {
+        Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
+        int teamLeaderIDInt = teamLeaderIDLong.intValue();
+        Integer teamLeaderID = Integer.valueOf(teamLeaderIDInt);
+
         if (teamLeaderID == null || sectionID == null || taskName == null || dueDate == null) {
             ErrorResponse errorResponse = new ErrorResponse("Missing required parameter(s). Please ensure all required parameters are provided.",
                     HttpStatus.BAD_REQUEST.value());
@@ -99,11 +110,15 @@ public class TasksController {
     @PutMapping("/{id}")
     @Transactional
     ResponseEntity<?> updateTask(@PathVariable("id") Long id,
-                                 @RequestParam("teamLeaderID") Integer teamLeaderID,
+                                 Authentication authentication,
                                  @RequestParam("newTaskName") String newTaskName,
                                  @RequestParam("newTaskDescription") String newTaskDescription,
                                  @RequestParam("newTaskPriority") Byte newTaskPriority,
                                  @RequestParam("newDueDate") LocalDateTime newDueDate) {
+        Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
+        int teamLeaderIDInt = teamLeaderIDLong.intValue();
+        Integer teamLeaderID = Integer.valueOf(teamLeaderIDInt);
+
         if (teamLeaderID == null) {
             ErrorResponse errorResponse = new ErrorResponse("Team Leader ID is required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
@@ -122,9 +137,14 @@ public class TasksController {
     @PutMapping("/{id}/position")
     @Transactional
     ResponseEntity<?> updateTaskPosition(@PathVariable("id") Long id,
-                                         @RequestParam(name = "teamLeaderID", required = false) Integer teamLeaderID,
+                                         Authentication authentication,
                                          @RequestParam(name = "newTaskPosition", required = false) Integer newTaskPosition,
                                          @RequestParam(name = "sectionID", required = false) Integer sectionID) {
+
+        Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
+        int teamLeaderIDInt = teamLeaderIDLong.intValue();
+        Integer teamLeaderID = Integer.valueOf(teamLeaderIDInt);
+
         if (teamLeaderID == null || sectionID == null || newTaskPosition == null) {
             ErrorResponse errorResponse = new ErrorResponse("Missing required parameter(s). Please ensure all required parameters are provided.",
                     HttpStatus.BAD_REQUEST.value());
@@ -143,7 +163,12 @@ public class TasksController {
 
     @DeleteMapping("/{id}")
     @Transactional
-    ResponseEntity<?> deleteTask(@PathVariable("id") Long id, @RequestParam(name = "teamLeaderID", required = false) Integer teamLeaderID) {
+    ResponseEntity<?> deleteTask(@PathVariable("id") Long id, Authentication authentication) {
+
+        Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
+        int teamLeaderIDInt = teamLeaderIDLong.intValue();
+        Integer teamLeaderID = Integer.valueOf(teamLeaderIDInt);
+
         if (teamLeaderID == null) {
             ErrorResponse errorResponse = new ErrorResponse("Team Leader ID is required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);

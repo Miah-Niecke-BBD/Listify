@@ -4,11 +4,13 @@ import org.setup.Listify.exception.ErrorResponse;
 import org.setup.Listify.model.TaskAssignees;
 import org.setup.Listify.assembler.TaskAssigneesModelAssembler;
 import org.setup.Listify.service.TaskAssigneesService;
+import org.setup.Listify.service.UserService;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,10 +22,12 @@ import java.util.Map;
 public class TaskAssigneesController {
 
     private final TaskAssigneesService taskAssigneesService;
+    private final UserService userService;
     private final TaskAssigneesModelAssembler assembler;
 
-    public TaskAssigneesController(TaskAssigneesService taskAssigneesService, TaskAssigneesModelAssembler assembler) {
+    public TaskAssigneesController(TaskAssigneesService taskAssigneesService, TaskAssigneesModelAssembler assembler, UserService userService) {
         this.taskAssigneesService = taskAssigneesService;
+        this.userService = userService;
         this.assembler = assembler;
     }
 
@@ -51,8 +55,12 @@ public class TaskAssigneesController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<?> assignTask(@RequestParam(name = "userID", required = false) Integer userID,
+    public ResponseEntity<?> assignTask(Authentication authentication,
                                         @RequestParam(name = "taskID", required = false) Integer taskID) {
+        Long userIDLong = userService.getUserIDFromAuthentication(authentication);
+        int userIDInt = userIDLong.intValue();
+        Integer userID = Integer.valueOf(userIDInt);
+
         if (userID == null || taskID == null) {
             ErrorResponse errorResponse = new ErrorResponse("User ID and Task ID are required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
@@ -69,7 +77,11 @@ public class TaskAssigneesController {
     @Transactional
     public ResponseEntity<?> deleteTaskAssignment(@PathVariable("taskID") Long taskID,
                                                   @RequestParam(name = "userID", required = false) Integer userID,
-                                                  @RequestParam(name = "teamLeaderID", required = false) Integer teamLeaderID) {
+                                                  Authentication authentication) {
+        Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
+        int teamLeaderIDInt = teamLeaderIDLong.intValue();
+        Integer teamLeaderID = Integer.valueOf(teamLeaderIDInt);
+
         if (teamLeaderID == null || userID == null) {
             ErrorResponse errorResponse = new ErrorResponse("User ID and Team Leader ID are required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);

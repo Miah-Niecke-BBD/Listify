@@ -1,15 +1,18 @@
 package org.setup.Listify.controller;
 
 
+import org.apache.catalina.User;
 import org.setup.Listify.assembler.ProjectAssigneesAssembler;
 import org.setup.Listify.exception.ErrorResponse;
 import org.setup.Listify.model.ProjectAssignees;
 import org.setup.Listify.service.ProjectAssigneesService;
+import org.setup.Listify.service.UserService;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,10 +24,12 @@ import java.util.Map;
 public class ProjectAssigneesController {
 
     private final ProjectAssigneesService projectAssigneesService;
+    private final UserService userService;
     private final ProjectAssigneesAssembler assembler;
 
-    public ProjectAssigneesController(ProjectAssigneesService projectAssigneesService, ProjectAssigneesAssembler assembler) {
+    public ProjectAssigneesController(ProjectAssigneesService projectAssigneesService, ProjectAssigneesAssembler assembler, UserService userService) {
         this.projectAssigneesService = projectAssigneesService;
+        this.userService = userService;
         this.assembler = assembler;
     }
 
@@ -45,8 +50,7 @@ public class ProjectAssigneesController {
         List<ProjectAssignees> projects = projectAssigneesService.getProjectsAssignedToSpecificUser(userID);
         return assembler.toCollectionModel(projects);
     }
-
-
+    
     @PostMapping("/assign")
     @Transactional
     public ResponseEntity<?> assignUserToProject(@RequestParam int userID, @RequestParam int projectID) {
@@ -65,7 +69,11 @@ public class ProjectAssigneesController {
 
     @DeleteMapping("/unassign")
     @Transactional
-    public ResponseEntity<?> deleteUserFromProject(@RequestParam int userID, @RequestParam int projectID, @RequestParam int teamLeaderID) {
+    public ResponseEntity<?> deleteUserFromProject(@RequestParam int userID, @RequestParam int projectID, Authentication authentication) {
+        Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
+        int teamLeaderIDInt = teamLeaderIDLong.intValue();
+        Integer teamLeaderID = Integer.valueOf(teamLeaderIDInt);
+
         projectAssigneesService.deleteUserFromProject(userID, projectID, teamLeaderID);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(Map.of("message", "User " + userID + " has been removed from project " + projectID));

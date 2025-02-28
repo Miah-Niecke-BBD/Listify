@@ -6,6 +6,8 @@ import org.setup.Listify.exception.TaskDependencyNotFoundException;
 import org.setup.Listify.model.Tasks;
 import org.setup.Listify.repo.TasksRepository;
 import org.setup.Listify.exception.TaskNotFoundException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,28 +16,37 @@ import java.util.List;
 public class TasksService {
 
     private final TasksRepository repository;
+    private final UserService userService;
 
-    public TasksService(TasksRepository repository) {
+    public TasksService(TasksRepository repository, UserService userService) {
         this.repository = repository;
+        this.userService = userService;
     }
 
 
-    public List<Tasks> getAllTasks() {
-        List<Tasks> tasks = repository.findAll();
+    public List<Tasks> getAllTasks(Long userID) {
+        List<Tasks> tasks = repository.findTasksByUserID(userID);
         if (tasks.isEmpty()) {
             throw new ListNotFoundException("tasks");
         }
         return tasks;
     }
 
-
     public Tasks getTaskById(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new TaskNotFoundException(id));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Long userID = userService.getUserIDFromAuthentication(authentication);
+
+        Tasks task = repository.getTaskById(userID, id);
+
+        if (task == null) {
+            throw new TaskNotFoundException(id);
+        }
+
+        return task;
     }
 
-
     public List<Tasks> getAllSubtasksOfTask(Long parentTaskID) {
+        getTaskById(parentTaskID);
         List<Tasks> subtasks = repository.getAllSubtasksOfTask(parentTaskID);
         if (subtasks.isEmpty()) {
             throw new ListNotFoundException("subtasks");
@@ -44,6 +55,7 @@ public class TasksService {
     }
 
     public Tasks getDependentTaskById(Long taskID) {
+        getTaskById(taskID);
         Tasks dependentTask = repository.findDependentTaskByTaskID(taskID);
         if (dependentTask == null) {
             throw new TaskDependencyNotFoundException(taskID);
@@ -65,6 +77,7 @@ public class TasksService {
     }
 
     public Long createSubTask(int teamLeaderID, int parentTaskID, String taskName, String taskDescription, int sectionID, LocalDateTime dueDate) {
+
         repository.createSubTask(teamLeaderID, parentTaskID, taskName, taskDescription, sectionID, dueDate);
 
         Tasks newlyAddedTask = repository.findTopOrderByTaskIDDesc();

@@ -6,11 +6,13 @@ import org.setup.Listify.exception.ErrorResponse;
 import org.setup.Listify.model.Projects;
 import org.setup.Listify.model.Sections;
 import org.setup.Listify.service.ProjectsService;
+import org.setup.Listify.service.UserService;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,11 +24,13 @@ import java.util.Map;
 public class ProjectsController {
 
     private final ProjectsService projectsService;
+    private final UserService userService;
     private final ProjectsModelAssembler assembler;
     private final SectionsModelAssembler sectionsAssembler;
 
-    public ProjectsController(ProjectsService projectsService, ProjectsModelAssembler assembler, SectionsModelAssembler sectionsAssembler) {
+    public ProjectsController(ProjectsService projectsService, ProjectsModelAssembler assembler, SectionsModelAssembler sectionsAssembler, UserService userService) {
         this.projectsService = projectsService;
+        this.userService = userService;
         this.assembler = assembler;
         this.sectionsAssembler = sectionsAssembler;
     }
@@ -52,10 +56,15 @@ public class ProjectsController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<?> newProject(@RequestParam(name = "teamLeaderID", required = false) Integer teamLeaderID,
+    public ResponseEntity<?> newProject(Authentication authentication,
                                         @RequestParam(name = "teamID", required = false) Integer teamID,
                                         @RequestParam(name = "projectName", required = false) String projectName,
                                         @RequestParam(name = "projectDescription", required = false) String projectDescription) {
+
+        Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
+        int teamLeaderIDInt = teamLeaderIDLong.intValue();
+        Integer teamLeaderID = Integer.valueOf(teamLeaderIDInt);
+
         if (teamLeaderID == null || teamID == null || projectName == null) {
             ErrorResponse errorResponse = new ErrorResponse("Missing required parameter(s). Please ensure all required parameters are provided.",
                     HttpStatus.BAD_REQUEST.value());
@@ -73,9 +82,13 @@ public class ProjectsController {
     @PutMapping("/{id}")
     @Transactional
     public ResponseEntity<?> updateProject(@PathVariable("id") Long id,
-                                           @RequestParam(name = "userID") Integer userID,
+                                          Authentication authentication,
                                            @RequestParam(name = "projectName") String projectName,
                                            @RequestParam(name = "projectDescription") String projectDescription) {
+        Long userIDLong = userService.getUserIDFromAuthentication(authentication);
+        int userIDInt = userIDLong.intValue();
+        Integer userID = Integer.valueOf(userIDInt);
+
         if (userID == null) {
             ErrorResponse errorResponse = new ErrorResponse("User ID is required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
@@ -93,7 +106,11 @@ public class ProjectsController {
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<?> deleteProjectById(@PathVariable("id") Long id,
-                                               @RequestParam(name = "teamLeaderID", required = false) Integer teamLeaderID) {
+                                               Authentication authentication) {
+        Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
+        int teamLeaderIDInt = teamLeaderIDLong.intValue();
+        Integer teamLeaderID = Integer.valueOf(teamLeaderIDInt);
+
         if (teamLeaderID == null) {
             ErrorResponse errorResponse = new ErrorResponse("Team Leader ID is required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
