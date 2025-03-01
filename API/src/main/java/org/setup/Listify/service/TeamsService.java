@@ -4,7 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.setup.Listify.exception.*;
 import org.setup.Listify.model.TeamMembers;
-import org.setup.Listify.model.UserTeamProjects;
+import org.setup.Listify.dto.UserTeamProjects;
 import org.setup.Listify.model.Teams;
 import org.setup.Listify.repo.TeamMembersRepository;
 import org.setup.Listify.repo.TeamsRepository;
