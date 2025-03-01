@@ -5,8 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 
-public class ListifyApplication {
+public class listifyApplication {
     public static void main(String[] args) {
-        SpringApplication.run(ListifyApplication.class, args);
+        SpringApplication.run(listifyApplication.class, args);
     }
 }
