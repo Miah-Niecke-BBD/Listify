@@ -1,9 +1,7 @@
 package org.setup.Listify.service;
 
-import org.setup.Listify.exception.ListNotFoundException;
 import org.setup.Listify.model.TaskAssignees;
 import org.setup.Listify.repo.TaskAssigneesRepository;
-import org.setup.Listify.exception.AssignedTaskNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,24 +16,16 @@ public class TaskAssigneesService {
     }
 
     public List<TaskAssignees> getAllAssignedTasks() {
-        List<TaskAssignees> taskAssigneesList = repository.findAll();
-        if (taskAssigneesList.isEmpty()) {
-            throw new ListNotFoundException("Task Assignees");
-        }
-        return taskAssigneesList;
+        return repository.findAll();
     }
 
     public TaskAssignees getAssignedTaskById(Long taskAssigneeID) {
         return repository.findById(taskAssigneeID)
-                .orElseThrow(() -> new AssignedTaskNotFoundException(taskAssigneeID));
+                .orElseThrow();
     }
 
     public List<TaskAssignees> getTasksAssignedToSpecificUser(Long userID) {
-        List<TaskAssignees> tasksAssignedToUser = repository.findAssignedTasksByUserID(userID);
-        if (tasksAssignedToUser.isEmpty()) {
-            throw new ListNotFoundException("tasks assigned to user");
-        }
-        return tasksAssignedToUser;
+        return repository.findAssignedTasksByUserID(userID);
     }
 
     public Long assignTaskToUser(int userID, int taskID) {
