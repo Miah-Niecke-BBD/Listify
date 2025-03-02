@@ -1,11 +1,7 @@
 package org.setup.Listify.service;
 
-import org.setup.Listify.exception.ListNotFoundException;
-import org.setup.Listify.exception.SectionNotFoundException;
-import org.setup.Listify.exception.TaskDependencyNotFoundException;
 import org.setup.Listify.model.Tasks;
 import org.setup.Listify.repo.TasksRepository;
-import org.setup.Listify.exception.TaskNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -25,42 +21,23 @@ public class TasksService {
 
 
     public List<Tasks> getAllTasks(Long userID) {
-        List<Tasks> tasks = repository.findTasksByUserID(userID);
-        if (tasks.isEmpty()) {
-            throw new ListNotFoundException("tasks");
-        }
-        return tasks;
+        return repository.findTasksByUserID(userID);
     }
 
     public Tasks getTaskById(Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Long userID = userService.getUserIDFromAuthentication(authentication);
-
-        Tasks task = repository.getTaskById(userID, id);
-
-        if (task == null) {
-            throw new TaskNotFoundException(id);
-        }
-
-        return task;
+        return repository.getTaskById(userID, id);
     }
 
     public List<Tasks> getAllSubtasksOfTask(Long parentTaskID) {
         getTaskById(parentTaskID);
-        List<Tasks> subtasks = repository.getAllSubtasksOfTask(parentTaskID);
-        if (subtasks.isEmpty()) {
-            throw new ListNotFoundException("subtasks");
-        }
-        return subtasks;
+        return repository.getAllSubtasksOfTask(parentTaskID);
     }
 
     public Tasks getDependentTaskById(Long taskID) {
         getTaskById(taskID);
-        Tasks dependentTask = repository.findDependentTaskByTaskID(taskID);
-        if (dependentTask == null) {
-            throw new TaskDependencyNotFoundException(taskID);
-        }
-        return dependentTask;
+        return repository.findDependentTaskByTaskID(taskID);
     }
 
 
