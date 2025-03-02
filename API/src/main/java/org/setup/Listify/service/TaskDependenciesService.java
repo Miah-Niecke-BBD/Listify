@@ -1,12 +1,8 @@
 package org.setup.Listify.service;
 
-import org.setup.Listify.exception.ListNotFoundException;
 import org.setup.Listify.model.TaskDependencies;
 import org.setup.Listify.repo.TaskDependenciesRepository;
-import org.setup.Listify.exception.TaskDependencyNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class TaskDependenciesService {
@@ -17,17 +13,9 @@ public class TaskDependenciesService {
         this.repository = repository;
     }
 
-    public List<TaskDependencies> getAllTaskDependencies() {
-        List<TaskDependencies> taskDependencies = repository.findAll();
-        if (taskDependencies.isEmpty()) {
-            throw new ListNotFoundException("Task Dependencies");
-        }
-        return taskDependencies;
-    }
-
     public TaskDependencies getTaskDependencyById(Long taskDependencyID) {
         return repository.findById(taskDependencyID)
-                .orElseThrow(() -> new TaskDependencyNotFoundException(taskDependencyID));
+                .orElseThrow();
     }
 
     public Long newTaskDependency(int teamLeaderID, int taskID, int dependentTaskID) {

@@ -2,20 +2,13 @@ package org.setup.Listify.controller;
 
 import org.setup.Listify.exception.ErrorResponse;
 import org.setup.Listify.model.TaskDependencies;
-import org.setup.Listify.assembler.TaskDependenciesModelAssembler;
 import org.setup.Listify.service.TaskDependenciesService;
 import org.setup.Listify.service.UserService;
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/tasks/dependencies")
@@ -23,26 +16,13 @@ public class TaskDependenciesController {
 
     private final TaskDependenciesService taskDependenciesService;
     private final UserService userService;
-    private final TaskDependenciesModelAssembler assembler;
 
-    public TaskDependenciesController(TaskDependenciesService taskDependenciesService, TaskDependenciesModelAssembler assembler, UserService userService) {
+    public TaskDependenciesController(TaskDependenciesService taskDependenciesService, UserService userService) {
         this.taskDependenciesService = taskDependenciesService;
         this.userService = userService;
-        this.assembler = assembler;
     }
 
-    @GetMapping
-    public CollectionModel<EntityModel<TaskDependencies>> getAllTaskDependencies() {
-        List<TaskDependencies> taskDependencies = taskDependenciesService.getAllTaskDependencies();
-        return assembler.toCollectionModel(taskDependencies);
-    }
-
-    @GetMapping("/{id}")
-    public EntityModel<TaskDependencies> getTaskDependenciesById(@PathVariable("id") Long id) {
-        TaskDependencies taskDependency = taskDependenciesService.getTaskDependencyById(id);
-        return assembler.toModel(taskDependency);
-    }
-
+    
     @PostMapping
     @Transactional
     public ResponseEntity<?> newTaskDependency(Authentication authentication,
@@ -50,10 +30,9 @@ public class TaskDependenciesController {
                                             @RequestParam(name = "dependentTaskID", required = false) Integer dependentTaskID) {
 
         Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
-        int teamLeaderIDInt = teamLeaderIDLong.intValue();
-        Integer teamLeaderID = Integer.valueOf(teamLeaderIDInt);
+        int teamLeaderID = teamLeaderIDLong.intValue();
 
-        if (teamLeaderID == null || taskID == null || dependentTaskID == null) {
+        if (taskID == null || dependentTaskID == null) {
             ErrorResponse errorResponse = new ErrorResponse("Missing required parameter(s). Please ensure all required parameters are provided.",
                     HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.badRequest().body(errorResponse);
@@ -61,10 +40,9 @@ public class TaskDependenciesController {
 
         Long newTaskDependencyID = taskDependenciesService.newTaskDependency(teamLeaderID, taskID, dependentTaskID);
         TaskDependencies newTaskDependency = taskDependenciesService.getTaskDependencyById(newTaskDependencyID);
-        EntityModel<TaskDependencies> entityModel = assembler.toModel(newTaskDependency);
-        return ResponseEntity.created((entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()))
-                .body(entityModel);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newTaskDependency);
     }
+
 
     @DeleteMapping("/{dependentTaskID}")
     @Transactional
@@ -72,17 +50,13 @@ public class TaskDependenciesController {
                                                                 @RequestParam(name = "taskID", required = false) Integer taskID,
                                                                 Authentication authentication) {
         Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
-        int teamLeaderIDInt = teamLeaderIDLong.intValue();
-        Integer teamLeaderID = Integer.valueOf(teamLeaderIDInt);
+        int teamLeaderID = teamLeaderIDLong.intValue();
 
-        if (teamLeaderID == null || taskID == null) {
-            ErrorResponse errorResponse = new ErrorResponse("Task ID and Team Leader ID are required.", HttpStatus.BAD_REQUEST.value());
+        if (taskID == null) {
+            ErrorResponse errorResponse = new ErrorResponse("Task ID is required.", HttpStatus.BAD_REQUEST.value());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
-
         taskDependenciesService.deleteTaskDependencyByDependencyId(taskID, dependentTaskID, teamLeaderID);
-
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                .body(Map.of("message", "Task Dependency with id: "+ dependentTaskID +" has been successfully deleted"));
+        return ResponseEntity.noContent().build();
     }
 }
