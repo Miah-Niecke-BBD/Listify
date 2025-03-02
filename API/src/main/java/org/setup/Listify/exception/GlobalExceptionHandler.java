@@ -29,28 +29,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(TaskNotFoundException.class)
-    public ResponseEntity<String> handleTaskNotFoundException(TaskNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
     @ExceptionHandler(ProjectNotFoundException.class)
     public ResponseEntity<String> handleProjectNotFoundException(ProjectNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(SectionNotFoundException.class)
-    public ResponseEntity<String> handleSectionNotFoundException(SectionNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(TaskDependencyNotFoundException.class)
-    public ResponseEntity<String> handleTaskDependencyNotFoundException(TaskDependencyNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(AssignedTaskNotFoundException.class)
-    public ResponseEntity<String> handleAssignedTaskNotFoundException(AssignedTaskNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
