@@ -18,7 +18,6 @@ public class SectionsModelAssembler implements RepresentationModelAssembler<Sect
     @Override
     public EntityModel<Sections> toModel(Sections section) {
         return EntityModel.of(section,
-                linkTo(methodOn(SectionsController.class).getSectionsById(section.getSectionID())).withSelfRel(),
                 linkTo(methodOn(SectionsController.class).getAllSections()).withRel("sections"),
                 linkTo(methodOn(SectionsController.class).getTaskBySectionId(section.getSectionID())).withRel("tasksInSection"));
     }
