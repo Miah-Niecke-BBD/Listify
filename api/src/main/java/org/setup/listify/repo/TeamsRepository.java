@@ -1,7 +1,7 @@
 package org.setup.listify.repo;
 
 import org.setup.listify.model.Tasks;
-import org.setup.listify.model.UserTeamProjects;
+import org.setup.listify.dto.UserTeamProjects;
 import org.setup.listify.model.Teams;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,6 +11,8 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface TeamsRepository extends JpaRepository<Teams, Long> {
+    Teams findByTeamID(Long teamId);
+
     @Procedure("listify.uspCreateTeam")
     void createTeam(@Param("userID") Long userID, @Param("teamName") String teamName);
 
@@ -29,8 +31,8 @@ public interface TeamsRepository extends JpaRepository<Teams, Long> {
     @Query(value = "SELECT teamID, teamName, teamCreatedAt AS createdAt, teamUpdatedAt AS updatedAt FROM listify.vUserTeams WHERE userID = ?1", nativeQuery = true)
     List<Teams> findTeamsByUserID(Long userID);
 
-    @Query(value = "SELECT teamID, teamName, teamCreatedAt AS createdAt, teamUpdatedAt AS updatedAt FROM listify.vUserTeams WHERE teamID = ?1 AND userID = ?2", nativeQuery = true)
-    Teams getTeamById(Long teamID, Long userID);
+    @Query(value = "SELECT teamID, teamName, teamCreatedAt AS createdAt, teamUpdatedAt AS updatedAt FROM listify.vUserTeams WHERE userID = ?1 AND teamID = ?2", nativeQuery = true)
+    Teams findATeamByUserID(Long userID, Long teamID);
 
     @Query(value = "SELECT " +
             "t.taskID, t.sectionID, t.parentTaskID, t.taskName, t.taskDescription, t.taskPriority, t.taskPosition, t.dateCompleted, t.dueDate, t.createdAt, t.updatedAt " +
