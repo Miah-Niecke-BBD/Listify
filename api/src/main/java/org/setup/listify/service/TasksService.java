@@ -1,7 +1,6 @@
 package org.setup.listify.service;
 
 import org.setup.listify.exception.ListNotFoundException;
-import org.setup.listify.exception.SectionNotFoundException;
 import org.setup.listify.exception.TaskDependencyNotFoundException;
 import org.setup.listify.model.Tasks;
 import org.setup.listify.repo.TasksRepository;

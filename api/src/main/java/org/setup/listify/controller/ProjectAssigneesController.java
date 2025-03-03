@@ -1,7 +1,6 @@
 package org.setup.listify.controller;
 
 
-import org.apache.catalina.User;
 import org.setup.listify.assembler.ProjectAssigneesAssembler;
 import org.setup.listify.exception.ErrorResponse;
 import org.setup.listify.model.ProjectAssignees;
