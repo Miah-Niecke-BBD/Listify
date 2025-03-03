@@ -1,6 +1,7 @@
 package org.setup.listify.service;
 
 import org.setup.listify.model.TaskAssignees;
+import org.setup.listify.dto.UserAssignedTasksDTO;
 import org.setup.listify.repo.TaskAssigneesRepository;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class TaskAssigneesService {
                 .orElseThrow();
     }
 
-    public List<TaskAssignees> getTasksAssignedToSpecificUser(Long userID) {
+    public List<UserAssignedTasksDTO> getTasksAssignedToSpecificUser(Long userID) {
         return repository.findAssignedTasksByUserID(userID);
     }
 
