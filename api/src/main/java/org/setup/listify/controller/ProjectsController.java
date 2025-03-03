@@ -2,6 +2,7 @@ package org.setup.listify.controller;
 
 import org.setup.listify.assembler.ProjectsModelAssembler;
 import org.setup.listify.assembler.SectionsModelAssembler;
+import org.setup.listify.dto.ProjectOverviewDTO;
 import org.setup.listify.exception.ErrorResponse;
 import org.setup.listify.model.Projects;
 import org.setup.listify.model.Sections;
@@ -119,6 +120,25 @@ public class ProjectsController {
         projectsService.deleteProjectById(id.intValue(), teamLeaderID);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(Map.of("message", "Project with id: "+ id +" has been successfully deleted"));
+    }
+
+
+    @GetMapping("/{projectID}/details")
+    public ResponseEntity<ProjectOverviewDTO> getCompleteProjectDetails(@PathVariable("projectID") Long projectID,
+                                                                        Authentication authentication) {
+        // Extracting the userID from the authentication to pass to the service method
+        Long userID = userService.getUserIDFromAuthentication(authentication);
+
+        // Fetching the project details using the service method
+        ProjectOverviewDTO projectOverview = projectsService.getCompleteProjectDetails(userID, projectID);
+
+        if (projectOverview == null) {
+            ProjectOverviewDTO errorResponse = null;
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
+
+        // Return the project overview DTO as the response
+        return ResponseEntity.ok(projectOverview);
     }
 
 }

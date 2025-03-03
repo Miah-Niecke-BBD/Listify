@@ -19,28 +19,17 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-
-                .addFilterBefore(gitHubTokenFilter, UsernamePasswordAuthenticationFilter.class)
-
-
+        http.addFilterBefore(gitHubTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/login").permitAll()
                         .anyRequest().authenticated()
-                )
-
-
-                .oauth2Login(oauth2 -> oauth2
+                ).oauth2Login(oauth2 -> oauth2
                         .defaultSuccessUrl("/home")
                         .failureUrl("/error")
-                )
-
-
-                .logout(logout -> logout
+                ).logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/")
-                )
-                .csrf(AbstractHttpConfigurer::disable);
+                );
 
         return http.build();
     }
