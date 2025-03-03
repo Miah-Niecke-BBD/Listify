@@ -20,7 +20,7 @@ public class TeamCalendarService {
     private UserService userService;
 
     public List<Tasks> findTeamsDueTasks(Long teamId, Long userID, Long projectID) {
-        teamsService.getTeamById(teamId);
+        teamsService.findATeamByUserID(teamId,userID);
         List<Tasks> tasks = teamsRepository.findTeamsDueTasks(teamId, userID, projectID);
 
         if (tasks.isEmpty()) {

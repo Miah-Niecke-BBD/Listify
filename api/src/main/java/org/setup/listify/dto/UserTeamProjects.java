@@ -1,4 +1,4 @@
-package org.setup.listify.model;
+package org.setup.listify.dto;
 
 import jakarta.persistence.*;
 
