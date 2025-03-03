@@ -1,5 +1,7 @@
 package org.setup.listify.controller;
 
+import org.setup.listify.dto.TeamInfoAndProjectsList;
+import org.setup.listify.model.Projects;
 import org.setup.listify.model.TeamMembers;
 import org.setup.listify.model.Teams;
 import org.setup.listify.service.TeamsService;
@@ -48,7 +50,10 @@ public class TeamsController {
         Long userID = userService.getUserIDFromAuthentication(authentication);
 
         Teams team = teamService.findATeamByUserID(userID, teamID);
-        return ResponseEntity.status(HttpStatus.OK).body(team);
+        List<Projects> projects = teamService.findTeamProjects(teamID, userID);
+
+        TeamInfoAndProjectsList teamInfoAndProjectsList = new TeamInfoAndProjectsList(team, projects);
+        return ResponseEntity.status(HttpStatus.OK).body(teamInfoAndProjectsList);
     }
 
     @DeleteMapping("/{teamID}")
@@ -96,18 +101,12 @@ public class TeamsController {
     }
 
     @PutMapping("/{teamID}/members")
-    public ResponseEntity<Object> updateTeamLeader(Authentication authentication, @PathVariable("teamID") Long teamID, @RequestParam("newTeamLeaderGithubID")String newTeamLeaderGithubID) {
+    public ResponseEntity<Object> updateTeamLeader(Authentication authentication, @PathVariable("teamID") Long teamID, @RequestParam("newTeamLeaderGithubID") String newTeamLeaderGithubID) {
         Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
 
         teamService.updateTeamLeader(teamLeaderID, teamID, newTeamLeaderGithubID);
 
         return ResponseEntity.status(HttpStatus.OK).body("Team leader for team " + teamID + " successfully update to user " + newTeamLeaderGithubID);
-    }
-
-    @GetMapping("/{teamID}/projects")
-    public ResponseEntity<Object> getProjectsByTeamIDAndUserID(@PathVariable("teamID") Long teamID, Authentication authentication) {
-        Long userID = userService.getUserIDFromAuthentication(authentication);
-        return ResponseEntity.status(HttpStatus.OK).body(teamService.getProjectsByTeamIDAndUserID(teamID, userID));
     }
 }
 
