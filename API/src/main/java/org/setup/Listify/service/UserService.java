@@ -1,5 +1,6 @@
 package org.setup.Listify.service;
 
+import org.setup.Listify.exception.NotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -75,6 +76,11 @@ public class UserService {
         } else {
             throw new RuntimeException("User not found for GitHub ID: " + gitHubID);
         }
+    }
+
+    public LocalDateTime getUserCreatedAt(Long userID) {
+        Users user = usersRepo.findByUserID(userID).orElseThrow(() -> new NotFoundException("User not found"));
+        return user.getCreatedAt();
     }
 }
 
