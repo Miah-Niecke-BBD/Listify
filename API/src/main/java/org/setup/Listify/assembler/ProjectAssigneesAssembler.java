@@ -1,7 +1,7 @@
-package org.setup.Listify.assembler;
+package org.setup.listify.assembler;
 
-import org.setup.Listify.controller.ProjectAssigneesController;
-import org.setup.Listify.model.ProjectAssignees;
+import org.setup.listify.controller.ProjectAssigneesController;
+import org.setup.listify.model.ProjectAssignees;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;

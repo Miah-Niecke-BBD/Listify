@@ -1,4 +1,4 @@
-package org.setup.Listify.controller;
+package org.setup.listify.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -11,8 +11,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.setup.Listify.model.Users;
-import org.setup.Listify.service.UserService;
+import org.setup.listify.model.Users;
+import org.setup.listify.service.UserService;
 
 @RestController
 public class GitHubOAuthController {

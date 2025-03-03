@@ -1,8 +1,8 @@
-package org.setup.Listify.handler;
+package org.setup.listify.handler;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.setup.Listify.service.UserService;
+import org.setup.listify.service.UserService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;

@@ -1,12 +1,12 @@
-package org.setup.Listify.controller;
+package org.setup.listify.controller;
 
 
 import org.apache.catalina.User;
-import org.setup.Listify.assembler.ProjectAssigneesAssembler;
-import org.setup.Listify.exception.ErrorResponse;
-import org.setup.Listify.model.ProjectAssignees;
-import org.setup.Listify.service.ProjectAssigneesService;
-import org.setup.Listify.service.UserService;
+import org.setup.listify.assembler.ProjectAssigneesAssembler;
+import org.setup.listify.exception.ErrorResponse;
+import org.setup.listify.model.ProjectAssignees;
+import org.setup.listify.service.ProjectAssigneesService;
+import org.setup.listify.service.UserService;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;

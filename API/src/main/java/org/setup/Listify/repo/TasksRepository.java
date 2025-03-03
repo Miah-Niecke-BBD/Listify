@@ -1,6 +1,6 @@
-package org.setup.Listify.repo;
+package org.setup.listify.repo;
 
-import org.setup.Listify.model.Tasks;
+import org.setup.listify.model.Tasks;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;

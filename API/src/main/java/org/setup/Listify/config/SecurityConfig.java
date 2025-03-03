@@ -1,6 +1,6 @@
-package org.setup.Listify.config;
+package org.setup.listify.config;
 
-import org.setup.Listify.handler.GitHubTokenFilter;
+import org.setup.listify.handler.GitHubTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

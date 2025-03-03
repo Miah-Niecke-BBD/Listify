@@ -1,4 +1,4 @@
-package org.setup.Listify.response;
+package org.setup.listify.response;
 
 public class SuccessResponse {
     private String message;

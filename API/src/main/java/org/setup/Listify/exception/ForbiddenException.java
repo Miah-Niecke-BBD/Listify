@@ -1,4 +1,4 @@
-package org.setup.Listify.exception;
+package org.setup.listify.exception;
 
 public class ForbiddenException extends RuntimeException {
     public ForbiddenException(String message) {

@@ -1,12 +1,12 @@
-package org.setup.Listify;
+package org.setup.listify;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 
-public class listifyApplication {
+public class ListifyApplication {
     public static void main(String[] args) {
-        SpringApplication.run(listifyApplication.class, args);
+        SpringApplication.run(ListifyApplication.class, args);
     }
 }

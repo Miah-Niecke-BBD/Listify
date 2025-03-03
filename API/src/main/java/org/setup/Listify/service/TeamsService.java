@@ -1,19 +1,18 @@
-package org.setup.Listify.service;
+package org.setup.listify.service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import org.setup.Listify.exception.*;
-import org.setup.Listify.model.TeamMembers;
-import org.setup.Listify.dto.UserTeamProjects;
-import org.setup.Listify.model.Teams;
-import org.setup.Listify.model.Users;
-import org.setup.Listify.repo.TeamMembersRepository;
-import org.setup.Listify.repo.TeamsRepository;
-import org.setup.Listify.repo.UsersRepository;
+import org.setup.listify.exception.*;
+import org.setup.listify.model.TeamMembers;
+import org.setup.listify.dto.UserTeamProjects;
+import org.setup.listify.model.Teams;
+import org.setup.listify.model.Users;
+import org.setup.listify.repo.TeamMembersRepository;
+import org.setup.listify.repo.TeamsRepository;
+import org.setup.listify.repo.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 

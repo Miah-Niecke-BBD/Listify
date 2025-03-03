@@ -1,8 +1,8 @@
-package org.setup.Listify.controller;
+package org.setup.listify.controller;
 
-import org.setup.Listify.assembler.TasksModelAssembler;
-import org.setup.Listify.model.Tasks;
-import org.setup.Listify.service.TeamCalendarService;
+import org.setup.listify.assembler.TasksModelAssembler;
+import org.setup.listify.model.Tasks;
+import org.setup.listify.service.TeamCalendarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.CollectionModel;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.setup.Listify.service.UserService;
+import org.setup.listify.service.UserService;
 
 import java.util.List;
 

@@ -1,9 +1,9 @@
-package org.setup.Listify.controller;
+package org.setup.listify.controller;
 
-import org.setup.Listify.model.TeamMembers;
-import org.setup.Listify.model.Teams;
-import org.setup.Listify.service.TeamsService;
-import org.setup.Listify.service.UserService;
+import org.setup.listify.model.TeamMembers;
+import org.setup.listify.model.Teams;
+import org.setup.listify.service.TeamsService;
+import org.setup.listify.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

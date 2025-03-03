@@ -1,8 +1,8 @@
-package org.setup.Listify.assembler;
+package org.setup.listify.assembler;
 
 
-import org.setup.Listify.controller.TaskAssigneesController;
-import org.setup.Listify.model.TaskAssignees;
+import org.setup.listify.controller.TaskAssigneesController;
+import org.setup.listify.model.TaskAssignees;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
