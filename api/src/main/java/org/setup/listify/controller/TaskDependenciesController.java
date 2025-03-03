@@ -26,17 +26,11 @@ public class TaskDependenciesController {
     @PostMapping
     @Transactional
     public ResponseEntity<?> newTaskDependency(Authentication authentication,
-                                            @RequestParam(name = "taskID", required = false) Integer taskID,
-                                            @RequestParam(name = "dependentTaskID", required = false) Integer dependentTaskID) {
+                                            @RequestParam(name = "taskID") Integer taskID,
+                                            @RequestParam(name = "dependentTaskID") Integer dependentTaskID) {
 
         Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
         int teamLeaderID = teamLeaderIDLong.intValue();
-
-        if (taskID == null || dependentTaskID == null) {
-            ErrorResponse errorResponse = new ErrorResponse("Missing required parameter(s). Please ensure all required parameters are provided.",
-                    HttpStatus.BAD_REQUEST.value());
-            return ResponseEntity.badRequest().body(errorResponse);
-        }
 
         Long newTaskDependencyID = taskDependenciesService.newTaskDependency(teamLeaderID, taskID, dependentTaskID);
         TaskDependencies newTaskDependency = taskDependenciesService.getTaskDependencyById(newTaskDependencyID);
@@ -47,15 +41,11 @@ public class TaskDependenciesController {
     @DeleteMapping("/{dependentTaskID}")
     @Transactional
     public ResponseEntity<?> deleteTaskDependencyByDependencyId(@PathVariable("dependentTaskID") Long dependentTaskID,
-                                                                @RequestParam(name = "taskID", required = false) Integer taskID,
+                                                                @RequestParam(name = "taskID") Integer taskID,
                                                                 Authentication authentication) {
         Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
         int teamLeaderID = teamLeaderIDLong.intValue();
 
-        if (taskID == null) {
-            ErrorResponse errorResponse = new ErrorResponse("Task ID is required.", HttpStatus.BAD_REQUEST.value());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        }
         taskDependenciesService.deleteTaskDependencyByDependencyId(taskID, dependentTaskID, teamLeaderID);
         return ResponseEntity.noContent().build();
     }

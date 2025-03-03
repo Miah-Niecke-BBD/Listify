@@ -46,9 +46,9 @@ public class SectionsController {
     @PostMapping
     @Transactional
     public ResponseEntity<?> newSection(Authentication authentication,
-                                        @RequestParam(name = "projectID", required = false) Integer projectID,
-                                        @RequestParam(name = "sectionName", required = false) String sectionName,
-                                        @RequestParam(name = "sectionPosition", required = false) Byte sectionPosition) {
+                                        @RequestParam(name = "projectID") Integer projectID,
+                                        @RequestParam(name = "sectionName") String sectionName,
+                                        @RequestParam(name = "sectionPosition") Byte sectionPosition) {
         Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
         Integer teamLeaderID = teamLeaderIDLong.intValue();
 
