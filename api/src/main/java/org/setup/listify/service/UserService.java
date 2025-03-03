@@ -61,6 +61,7 @@ public class UserService {
         return usersRepo.existsByGitHubID(gitHubID);
     }
 
+
     public Long getUserIDFromAuthentication(Authentication authentication) {
         OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
         OAuth2User oauth2User = oauthToken.getPrincipal();
