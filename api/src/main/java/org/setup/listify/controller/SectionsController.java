@@ -24,21 +24,10 @@ public class SectionsController {
         this.userService = userService;
     }
 
-    @GetMapping
-    public ResponseEntity<Object> getAllSections() {
-        List<Sections> sections = sectionsService.getAllSections();
-        if (sections.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("There are no sections in this project");
-        }
-        return ResponseEntity.ok(sections);
-    }
 
     @GetMapping("{sectionID}/tasks")
     public ResponseEntity<Object> getTaskBySectionId(@PathVariable("sectionID") Long sectionID) {
         List<Tasks> tasksList = sectionsService.getTaskBySectionId(sectionID);
-        if (tasksList.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("There are no tasks in section: "+sectionID);
-        }
         return ResponseEntity.ok(tasksList);
     }
 

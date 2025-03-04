@@ -1,5 +1,6 @@
 package org.setup.listify.service;
 
+import org.setup.listify.exception.NotFoundException;
 import org.setup.listify.model.Sections;
 import org.setup.listify.model.Tasks;
 import org.setup.listify.repo.SectionsRepository;
@@ -16,17 +17,17 @@ public class SectionsService {
         this.repository = repository;
     }
 
-    public List<Sections> getAllSections() {
-        return repository.findAll();
-    }
-
     public Sections getSectionById(Long id) {
         return repository.findById(id)
                 .orElseThrow();
     }
 
     public List<Tasks> getTaskBySectionId(Long sectionId) {
-        return repository.findTasksBySectionID(sectionId);
+        List<Tasks> tasks = repository.findTasksBySectionID(sectionId);
+        if (tasks.isEmpty()) {
+            throw new NotFoundException("There are no tasks in this section");
+        }
+        return tasks;
     }
 
     public Long createSection(Long teamLeaderID, Long projectID,
