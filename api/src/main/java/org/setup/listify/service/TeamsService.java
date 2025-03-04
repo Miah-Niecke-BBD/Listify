@@ -80,7 +80,7 @@ public class TeamsService {
 
     public List<Projects> findTeamProjects(Long teamID, Long userID) {
         findATeamByUserID(userID, teamID);
-        return teamsRepository.findTeamProjects(teamID, userID);
+        return teamsRepository.findTeamProjects(userID, teamID);
     }
 
     @Transactional
