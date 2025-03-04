@@ -3,8 +3,8 @@ package org.setup.listify.service;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.setup.listify.exception.*;
+import org.setup.listify.model.Projects;
 import org.setup.listify.model.TeamMembers;
-import org.setup.listify.dto.UserTeamProjects;
 import org.setup.listify.model.Teams;
 import org.setup.listify.model.Users;
 import org.setup.listify.repo.TeamMembersRepository;
@@ -24,8 +24,6 @@ public class TeamsService {
     private TeamsRepository teamsRepository;
     @Autowired
     private TeamMembersRepository teamMembersRepository;
-    @Autowired
-    private UsersRepository usersRepository;
     @Autowired
     UserService userService;
 
@@ -80,15 +78,9 @@ public class TeamsService {
         return teamMembersRepository.existsByTeamIDAndUserIDAndIsTeamLeaderTrue(teamID, userID);
     }
 
-    public List<UserTeamProjects> getProjectsByTeamIDAndUserID(Long teamID, Long userID) {
+    public List<Projects> findTeamProjects(Long teamID, Long userID) {
         findATeamByUserID(userID, teamID);
-        List<UserTeamProjects> userTeamProjects = teamsRepository.findProjectsByTeamIDAndUserID(teamID, userID);
-
-        if (userTeamProjects.isEmpty()) {
-            throw new NotFoundException("No project found for team " + teamID);
-        }
-
-        return userTeamProjects;
+        return teamsRepository.findTeamProjects(userID, teamID);
     }
 
     @Transactional
@@ -105,7 +97,7 @@ public class TeamsService {
 
     @Transactional
     public void assignMemberToTeam(Long teamLeaderID, String githubID, Long teamID) {
-        Long userID = getUserIDFromGithubID(githubID);
+        Long userID = userService.getUserIDFromGithubID(githubID);
 
         Teams team = findATeamByUserID(teamLeaderID, teamID);
 
@@ -144,7 +136,7 @@ public class TeamsService {
 
     @Transactional
     public void deleteMemberFromTeam(String githubID, Long teamID, Long teamLeaderID) {
-        Long userID = getUserIDFromGithubID(githubID);
+        Long userID = userService.getUserIDFromGithubID(githubID);
 
         boolean isTeamLeader = isTeamLeader(teamID, teamLeaderID);
         if (!isTeamLeader) {
@@ -180,7 +172,7 @@ public class TeamsService {
     }
 
     public void updateTeamLeader(Long teamLeaderID, Long teamID, String newTeamLeaderGithubID) {
-        Long newTeamLeaderID = getUserIDFromGithubID(newTeamLeaderGithubID);
+        Long newTeamLeaderID = userService.getUserIDFromGithubID(newTeamLeaderGithubID);
 
         findATeamByUserID(newTeamLeaderID, teamID);
         boolean isTeamLeader = isTeamLeader(teamID, teamLeaderID);
@@ -192,12 +184,4 @@ public class TeamsService {
         teamMembersRepository.updateTeamLeader(teamLeaderID, teamID, newTeamLeaderID);
     }
 
-    public Long getUserIDFromGithubID(String githubID) {
-        Optional<Users> users = usersRepository.findByGitHubID(githubID);
-        if (users.isEmpty()) {
-            throw new NotFoundException("User with github ID: " + githubID + " not found");
-        }
-
-        return users.get().getUserID();
-    }
 }

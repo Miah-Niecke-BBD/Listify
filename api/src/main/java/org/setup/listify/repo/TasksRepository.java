@@ -12,9 +12,9 @@ import java.util.List;
 public interface TasksRepository extends JpaRepository<Tasks, Long> {
     @Procedure("listify.uspCreateTask")
     void createTask(
-            @Param("teamLeaderID") int teamLeaderID,
-            @Param("projectID") int projectID,
-            @Param("sectionID") int sectionID,
+            @Param("teamLeaderID") Long teamLeaderID,
+            @Param("projectID") Long projectID,
+            @Param("sectionID") Long sectionID,
             @Param("taskName") String taskName,
             @Param("taskDescription") String taskDescription,
             @Param("taskPriority") byte taskPriority,
@@ -23,18 +23,18 @@ public interface TasksRepository extends JpaRepository<Tasks, Long> {
 
     @Procedure("listify.uspCreateSubTask")
     void createSubTask(
-            @Param("teamLeaderID") int teamLeaderID,
-            @Param("parentTaskID") int parentTaskID,
+            @Param("teamLeaderID") Long teamLeaderID,
+            @Param("parentTaskID") Long parentTaskID,
             @Param("taskName") String taskName,
             @Param("taskDescription") String taskDescription,
-            @Param("sectionID") int sectionID,
+            @Param("sectionID") Long sectionID,
             @Param("dueDate") LocalDateTime dueDate
     );
 
     @Procedure("listify.uspUpdateTaskDetails")
     void updateTaskDetails(
-            @Param("taskID") int taskID,
-            @Param("teamLeaderID") int teamLeaderID,
+            @Param("taskID") Long taskID,
+            @Param("teamLeaderID") Long teamLeaderID,
             @Param("newTaskName") String newTaskName,
             @Param("newTaskDescription") String newTaskDescription,
             @Param("newTaskPriority") Byte newTaskPriority,
@@ -43,15 +43,15 @@ public interface TasksRepository extends JpaRepository<Tasks, Long> {
 
     @Procedure("listify.uspUpdateTaskPosition")
     void updateTaskPosition(
-            @Param("teamLeaderID") int teamLeaderID,
-            @Param("taskID") int taskID,
-            @Param("newTaskPosition") int newTaskPosition,
-            @Param("sectionID") int sectionID
+            @Param("teamLeaderID") Long teamLeaderID,
+            @Param("taskID") Long taskID,
+            @Param("newTaskPosition") Long newTaskPosition,
+            @Param("sectionID") Long sectionID
     );
 
 
     @Procedure("listify.uspDeleteTask")
-    void deleteTasksById(@Param("taskID") int taskID, @Param("teamLeaderID") int teamLeaderID);
+    void deleteTasksById(@Param("taskID") Long taskID, @Param("teamLeaderID") Long teamLeaderID);
 
     @Query(value = "SELECT TOP 1 * FROM listify.Tasks ORDER BY taskID DESC", nativeQuery = true)
     Tasks findTopOrderByTaskIDDesc();

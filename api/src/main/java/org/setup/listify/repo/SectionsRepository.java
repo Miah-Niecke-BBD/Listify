@@ -12,8 +12,8 @@ import java.util.List;
 public interface SectionsRepository extends JpaRepository<Sections, Long> {
 
     @Procedure("listify.uspAddSection")
-    void createSection(@Param("teamLeaderID") Integer teamLeaderID,
-                       @Param("projectID") Integer projectID,
+    void createSection(@Param("teamLeaderID") Long teamLeaderID,
+                       @Param("projectID") Long projectID,
                        @Param("sectionName") String sectionName,
                        @Param("sectionPosition") Byte sectionPosition
     );
@@ -23,15 +23,27 @@ public interface SectionsRepository extends JpaRepository<Sections, Long> {
 
     @Procedure("listify.uspUpdateSectionDetails")
     void updateSection(@Param("sectionID") Long sectionID,
-                       @Param("userID") Integer userID,
+                       @Param("userID") Long userID,
                        @Param("newSectionName") String newSectionName
     );
 
     @Procedure("listify.uspDeleteSection")
-    void deleteSectionById(@Param("teamLeaderID")Integer teamLeaderID,
-                           @Param("sectionID") Integer sectionID
+    void deleteSectionById(@Param("teamLeaderID")Long teamLeaderID,
+                           @Param("sectionID") Long sectionID
     );
 
-    @Query("SELECT t FROM Tasks t WHERE t.sectionID = :id")
-    List<Tasks> findTasksBySectionID(@Param("id") Long id);
+    @Procedure("listify.uspUpdateSectionPosition")
+    void updateSectionPosition(@Param("userID") Long loggedInUserID,
+                               @Param("sectionID") Long sectionID,
+                               @Param("newSectionPosition") Integer newSectionPosition);
+
+    @Query("SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END " +
+            "FROM Sections s " +
+            "JOIN Tasks t ON s.sectionID = t.sectionID " +
+            "JOIN Projects p ON s.projectID = p.projectID " +
+            "JOIN ProjectAssignees pa ON p.projectID = pa.projectID " +
+            "WHERE s.sectionID = :sectionID " +
+            "AND pa.userID = :userID")
+    boolean isSectionAndUserInSameProject(@Param("sectionID") Long sectionID,
+                                          @Param("userID") Long userID);
 }

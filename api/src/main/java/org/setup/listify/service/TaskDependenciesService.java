@@ -1,12 +1,9 @@
 package org.setup.listify.service;
 
-import org.setup.listify.exception.ListNotFoundException;
+import org.setup.listify.exception.NotFoundException;
 import org.setup.listify.model.TaskDependencies;
 import org.setup.listify.repo.TaskDependenciesRepository;
-import org.setup.listify.exception.TaskDependencyNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class TaskDependenciesService {
@@ -17,27 +14,19 @@ public class TaskDependenciesService {
         this.repository = repository;
     }
 
-    public List<TaskDependencies> getAllTaskDependencies() {
-        List<TaskDependencies> taskDependencies = repository.findAll();
-        if (taskDependencies.isEmpty()) {
-            throw new ListNotFoundException("Task Dependencies");
-        }
-        return taskDependencies;
-    }
-
     public TaskDependencies getTaskDependencyById(Long taskDependencyID) {
         return repository.findById(taskDependencyID)
-                .orElseThrow(() -> new TaskDependencyNotFoundException(taskDependencyID));
+                .orElseThrow(() -> new NotFoundException("No Task Dependency with ID: "+ taskDependencyID));
     }
 
-    public Long newTaskDependency(int teamLeaderID, int taskID, int dependentTaskID) {
+    public Long newTaskDependency(Long teamLeaderID, Long taskID, Long dependentTaskID) {
         repository.newTaskDependency(teamLeaderID, taskID, dependentTaskID);
 
         TaskDependencies latestTaskDependency = repository.findTopOrderByTaskIDDesc();
         return latestTaskDependency != null ? latestTaskDependency.getTaskDependencyID() : null;
     }
 
-    public void deleteTaskDependencyByDependencyId(int taskID, Long taskDependencyID, int teamLeaderID) {
-        repository.deleteTaskDependency(taskID, taskDependencyID.intValue(), teamLeaderID);
+    public void deleteTaskDependencyByDependencyId(Long taskID, Long taskDependencyID, Long teamLeaderID) {
+        repository.deleteTaskDependency(taskID, taskDependencyID, teamLeaderID);
     }
 }

@@ -1,9 +1,10 @@
 package org.setup.listify.service;
 
-import org.setup.listify.exception.ListNotFoundException;
+import org.setup.listify.exception.ForbiddenException;
+import org.setup.listify.exception.NotFoundException;
 import org.setup.listify.model.TaskAssignees;
+import org.setup.listify.model.Users;
 import org.setup.listify.repo.TaskAssigneesRepository;
-import org.setup.listify.exception.AssignedTaskNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,40 +13,46 @@ import java.util.List;
 public class TaskAssigneesService {
 
     private final TaskAssigneesRepository repository;
+    private final UserService userService;
 
-    public TaskAssigneesService(TaskAssigneesRepository repository) {
+    public TaskAssigneesService(TaskAssigneesRepository repository, UserService userService) {
         this.repository = repository;
-    }
-
-    public List<TaskAssignees> getAllAssignedTasks() {
-        List<TaskAssignees> taskAssigneesList = repository.findAll();
-        if (taskAssigneesList.isEmpty()) {
-            throw new ListNotFoundException("Task Assignees");
-        }
-        return taskAssigneesList;
+        this.userService = userService;
     }
 
     public TaskAssignees getAssignedTaskById(Long taskAssigneeID) {
         return repository.findById(taskAssigneeID)
-                .orElseThrow(() -> new AssignedTaskNotFoundException(taskAssigneeID));
+                .orElseThrow(() -> new NotFoundException("Task assignment does not exist"));
     }
 
-    public List<TaskAssignees> getTasksAssignedToSpecificUser(Long userID) {
-        List<TaskAssignees> tasksAssignedToUser = repository.findAssignedTasksByUserID(userID);
-        if (tasksAssignedToUser.isEmpty()) {
-            throw new ListNotFoundException("tasks assigned to user");
+
+    public Long assignTaskToUser(String githubID, Long loggedInUserID, Long taskID) {
+        Long userID = userService.getUserIDFromGithubID(githubID);
+
+        if (!repository.findTaskAndUsersInProject(taskID, loggedInUserID, userID)) {
+            throw new ForbiddenException("Only users in the project can be assigned to tasks");
         }
-        return tasksAssignedToUser;
-    }
 
-    public Long assignTaskToUser(int userID, int taskID) {
         repository.assignTaskToUser(userID, taskID);
-
         TaskAssignees newlyAssignedTask = repository.findTopOrderByTaskIDDesc();
         return newlyAssignedTask != null ? newlyAssignedTask.getTaskAssigneeID() : null;
     }
 
-    public void deleteUserFromTask(int userID, int taskID, int teamLeaderID) {
+    public void deleteUserFromTask(Long userID, Long taskID, Long teamLeaderID) {
+        if (!repository.findUserAndTaskInProject(userID, taskID)) {
+            throw new ForbiddenException("Tasks and Users should both exist in the project");
+        }
         repository.deleteUserFromTask(userID, taskID, teamLeaderID);
+    }
+
+    public List<Users> getUsersAssignedToTask(Long taskID, Long loggedInUserID) {
+        if (!repository.findUserAndTaskInProject(loggedInUserID, taskID)) {
+            throw new ForbiddenException("Cannot excess tasks that are not in the project");
+        }
+        List<Users> usersAssignedToTask = repository.getUsersAssignedToTask(taskID);
+        if (usersAssignedToTask.isEmpty()) {
+            throw new NotFoundException("There no users assigned to task: "+taskID);
+        }
+        return usersAssignedToTask;
     }
 }
