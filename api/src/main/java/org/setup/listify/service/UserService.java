@@ -82,5 +82,14 @@ public class UserService {
         Users user = usersRepo.findByUserID(userID).orElseThrow(() -> new NotFoundException("User not found"));
         return user.getCreatedAt();
     }
+
+    public Long getUserIDFromGithubID(String githubID) {
+        Optional<Users> users = usersRepo.findByGitHubID(githubID);
+        if (users.isEmpty()) {
+            throw new NotFoundException("User with github ID: " + githubID + " not found");
+        }
+
+        return users.get().getUserID();
+    }
 }
 

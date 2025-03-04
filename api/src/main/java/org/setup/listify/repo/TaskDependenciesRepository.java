@@ -13,14 +13,14 @@ public interface TaskDependenciesRepository extends JpaRepository<TaskDependenci
 
     @Procedure("listify.uspAssignTaskDependency")
     void newTaskDependency(
-            @Param("teamLeaderID") int teamLeaderID,
-            @Param("taskID") int taskID,
-            @Param("dependentTaskID") int dependentTaskID);
+            @Param("teamLeaderID") Long teamLeaderID,
+            @Param("taskID") Long taskID,
+            @Param("dependentTaskID") Long dependentTaskID);
 
 
     @Procedure("listify.uspDeleteTaskDependency")
     void deleteTaskDependency(
-            @Param("taskID") int taskID,
-            @Param("taskDependencyID") int taskDependencyID,
-            @Param("teamLeaderID") int teamLeaderID);
+            @Param("taskID") Long taskID,
+            @Param("taskDependencyID") Long taskDependencyID,
+            @Param("teamLeaderID") Long teamLeaderID);
 }

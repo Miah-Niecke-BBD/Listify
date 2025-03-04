@@ -1,13 +1,8 @@
 package org.setup.listify.controller;
 
-import org.setup.listify.exception.ErrorResponse;
 import org.setup.listify.model.Tasks;
 import org.setup.listify.service.TasksService;
-import org.setup.listify.assembler.TasksModelAssembler;
 import org.setup.listify.service.UserService;
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/tasks")
@@ -25,155 +19,108 @@ public class TasksController {
 
     private final TasksService tasksService;
     private final UserService userService;
-    private final TasksModelAssembler assembler;
 
-    public TasksController(TasksService tasksService, TasksModelAssembler assembler, UserService userService) {
+    public TasksController(TasksService tasksService, UserService userService) {
         this.tasksService = tasksService;
         this.userService = userService;
-        this.assembler = assembler;
     }
 
     @GetMapping
-    public CollectionModel<EntityModel<Tasks>> getAllTasks() {
+    public ResponseEntity<List<Tasks>> getAllTasks() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Long userID = userService.getUserIDFromAuthentication(authentication);
         List<Tasks> tasks = tasksService.getAllTasks(userID);
-        return assembler.toCollectionModel(tasks);
+        return ResponseEntity.ok(tasks);
     }
 
-    @GetMapping("/{id}")
-    public EntityModel<Tasks> getTaskById(@PathVariable("id") Long id) {
-        Tasks task = tasksService.getTaskById(id);
-        return assembler.toModel(task);
+    @GetMapping("/{taskID}")
+    public ResponseEntity<Object> getTaskById(@PathVariable("taskID") Long taskID, Authentication authentication) {
+        Long userID = userService.getUserIDFromAuthentication(authentication);
+        Tasks task = tasksService.getTaskById(taskID, userID);
+        return ResponseEntity.ok(task);
     }
 
-    @GetMapping("/subtask/{parentTaskID}")
-    public CollectionModel<EntityModel<Tasks>> getAllSubtasksOfTask(@PathVariable("parentTaskID") Long parentTaskID) {
-        List<Tasks> subtasks = tasksService.getAllSubtasksOfTask(parentTaskID);
-        return assembler.toCollectionModel(subtasks);
+    @GetMapping("/{parentTaskID}/subtask")
+    public ResponseEntity<Object> getAllSubtasksOfTask(@PathVariable("parentTaskID") Long parentTaskID, Authentication authentication) {
+        Long userID = userService.getUserIDFromAuthentication(authentication);
+        List<Tasks> subtasks = tasksService.getAllSubtasksOfTask(parentTaskID, userID);
+        return ResponseEntity.ok(subtasks);
     }
 
-    @GetMapping("dependent/{taskID}")
-    public EntityModel<Tasks> getDependentTaskByTaskId(@PathVariable("taskID") Long taskID) {
-        Tasks dependentTask = tasksService.getDependentTaskById(taskID);
-        return assembler.toModel(dependentTask);
+    @GetMapping("/{taskID}/dependent")
+    public ResponseEntity<Object> getDependentTaskByTaskId(@PathVariable("taskID") Long taskID, Authentication authentication) {
+        Long userID = userService.getUserIDFromAuthentication(authentication);
+        Tasks dependentTask = tasksService.getDependentTaskById(taskID, userID);
+        return ResponseEntity.ok(dependentTask);
     }
 
     @PostMapping
     @Transactional
-    public ResponseEntity<?> newTask(@RequestParam(name = "teamLeader", required = false) Integer teamLeaderID,
-                                     @RequestParam(name = "projectID", required = false) Integer projectID,
-                                     @RequestParam(name = "sectionID", required = false) Integer sectionID,
-                                     @RequestParam(name = "taskName", required = false) String taskName,
-                                     @RequestParam(name = "taskDescription", required = false) String taskDescription,
-                                     @RequestParam(name = "taskPriority", required = false) Byte taskPriority,
-                                     @RequestParam(name = "taskPosition", required = false) Byte taskPosition) {
-        if (teamLeaderID == null || projectID == null || sectionID == null || taskName == null || taskPriority == null || taskPosition == null) {
-            ErrorResponse errorResponse = new ErrorResponse("Missing required parameter(s). Please ensure all required parameters are provided.",
-                    HttpStatus.BAD_REQUEST.value());
-            return ResponseEntity.badRequest().body(errorResponse);
-        }
+    public ResponseEntity<Object> newTask(@RequestParam(name = "teamLeaderID") Long teamLeaderID,
+                                     Authentication authentication,
+                                     @RequestParam(name = "projectID") Long projectID,
+                                     @RequestParam(name = "sectionID") Long sectionID,
+                                     @RequestParam(name = "taskName") String taskName,
+                                     @RequestParam(name = "taskDescription") String taskDescription,
+                                     @RequestParam(name = "taskPriority") Byte taskPriority,
+                                     @RequestParam(name = "taskPosition") Byte taskPosition) {
 
+        Long userID = userService.getUserIDFromAuthentication(authentication);
         Long newTaskID = tasksService.createTask(teamLeaderID, projectID, sectionID, taskName, taskDescription, taskPriority, taskPosition);
-        Tasks newTask = tasksService.getTaskById(newTaskID);
-        EntityModel<Tasks> entityModel = assembler.toModel(newTask);
-        return ResponseEntity.created((entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()))
-                .body(entityModel);
+        Tasks newTask = tasksService.getTaskById(newTaskID, userID);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newTask);
     }
 
-    @PostMapping("/subtask/{parentTaskID}")
+    @PostMapping("/{parentTaskID}/subtask")
     @Transactional
-    public ResponseEntity<?> newSubTask(@PathVariable("parentTaskID") Long parentTaskID,
+    public ResponseEntity<Object> newSubTask(@PathVariable("parentTaskID") Long parentTaskID,
                                         Authentication authentication,
-                                        @RequestParam(name = "taskName", required = false) String taskName,
-                                        @RequestParam(name = "taskDescription", required = false) String taskDescription,
-                                        @RequestParam(name = "sectionID", required = false) Integer sectionID,
-                                        @RequestParam(name = "dueDate", required = false) LocalDateTime dueDate) {
-        Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
-        int teamLeaderIDInt = teamLeaderIDLong.intValue();
-        Integer teamLeaderID = Integer.valueOf(teamLeaderIDInt);
+                                        @RequestParam(name = "taskName") String taskName,
+                                        @RequestParam(name = "taskDescription") String taskDescription,
+                                        @RequestParam(name = "sectionID") Long sectionID,
+                                        @RequestParam(name = "dueDate") LocalDateTime dueDate) {
 
-        if (teamLeaderID == null || sectionID == null || taskName == null || dueDate == null) {
-            ErrorResponse errorResponse = new ErrorResponse("Missing required parameter(s). Please ensure all required parameters are provided.",
-                    HttpStatus.BAD_REQUEST.value());
-            return ResponseEntity.badRequest().body(errorResponse);
-        }
-
-        Long newTaskID = tasksService.createSubTask(teamLeaderID, parentTaskID.intValue(), taskName, taskDescription, sectionID, dueDate);
-
-        Tasks newTask = tasksService.getTaskById(newTaskID);
-        EntityModel<Tasks> entityModel = assembler.toModel(newTask);
-        return ResponseEntity.created((entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()))
-                .body(entityModel);
+        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
+        Long newTaskID = tasksService.createSubTask(teamLeaderID, parentTaskID, taskName, taskDescription, sectionID, dueDate);
+        Tasks newTask = tasksService.getTaskById(newTaskID, teamLeaderID);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newTask);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{taskID}")
     @Transactional
-    ResponseEntity<?> updateTask(@PathVariable("id") Long id,
+    ResponseEntity<Object> updateTask(@PathVariable("taskID") Long taskID,
                                  Authentication authentication,
                                  @RequestParam("newTaskName") String newTaskName,
                                  @RequestParam("newTaskDescription") String newTaskDescription,
                                  @RequestParam("newTaskPriority") Byte newTaskPriority,
                                  @RequestParam("newDueDate") LocalDateTime newDueDate) {
-        Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
-        int teamLeaderIDInt = teamLeaderIDLong.intValue();
-        Integer teamLeaderID = Integer.valueOf(teamLeaderIDInt);
 
-        if (teamLeaderID == null) {
-            ErrorResponse errorResponse = new ErrorResponse("Team Leader ID is required.", HttpStatus.BAD_REQUEST.value());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        }
-
-        tasksService.updateTaskDetails(id.intValue(), teamLeaderID, newTaskName, newTaskDescription, newTaskPriority, newDueDate);
-
-        Tasks updatedTask = tasksService.getTaskById(id);
-        EntityModel<Tasks> entityModel = assembler.toModel(updatedTask);
-        return ResponseEntity
-                .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-                .body(entityModel);
+        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
+        tasksService.updateTaskDetails(taskID, teamLeaderID, newTaskName, newTaskDescription, newTaskPriority, newDueDate);
+        Tasks updatedTask = tasksService.getTaskById(taskID, teamLeaderID);
+        return ResponseEntity.status(HttpStatus.CREATED).body(updatedTask);
     }
 
 
-    @PutMapping("/{id}/position")
+    @PutMapping("/{taskID}/position")
     @Transactional
-    ResponseEntity<?> updateTaskPosition(@PathVariable("id") Long id,
+    ResponseEntity<Object> updateTaskPosition(@PathVariable("taskID") Long taskID,
                                          Authentication authentication,
-                                         @RequestParam(name = "newTaskPosition", required = false) Integer newTaskPosition,
-                                         @RequestParam(name = "sectionID", required = false) Integer sectionID) {
+                                         @RequestParam(name = "newTaskPosition") Long newTaskPosition,
+                                         @RequestParam(name = "sectionID") Long sectionID) {
 
-        Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
-        int teamLeaderIDInt = teamLeaderIDLong.intValue();
-        Integer teamLeaderID = Integer.valueOf(teamLeaderIDInt);
-
-        if (teamLeaderID == null || sectionID == null || newTaskPosition == null) {
-            ErrorResponse errorResponse = new ErrorResponse("Missing required parameter(s). Please ensure all required parameters are provided.",
-                    HttpStatus.BAD_REQUEST.value());
-            return ResponseEntity.badRequest().body(errorResponse);
-        }
-
-        tasksService.updateTaskPosition(teamLeaderID, id.intValue(), newTaskPosition, sectionID);
-
-        Tasks updatedTask = tasksService.getTaskById(id);
-        EntityModel<Tasks> entityModel = assembler.toModel(updatedTask);
-        return ResponseEntity
-                .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-                .body(entityModel);
+        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
+        tasksService.updateTaskPosition(teamLeaderID, taskID, newTaskPosition, sectionID);
+        Tasks updatedTask = tasksService.getTaskById(taskID, teamLeaderID);
+        return ResponseEntity.status(HttpStatus.CREATED).body(updatedTask);
     }
 
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{taskID}")
     @Transactional
-    ResponseEntity<?> deleteTask(@PathVariable("id") Long id, Authentication authentication) {
-
-        Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
-        int teamLeaderIDInt = teamLeaderIDLong.intValue();
-        Integer teamLeaderID = Integer.valueOf(teamLeaderIDInt);
-
-        if (teamLeaderID == null) {
-            ErrorResponse errorResponse = new ErrorResponse("Team Leader ID is required.", HttpStatus.BAD_REQUEST.value());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        }
-        tasksService.deleteTaskById(id, teamLeaderID);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(Map.of("message", "Task with id: "+ id +" has been successfully deleted"));
+    ResponseEntity<Object> deleteTask(@PathVariable("taskID") Long taskID, Authentication authentication) {
+        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
+        tasksService.deleteTaskById(taskID, teamLeaderID);
+        return ResponseEntity.noContent().build();
     }
 }

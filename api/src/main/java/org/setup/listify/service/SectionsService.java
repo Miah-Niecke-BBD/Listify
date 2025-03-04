@@ -1,7 +1,7 @@
 package org.setup.listify.service;
 
-import org.setup.listify.exception.ListNotFoundException;
-import org.setup.listify.exception.SectionNotFoundException;
+import org.setup.listify.exception.ForbiddenException;
+import org.setup.listify.exception.NotFoundException;
 import org.setup.listify.model.Sections;
 import org.setup.listify.model.Tasks;
 import org.setup.listify.repo.SectionsRepository;
@@ -18,28 +18,12 @@ public class SectionsService {
         this.repository = repository;
     }
 
-    public List<Sections> getAllSections() {
-        List<Sections> sections = repository.findAll();
-        if (sections.isEmpty()) {
-            throw new ListNotFoundException("sections");
-        }
-        return sections;
-    }
-
     public Sections getSectionById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new SectionNotFoundException(id));
+                .orElseThrow();
     }
 
-    public List<Tasks> getTaskBySectionId(Long sectionId) {
-        List<Tasks> tasksInSection = repository.findTasksBySectionID(sectionId);
-        if (tasksInSection.isEmpty()) {
-            throw new SectionNotFoundException(sectionId);
-        }
-        return tasksInSection;
-    }
-
-    public Long createSection(Integer teamLeaderID, Integer projectID,
+    public Long createSection(Long teamLeaderID, Long projectID,
                               String sectionName, Byte sectionPosition) {
         repository.createSection(teamLeaderID, projectID, sectionName, sectionPosition);
 
@@ -47,11 +31,21 @@ public class SectionsService {
         return newlyCreatedSection != null ? newlyCreatedSection.getSectionID() : null;
     }
 
-    public void updateSection(Long id, Integer userID, String newSectionName) {
-        repository.updateSection(id, userID, newSectionName);
+    public void updateSection(Long sectionID, Long userID, String newSectionName) {
+        if (!repository.isSectionAndUserInSameProject(sectionID, userID)) {
+            throw new ForbiddenException("Only sections within your project can be updated.");
+        }
+        repository.updateSection(sectionID, userID, newSectionName);
     }
 
-    public void deleteSectionById(Integer teamLeaderID, int sectionID) {
+    public void deleteSectionById(Long teamLeaderID, Long sectionID) {
         repository.deleteSectionById(teamLeaderID, sectionID);
+    }
+
+    public void updateSectionPosition(Long sectionID, Long loggedInUserID, Integer newSectionPosition) {
+        if (!repository.isSectionAndUserInSameProject(sectionID, loggedInUserID)) {
+            throw new ForbiddenException("Only sections within your project can be updated.");
+        }
+        repository.updateSectionPosition(loggedInUserID, sectionID, newSectionPosition);
     }
 }
