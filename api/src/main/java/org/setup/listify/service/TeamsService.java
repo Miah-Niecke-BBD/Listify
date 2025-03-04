@@ -25,8 +25,6 @@ public class TeamsService {
     @Autowired
     private TeamMembersRepository teamMembersRepository;
     @Autowired
-    private UsersRepository usersRepository;
-    @Autowired
     UserService userService;
 
     public List<Teams> getAllUserTeams(Long userID) {
@@ -99,7 +97,7 @@ public class TeamsService {
 
     @Transactional
     public void assignMemberToTeam(Long teamLeaderID, String githubID, Long teamID) {
-        Long userID = getUserIDFromGithubID(githubID);
+        Long userID = userService.getUserIDFromGithubID(githubID);
 
         Teams team = findATeamByUserID(teamLeaderID, teamID);
 
@@ -138,7 +136,7 @@ public class TeamsService {
 
     @Transactional
     public void deleteMemberFromTeam(String githubID, Long teamID, Long teamLeaderID) {
-        Long userID = getUserIDFromGithubID(githubID);
+        Long userID = userService.getUserIDFromGithubID(githubID);
 
         boolean isTeamLeader = isTeamLeader(teamID, teamLeaderID);
         if (!isTeamLeader) {
@@ -174,7 +172,7 @@ public class TeamsService {
     }
 
     public void updateTeamLeader(Long teamLeaderID, Long teamID, String newTeamLeaderGithubID) {
-        Long newTeamLeaderID = getUserIDFromGithubID(newTeamLeaderGithubID);
+        Long newTeamLeaderID = userService.getUserIDFromGithubID(newTeamLeaderGithubID);
 
         findATeamByUserID(newTeamLeaderID, teamID);
         boolean isTeamLeader = isTeamLeader(teamID, teamLeaderID);
@@ -186,12 +184,4 @@ public class TeamsService {
         teamMembersRepository.updateTeamLeader(teamLeaderID, teamID, newTeamLeaderID);
     }
 
-    public Long getUserIDFromGithubID(String githubID) {
-        Optional<Users> users = usersRepository.findByGitHubID(githubID);
-        if (users.isEmpty()) {
-            throw new NotFoundException("User with github ID: " + githubID + " not found");
-        }
-
-        return users.get().getUserID();
-    }
 }
