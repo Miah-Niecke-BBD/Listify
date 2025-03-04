@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface TaskAssigneesRepository extends JpaRepository<TaskAssignees, Long> {
 
-    @Query("SELECT new org.setup.listify.model.UserAssignedTasksDTO(u.userID, u.gitHubID, t.taskID, t.taskName, " +
+    @Query("SELECT new org.setup.listify.dto.UserAssignedTasksDTO(u.userID, u.gitHubID, t.taskID, t.taskName, " +
             "t.taskDescription, t.taskPriority, t.dueDate, t.dateCompleted, t.createdAt, t.updatedAt," +
             "s.sectionID, s.sectionName, p.projectID, p.projectName) " +
             "FROM Users u " +
@@ -24,15 +24,15 @@ public interface TaskAssigneesRepository extends JpaRepository<TaskAssignees, Lo
 
     @Procedure("listify.uspAssignUserToTask")
     void assignTaskToUser(
-            @Param("userID") int userID,
-            @Param("taskID") int taskID
+            @Param("userID") Long userID,
+            @Param("taskID") Long taskID
     );
 
     @Procedure("listify.uspDeleteUserFromTask")
     void deleteUserFromTask(
-            @Param("userID") int userID,
-            @Param("taskID") int taskID,
-            @Param("teamLeaderID") int teamLeaderID
+            @Param("userID") Long userID,
+            @Param("taskID") Long taskID,
+            @Param("teamLeaderID") Long teamLeaderID
     );
 
     @Query(value = "SELECT TOP 1 * FROM listify.TaskAssignees ORDER BY taskAssigneeID DESC", nativeQuery = true)

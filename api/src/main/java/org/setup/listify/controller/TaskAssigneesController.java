@@ -26,7 +26,7 @@ public class TaskAssigneesController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllAssignedTasks() {
+    public ResponseEntity<Object> getAllAssignedTasks() {
         List<TaskAssignees> assignedTasks = taskAssigneesService.getAllAssignedTasks();
         if (assignedTasks.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("There are no assigned tasks");
@@ -36,7 +36,7 @@ public class TaskAssigneesController {
 
 
     @GetMapping("/user/{userID}")
-    public ResponseEntity<?> getTasksAssignedToSpecificUser(
+    public ResponseEntity<Object> getTasksAssignedToSpecificUser(
             @PathVariable("userID") Long userID) {
 
         List<UserAssignedTasksDTO> tasksAssignedToUser = taskAssigneesService
@@ -50,11 +50,9 @@ public class TaskAssigneesController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<?> assignTask(Authentication authentication,
-                                        @RequestParam(name = "taskID") Integer taskID) {
-        Long userIDLong = userService.getUserIDFromAuthentication(authentication);
-        int userID = userIDLong.intValue();
-
+    public ResponseEntity<Object> assignTask(Authentication authentication,
+                                        @RequestParam(name = "taskID") Long taskID) {
+        Long userID = userService.getUserIDFromAuthentication(authentication);
         Long newAssignedTaskID = taskAssigneesService.assignTaskToUser(userID, taskID);
         TaskAssignees newTaskAssignee = taskAssigneesService.getAssignedTaskById(newAssignedTaskID);
         return ResponseEntity.status(HttpStatus.CREATED).body(newTaskAssignee);
@@ -62,13 +60,11 @@ public class TaskAssigneesController {
 
     @DeleteMapping("/{taskID}")
     @Transactional
-    public ResponseEntity<?> deleteTaskAssignment(@PathVariable("taskID") Long taskID,
-                                                  @RequestParam(name = "userID") Integer userID,
+    public ResponseEntity<Object> deleteTaskAssignment(@PathVariable("taskID") Long taskID,
+                                                  @RequestParam(name = "userID") Long userID,
                                                   Authentication authentication) {
-        Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
-        int teamLeaderID = teamLeaderIDLong.intValue();
-
-        taskAssigneesService.deleteUserFromTask(userID, taskID.intValue(), teamLeaderID);
+        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
+        taskAssigneesService.deleteUserFromTask(userID, taskID, teamLeaderID);
         return ResponseEntity.noContent().build();
     }
 

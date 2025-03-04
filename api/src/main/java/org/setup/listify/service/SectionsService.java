@@ -29,7 +29,7 @@ public class SectionsService {
         return repository.findTasksBySectionID(sectionId);
     }
 
-    public Long createSection(Integer teamLeaderID, Integer projectID,
+    public Long createSection(Long teamLeaderID, Long projectID,
                               String sectionName, Byte sectionPosition) {
         repository.createSection(teamLeaderID, projectID, sectionName, sectionPosition);
 
@@ -37,11 +37,11 @@ public class SectionsService {
         return newlyCreatedSection != null ? newlyCreatedSection.getSectionID() : null;
     }
 
-    public void updateSection(Long id, Integer userID, String newSectionName) {
+    public void updateSection(Long id, Long userID, String newSectionName) {
         repository.updateSection(id, userID, newSectionName);
     }
 
-    public void deleteSectionById(Integer teamLeaderID, int sectionID) {
+    public void deleteSectionById(Long teamLeaderID, Long sectionID) {
         repository.deleteSectionById(teamLeaderID, sectionID);
     }
 }

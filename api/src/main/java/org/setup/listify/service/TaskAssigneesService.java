@@ -29,14 +29,14 @@ public class TaskAssigneesService {
         return repository.findAssignedTasksByUserID(userID);
     }
 
-    public Long assignTaskToUser(int userID, int taskID) {
+    public Long assignTaskToUser(Long userID, Long taskID) {
         repository.assignTaskToUser(userID, taskID);
 
         TaskAssignees newlyAssignedTask = repository.findTopOrderByTaskIDDesc();
         return newlyAssignedTask != null ? newlyAssignedTask.getTaskAssigneeID() : null;
     }
 
-    public void deleteUserFromTask(int userID, int taskID, int teamLeaderID) {
+    public void deleteUserFromTask(Long userID, Long taskID, Long teamLeaderID) {
         repository.deleteUserFromTask(userID, taskID, teamLeaderID);
     }
 }

@@ -25,13 +25,11 @@ public class TaskDependenciesController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<?> newTaskDependency(Authentication authentication,
-                                            @RequestParam(name = "taskID") Integer taskID,
-                                            @RequestParam(name = "dependentTaskID") Integer dependentTaskID) {
+    public ResponseEntity<Object> newTaskDependency(Authentication authentication,
+                                            @RequestParam(name = "taskID") Long taskID,
+                                            @RequestParam(name = "dependentTaskID") Long dependentTaskID) {
 
-        Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
-        int teamLeaderID = teamLeaderIDLong.intValue();
-
+        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
         Long newTaskDependencyID = taskDependenciesService.newTaskDependency(teamLeaderID, taskID, dependentTaskID);
         TaskDependencies newTaskDependency = taskDependenciesService.getTaskDependencyById(newTaskDependencyID);
         return ResponseEntity.status(HttpStatus.CREATED).body(newTaskDependency);
@@ -40,12 +38,10 @@ public class TaskDependenciesController {
 
     @DeleteMapping("/{dependentTaskID}")
     @Transactional
-    public ResponseEntity<?> deleteTaskDependencyByDependencyId(@PathVariable("dependentTaskID") Long dependentTaskID,
-                                                                @RequestParam(name = "taskID") Integer taskID,
+    public ResponseEntity<Object> deleteTaskDependencyByDependencyId(@PathVariable("dependentTaskID") Long dependentTaskID,
+                                                                @RequestParam(name = "taskID") Long taskID,
                                                                 Authentication authentication) {
-        Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
-        int teamLeaderID = teamLeaderIDLong.intValue();
-
+        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
         taskDependenciesService.deleteTaskDependencyByDependencyId(taskID, dependentTaskID, teamLeaderID);
         return ResponseEntity.noContent().build();
     }

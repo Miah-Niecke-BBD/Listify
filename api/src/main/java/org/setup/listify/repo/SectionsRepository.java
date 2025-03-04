@@ -12,8 +12,8 @@ import java.util.List;
 public interface SectionsRepository extends JpaRepository<Sections, Long> {
 
     @Procedure("listify.uspAddSection")
-    void createSection(@Param("teamLeaderID") Integer teamLeaderID,
-                       @Param("projectID") Integer projectID,
+    void createSection(@Param("teamLeaderID") Long teamLeaderID,
+                       @Param("projectID") Long projectID,
                        @Param("sectionName") String sectionName,
                        @Param("sectionPosition") Byte sectionPosition
     );
@@ -23,13 +23,13 @@ public interface SectionsRepository extends JpaRepository<Sections, Long> {
 
     @Procedure("listify.uspUpdateSectionDetails")
     void updateSection(@Param("sectionID") Long sectionID,
-                       @Param("userID") Integer userID,
+                       @Param("userID") Long userID,
                        @Param("newSectionName") String newSectionName
     );
 
     @Procedure("listify.uspDeleteSection")
-    void deleteSectionById(@Param("teamLeaderID")Integer teamLeaderID,
-                           @Param("sectionID") Integer sectionID
+    void deleteSectionById(@Param("teamLeaderID")Long teamLeaderID,
+                           @Param("sectionID") Long sectionID
     );
 
     @Query("SELECT t FROM Tasks t WHERE t.sectionID = :id")

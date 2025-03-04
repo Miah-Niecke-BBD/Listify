@@ -1,5 +1,6 @@
 package org.setup.listify.service;
 
+import org.setup.listify.exception.NotFoundException;
 import org.setup.listify.model.TaskDependencies;
 import org.setup.listify.repo.TaskDependenciesRepository;
 import org.springframework.stereotype.Service;
@@ -15,17 +16,17 @@ public class TaskDependenciesService {
 
     public TaskDependencies getTaskDependencyById(Long taskDependencyID) {
         return repository.findById(taskDependencyID)
-                .orElseThrow();
+                .orElseThrow(() -> new NotFoundException("No Task Dependency with ID: "+ taskDependencyID));
     }
 
-    public Long newTaskDependency(int teamLeaderID, int taskID, int dependentTaskID) {
+    public Long newTaskDependency(Long teamLeaderID, Long taskID, Long dependentTaskID) {
         repository.newTaskDependency(teamLeaderID, taskID, dependentTaskID);
 
         TaskDependencies latestTaskDependency = repository.findTopOrderByTaskIDDesc();
         return latestTaskDependency != null ? latestTaskDependency.getTaskDependencyID() : null;
     }
 
-    public void deleteTaskDependencyByDependencyId(int taskID, Long taskDependencyID, int teamLeaderID) {
-        repository.deleteTaskDependency(taskID, taskDependencyID.intValue(), teamLeaderID);
+    public void deleteTaskDependencyByDependencyId(Long taskID, Long taskDependencyID, Long teamLeaderID) {
+        repository.deleteTaskDependency(taskID, taskDependencyID, teamLeaderID);
     }
 }

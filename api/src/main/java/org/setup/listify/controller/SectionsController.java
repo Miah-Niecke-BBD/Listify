@@ -1,6 +1,5 @@
 package org.setup.listify.controller;
 
-import org.setup.listify.exception.ErrorResponse;
 import org.setup.listify.model.Sections;
 import org.setup.listify.model.Tasks;
 import org.setup.listify.service.SectionsService;
@@ -26,7 +25,7 @@ public class SectionsController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllSections() {
+    public ResponseEntity<Object> getAllSections() {
         List<Sections> sections = sectionsService.getAllSections();
         if (sections.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("There are no sections in this project");
@@ -35,7 +34,7 @@ public class SectionsController {
     }
 
     @GetMapping("{sectionID}/tasks")
-    public ResponseEntity<?> getTaskBySectionId(@PathVariable("sectionID") Long sectionID) {
+    public ResponseEntity<Object> getTaskBySectionId(@PathVariable("sectionID") Long sectionID) {
         List<Tasks> tasksList = sectionsService.getTaskBySectionId(sectionID);
         if (tasksList.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("There are no tasks in section: "+sectionID);
@@ -45,19 +44,11 @@ public class SectionsController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<?> newSection(Authentication authentication,
-                                        @RequestParam(name = "projectID") Integer projectID,
+    public ResponseEntity<Object> newSection(Authentication authentication,
+                                        @RequestParam(name = "projectID") Long projectID,
                                         @RequestParam(name = "sectionName") String sectionName,
                                         @RequestParam(name = "sectionPosition") Byte sectionPosition) {
-        Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
-        Integer teamLeaderID = teamLeaderIDLong.intValue();
-
-        if (projectID == null || sectionPosition == null || sectionName == null) {
-            ErrorResponse errorResponse = new ErrorResponse("Missing required parameter(s). Please ensure all required parameters are provided.",
-                    HttpStatus.BAD_REQUEST.value());
-            return ResponseEntity.badRequest().body(errorResponse);
-        }
-
+        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
         Long newSectionID = sectionsService.createSection(teamLeaderID, projectID, sectionName, sectionPosition);
         Sections section = sectionsService.getSectionById(newSectionID);
         return ResponseEntity.status(HttpStatus.CREATED).body(section);
@@ -65,13 +56,11 @@ public class SectionsController {
 
     @PutMapping("/{sectionID}")
     @Transactional
-    public ResponseEntity<?> updateSection(@PathVariable("sectionID") Long sectionID,
+    public ResponseEntity<Object> updateSection(@PathVariable("sectionID") Long sectionID,
                                            Authentication authentication,
                                            @RequestParam("newSectionName") String newSectionName) {
 
-        Long userIDLong = userService.getUserIDFromAuthentication(authentication);
-        Integer userID = userIDLong.intValue();
-
+        Long userID = userService.getUserIDFromAuthentication(authentication);
         sectionsService.updateSection(sectionID, userID, newSectionName);
         Sections updatedSection = sectionsService.getSectionById(sectionID);
         return ResponseEntity.status(HttpStatus.CREATED).body(updatedSection);
@@ -79,12 +68,10 @@ public class SectionsController {
 
     @DeleteMapping("/{sectionID}")
     @Transactional
-    public ResponseEntity<?> deleteSectionById(@PathVariable("sectionID") Long sectionID,
+    public ResponseEntity<Object> deleteSectionById(@PathVariable("sectionID") Long sectionID,
                                                Authentication authentication) {
-        Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
-        Integer teamLeaderID = teamLeaderIDLong.intValue();
-
-        sectionsService.deleteSectionById(teamLeaderID, sectionID.intValue());
+        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
+        sectionsService.deleteSectionById(teamLeaderID, sectionID);
         return ResponseEntity.noContent().build();
     }
 }
