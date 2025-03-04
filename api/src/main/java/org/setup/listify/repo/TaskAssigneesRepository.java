@@ -37,4 +37,27 @@ public interface TaskAssigneesRepository extends JpaRepository<TaskAssignees, Lo
 
     @Query(value = "SELECT TOP 1 * FROM listify.TaskAssignees ORDER BY taskAssigneeID DESC", nativeQuery = true)
     TaskAssignees findTopOrderByTaskIDDesc();
+
+    @Query("SELECT CASE WHEN COUNT(p) > 0 THEN TRUE ELSE FALSE END " +
+            "FROM Tasks t " +
+            "JOIN Sections s ON t.sectionID = s.sectionID " +
+            "JOIN Projects p ON s.projectID = p.projectID " +
+            "JOIN ProjectAssignees pa1 ON p.projectID = pa1.projectID " +
+            "JOIN ProjectAssignees pa2 ON p.projectID = pa2.projectID " +
+            "WHERE t.taskID = :taskID " +
+            "AND pa1.userID = :loggedInUserID " +
+            "AND pa2.userID = :userID")
+    boolean findTaskAndUsersInProject(@Param("taskID") Long taskID,
+                                       @Param("loggedInUserID") Long loggedInUserID,
+                                       @Param("userID") Long userID);
+
+
+    @Query("SELECT CASE WHEN COUNT(p) > 0 THEN TRUE ELSE FALSE END " +
+            "FROM ProjectAssignees pa1 " +
+            "JOIN ProjectAssignees pa2 ON pa1.projectID = pa2.projectID " +
+            "JOIN Projects p ON pa1.projectID = p.projectID " +
+            "WHERE pa1.userID = :userID1 " +
+            "AND pa2.userID = :userID2")
+    boolean findUsersInSameProject(@Param("userID1") Long userID1,
+                                   @Param("userID2") Long userID2);
 }

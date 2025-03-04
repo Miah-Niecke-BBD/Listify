@@ -1,5 +1,7 @@
 package org.setup.listify.service;
 
+import org.setup.listify.exception.ForbiddenException;
+import org.setup.listify.exception.NotFoundException;
 import org.setup.listify.model.TaskAssignees;
 import org.setup.listify.dto.UserAssignedTasksDTO;
 import org.setup.listify.repo.TaskAssigneesRepository;
@@ -11,27 +13,38 @@ import java.util.List;
 public class TaskAssigneesService {
 
     private final TaskAssigneesRepository repository;
+    private final UserService userService;
 
-    public TaskAssigneesService(TaskAssigneesRepository repository) {
+    public TaskAssigneesService(TaskAssigneesRepository repository, UserService userService) {
         this.repository = repository;
-    }
-
-    public List<TaskAssignees> getAllAssignedTasks() {
-        return repository.findAll();
+        this.userService = userService;
     }
 
     public TaskAssignees getAssignedTaskById(Long taskAssigneeID) {
         return repository.findById(taskAssigneeID)
-                .orElseThrow();
+                .orElseThrow(() -> new NotFoundException("Task assignment does not exist"));
     }
 
-    public List<UserAssignedTasksDTO> getTasksAssignedToSpecificUser(Long userID) {
-        return repository.findAssignedTasksByUserID(userID);
+    public List<UserAssignedTasksDTO> getTasksAssignedToSpecificUser(Long userID, Long loggedInUserID) {
+        if (!repository.findUsersInSameProject(userID, loggedInUserID)) {
+            throw new ForbiddenException("Cannot excess tasks of users that are not in the project");
+        }
+
+        List<UserAssignedTasksDTO> tasksAssignedToUser = repository.findAssignedTasksByUserID(userID);
+        if (tasksAssignedToUser.isEmpty()) {
+            throw new NotFoundException("There no tasks assigned to user: "+userID);
+        }
+        return tasksAssignedToUser;
     }
 
-    public Long assignTaskToUser(Long userID, Long taskID) {
+    public Long assignTaskToUser(String githubID, Long loggedInUserID, Long taskID) {
+        Long userID = userService.getUserIDFromGithubID(githubID);
+
+        if (!repository.findTaskAndUsersInProject(taskID, loggedInUserID, userID)) {
+            throw new ForbiddenException("Only users in the project can be assigned to tasks");
+        }
+
         repository.assignTaskToUser(userID, taskID);
-
         TaskAssignees newlyAssignedTask = repository.findTopOrderByTaskIDDesc();
         return newlyAssignedTask != null ? newlyAssignedTask.getTaskAssigneeID() : null;
     }

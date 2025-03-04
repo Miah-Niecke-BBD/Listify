@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/tasks/assigned")
+@RequestMapping("/tasks/assignee")
 public class TaskAssigneesController {
 
     private final TaskAssigneesService taskAssigneesService;
@@ -25,35 +25,25 @@ public class TaskAssigneesController {
         this.userService = userService;
     }
 
-    @GetMapping
-    public ResponseEntity<Object> getAllAssignedTasks() {
-        List<TaskAssignees> assignedTasks = taskAssigneesService.getAllAssignedTasks();
-        if (assignedTasks.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("There are no assigned tasks");
-        }
-        return ResponseEntity.ok(assignedTasks);
-    }
 
+    @GetMapping("/{userID}")
+    public ResponseEntity<Object> getTasksAssignedToSpecificUser(@PathVariable("userID") Long userID,
+                                                                 Authentication authentication) {
 
-    @GetMapping("/user/{userID}")
-    public ResponseEntity<Object> getTasksAssignedToSpecificUser(
-            @PathVariable("userID") Long userID) {
-
+        Long loggedInUserID = userService.getUserIDFromAuthentication(authentication);
         List<UserAssignedTasksDTO> tasksAssignedToUser = taskAssigneesService
-                .getTasksAssignedToSpecificUser(userID);
-
-        if (tasksAssignedToUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("There no tasks assigned to user: "+userID);
-        }
+                .getTasksAssignedToSpecificUser(userID, loggedInUserID);
         return ResponseEntity.ok(tasksAssignedToUser);
     }
 
-    @PostMapping
+    @PostMapping("/{taskID}")
     @Transactional
-    public ResponseEntity<Object> assignTask(Authentication authentication,
-                                        @RequestParam(name = "taskID") Long taskID) {
-        Long userID = userService.getUserIDFromAuthentication(authentication);
-        Long newAssignedTaskID = taskAssigneesService.assignTaskToUser(userID, taskID);
+    public ResponseEntity<Object> assignTask(@PathVariable("taskID") Long taskID,
+                                         Authentication authentication,
+                                        @RequestParam(name = "githubID") String githubID) {
+
+        Long loggedInUserID = userService.getUserIDFromAuthentication(authentication);
+        Long newAssignedTaskID = taskAssigneesService.assignTaskToUser(githubID, loggedInUserID, taskID);
         TaskAssignees newTaskAssignee = taskAssigneesService.getAssignedTaskById(newAssignedTaskID);
         return ResponseEntity.status(HttpStatus.CREATED).body(newTaskAssignee);
     }
