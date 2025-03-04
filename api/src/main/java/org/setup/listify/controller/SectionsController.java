@@ -1,7 +1,6 @@
 package org.setup.listify.controller;
 
 import org.setup.listify.model.Sections;
-import org.setup.listify.model.Tasks;
 import org.setup.listify.service.SectionsService;
 import org.setup.listify.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -9,8 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/sections")
@@ -42,9 +39,19 @@ public class SectionsController {
     public ResponseEntity<Object> updateSection(@PathVariable("sectionID") Long sectionID,
                                            Authentication authentication,
                                            @RequestParam("newSectionName") String newSectionName) {
+        Long loggedInUserID = userService.getUserIDFromAuthentication(authentication);
+        sectionsService.updateSection(sectionID, loggedInUserID, newSectionName);
+        Sections updatedSection = sectionsService.getSectionById(sectionID);
+        return ResponseEntity.status(HttpStatus.CREATED).body(updatedSection);
+    }
 
-        Long userID = userService.getUserIDFromAuthentication(authentication);
-        sectionsService.updateSection(sectionID, userID, newSectionName);
+    @PutMapping("/{sectionID}/position")
+    @Transactional
+    public ResponseEntity<Object> updateSectionPosition(@PathVariable("sectionID") Long sectionID,
+                                                        Authentication authentication,
+                                                        @RequestParam("newSectionPostion") Integer newSectionPosition) {
+        Long loggedInUserID = userService.getUserIDFromAuthentication(authentication);
+        sectionsService.updateSectionPosition(sectionID, loggedInUserID, newSectionPosition);
         Sections updatedSection = sectionsService.getSectionById(sectionID);
         return ResponseEntity.status(HttpStatus.CREATED).body(updatedSection);
     }
