@@ -38,12 +38,9 @@ public class ProjectsController {
                                         @RequestParam(name = "teamID") Long teamID,
                                         @RequestParam(name = "projectName") String projectName,
                                         @RequestParam(name = "projectDescription") String projectDescription) {
-        System.out.println("check 1-from controller");
         Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
-        System.out.println("check 2-from controller");
         Long newProjectID = projectsService.createProject(teamLeaderIDLong, teamID, projectName, projectDescription);
         Projects project = projectsService.getProjectById(newProjectID ,teamLeaderIDLong);
-        System.out.println("check 3-from controller");
         return ResponseEntity.ok(project);
     }
 
@@ -62,7 +59,6 @@ public class ProjectsController {
                                            @RequestParam(name = "projectDescription",required = false) String projectDescription) {
 
         Long userID= userService.getUserIDFromAuthentication(authentication);
-
         projectsService.updateProject(projectID, userID, projectName, projectDescription);
         Projects updatedProject = projectsService.getProjectById(projectID,userID);
 

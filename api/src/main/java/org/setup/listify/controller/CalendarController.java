@@ -36,6 +36,4 @@ public class CalendarController {
         ProjectsAndTasks projectsAndTasks = teamCalendarService.findTeamsDueTasks(userID, teamID, projectID);
         return ResponseEntity.ok().body(projectsAndTasks);
     }
-
-
 }
