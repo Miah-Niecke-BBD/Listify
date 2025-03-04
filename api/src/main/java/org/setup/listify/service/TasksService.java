@@ -1,9 +1,8 @@
 package org.setup.listify.service;
 
+import org.setup.listify.exception.NotFoundException;
 import org.setup.listify.model.Tasks;
 import org.setup.listify.repo.TasksRepository;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,36 +11,50 @@ import java.util.List;
 public class TasksService {
 
     private final TasksRepository repository;
-    private final UserService userService;
 
-    public TasksService(TasksRepository repository, UserService userService) {
+    public TasksService(TasksRepository repository) {
         this.repository = repository;
-        this.userService = userService;
     }
 
 
     public List<Tasks> getAllTasks(Long userID) {
-        return repository.findTasksByUserID(userID);
-    }
-
-    public Tasks getTaskById(Long id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Long userID = userService.getUserIDFromAuthentication(authentication);
-        return repository.getTaskById(userID, id);
-    }
-
-    public List<Tasks> getAllSubtasksOfTask(Long parentTaskID) {
-        getTaskById(parentTaskID);
-        return repository.getAllSubtasksOfTask(parentTaskID);
-    }
-
-    public Tasks getDependentTaskById(Long taskID) {
-        getTaskById(taskID);
-        return repository.findDependentTaskByTaskID(taskID);
+        List<Tasks> tasks = repository.findTasksByUserID(userID);
+        if (tasks.isEmpty()) {
+            throw new NotFoundException("No tasks found");
+        }
+        return tasks;
     }
 
 
-    public Long createTask(int teamLeaderID, int projectID, int sectionID,
+    public Tasks getTaskById(Long taskID, Long userID) {
+        Tasks task = repository.getTaskById(userID, taskID);
+        if (task == null) {
+            throw new NotFoundException("Task not found");
+        }
+        return task;
+    }
+
+
+    public List<Tasks> getAllSubtasksOfTask(Long parentTaskID, Long userID) {
+        getTaskById(parentTaskID, userID);
+        List<Tasks> subtasks = repository.getAllSubtasksOfTask(parentTaskID);
+        if (subtasks.isEmpty()) {
+            throw new NotFoundException("There are no subtasks for task: "+parentTaskID);
+        }
+        return subtasks;
+    }
+
+    public Tasks getDependentTaskById(Long taskID, Long userID) {
+        getTaskById(taskID, userID);
+        Tasks task = repository.findDependentTaskByTaskID(taskID);
+        if (task == null) {
+            throw new NotFoundException("There are no dependencies for task: " + taskID);
+        }
+        return task;
+    }
+
+
+    public Long createTask(Long teamLeaderID, Long projectID, Long sectionID,
                            String taskName, String taskDescription,
                            byte taskPriority, byte taskPosition) {
 
@@ -53,7 +66,7 @@ public class TasksService {
         return newlyAddedTask != null ? newlyAddedTask.getTaskID() : null;
     }
 
-    public Long createSubTask(int teamLeaderID, int parentTaskID, String taskName, String taskDescription, int sectionID, LocalDateTime dueDate) {
+    public Long createSubTask(Long teamLeaderID, Long parentTaskID, String taskName, String taskDescription, Long sectionID, LocalDateTime dueDate) {
 
         repository.createSubTask(teamLeaderID, parentTaskID, taskName, taskDescription, sectionID, dueDate);
 
@@ -62,7 +75,7 @@ public class TasksService {
     }
 
 
-    public void updateTaskDetails(int taskID, int teamLeaderID, String newTaskName,
+    public void updateTaskDetails(Long taskID, Long teamLeaderID, String newTaskName,
                                   String newTaskDescription, byte newTaskPriority,
                                   LocalDateTime newDate) {
 
@@ -71,12 +84,12 @@ public class TasksService {
     }
 
 
-    public void updateTaskPosition (int teamLeaderID, int taskID, int newTaskPosition, int sectionID) {
+    public void updateTaskPosition (Long teamLeaderID, Long taskID, Long newTaskPosition, Long sectionID) {
         repository.updateTaskPosition(teamLeaderID, taskID, newTaskPosition, sectionID);
     }
 
 
-    public void deleteTaskById(Long id, int teamLeaderID) {
-        repository.deleteTasksById(id.intValue(), teamLeaderID);
+    public void deleteTaskById(Long id, Long teamLeaderID) {
+        repository.deleteTasksById(id, teamLeaderID);
     }
 }
