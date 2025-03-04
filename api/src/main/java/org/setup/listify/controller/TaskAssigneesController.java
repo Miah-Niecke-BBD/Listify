@@ -1,7 +1,7 @@
 package org.setup.listify.controller;
 
 import org.setup.listify.model.TaskAssignees;
-import org.setup.listify.dto.UserAssignedTasksDTO;
+import org.setup.listify.model.Users;
 import org.setup.listify.service.TaskAssigneesService;
 import org.setup.listify.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -26,15 +26,14 @@ public class TaskAssigneesController {
     }
 
 
-    @GetMapping("/{userID}")
-    public ResponseEntity<Object> getTasksAssignedToSpecificUser(@PathVariable("userID") Long userID,
-                                                                 Authentication authentication) {
-
+    @GetMapping("/{taskID}")
+    public ResponseEntity<Object> getUsersAssignedToTask(@PathVariable("taskID") Long taskID,
+                                                         Authentication authentication) {
         Long loggedInUserID = userService.getUserIDFromAuthentication(authentication);
-        List<UserAssignedTasksDTO> tasksAssignedToUser = taskAssigneesService
-                .getTasksAssignedToSpecificUser(userID, loggedInUserID);
-        return ResponseEntity.ok(tasksAssignedToUser);
+        List<Users> usersAssignedToTask = taskAssigneesService.getUsersAssignedToTask(taskID, loggedInUserID);
+        return ResponseEntity.ok(usersAssignedToTask);
     }
+
 
     @PostMapping("/{taskID}")
     @Transactional
@@ -47,6 +46,7 @@ public class TaskAssigneesController {
         TaskAssignees newTaskAssignee = taskAssigneesService.getAssignedTaskById(newAssignedTaskID);
         return ResponseEntity.status(HttpStatus.CREATED).body(newTaskAssignee);
     }
+
 
     @DeleteMapping("/{taskID}")
     @Transactional

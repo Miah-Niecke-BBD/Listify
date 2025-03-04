@@ -3,7 +3,7 @@ package org.setup.listify.service;
 import org.setup.listify.exception.ForbiddenException;
 import org.setup.listify.exception.NotFoundException;
 import org.setup.listify.model.TaskAssignees;
-import org.setup.listify.dto.UserAssignedTasksDTO;
+import org.setup.listify.model.Users;
 import org.setup.listify.repo.TaskAssigneesRepository;
 import org.springframework.stereotype.Service;
 
@@ -25,17 +25,6 @@ public class TaskAssigneesService {
                 .orElseThrow(() -> new NotFoundException("Task assignment does not exist"));
     }
 
-    public List<UserAssignedTasksDTO> getTasksAssignedToSpecificUser(Long userID, Long loggedInUserID) {
-        if (!repository.findUsersInSameProject(userID, loggedInUserID)) {
-            throw new ForbiddenException("Cannot excess tasks of users that are not in the project");
-        }
-
-        List<UserAssignedTasksDTO> tasksAssignedToUser = repository.findAssignedTasksByUserID(userID);
-        if (tasksAssignedToUser.isEmpty()) {
-            throw new NotFoundException("There no tasks assigned to user: "+userID);
-        }
-        return tasksAssignedToUser;
-    }
 
     public Long assignTaskToUser(String githubID, Long loggedInUserID, Long taskID) {
         Long userID = userService.getUserIDFromGithubID(githubID);
@@ -50,6 +39,20 @@ public class TaskAssigneesService {
     }
 
     public void deleteUserFromTask(Long userID, Long taskID, Long teamLeaderID) {
+        if (!repository.findUserAndTaskInProject(userID, taskID)) {
+            throw new ForbiddenException("Tasks and Users should both exist in the project");
+        }
         repository.deleteUserFromTask(userID, taskID, teamLeaderID);
+    }
+
+    public List<Users> getUsersAssignedToTask(Long taskID, Long loggedInUserID) {
+        if (!repository.findUserAndTaskInProject(loggedInUserID, taskID)) {
+            throw new ForbiddenException("Cannot excess tasks that are not in the project");
+        }
+        List<Users> usersAssignedToTask = repository.getUsersAssignedToTask(taskID);
+        if (usersAssignedToTask.isEmpty()) {
+            throw new NotFoundException("There no users assigned to task: "+taskID);
+        }
+        return usersAssignedToTask;
     }
 }
