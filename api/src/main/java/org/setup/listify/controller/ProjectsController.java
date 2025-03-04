@@ -1,13 +1,9 @@
 package org.setup.listify.controller;
 
-
-import org.setup.listify.assembler.SectionsModelAssembler;
 import org.setup.listify.dto.ProjectOverviewDTO;
-import org.setup.listify.exception.ErrorResponse;
 import org.setup.listify.model.Projects;
 import org.setup.listify.service.ProjectsService;
 import org.setup.listify.service.UserService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +17,7 @@ public class ProjectsController {
     private final ProjectsService projectsService;
     private final UserService userService;
 
-    public ProjectsController(ProjectsService projectsService, SectionsModelAssembler sectionsAssembler, UserService userService) {
+    public ProjectsController(ProjectsService projectsService, UserService userService) {
         this.projectsService = projectsService;
         this.userService = userService;
     }
