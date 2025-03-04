@@ -3,8 +3,8 @@ package org.setup.listify.service;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.setup.listify.exception.*;
+import org.setup.listify.model.Projects;
 import org.setup.listify.model.TeamMembers;
-import org.setup.listify.dto.UserTeamProjects;
 import org.setup.listify.model.Teams;
 import org.setup.listify.model.Users;
 import org.setup.listify.repo.TeamMembersRepository;
@@ -80,15 +80,9 @@ public class TeamsService {
         return teamMembersRepository.existsByTeamIDAndUserIDAndIsTeamLeaderTrue(teamID, userID);
     }
 
-    public List<UserTeamProjects> getProjectsByTeamIDAndUserID(Long teamID, Long userID) {
+    public List<Projects> findTeamProjects(Long teamID, Long userID) {
         findATeamByUserID(userID, teamID);
-        List<UserTeamProjects> userTeamProjects = teamsRepository.findProjectsByTeamIDAndUserID(teamID, userID);
-
-        if (userTeamProjects.isEmpty()) {
-            throw new NotFoundException("No project found for team " + teamID);
-        }
-
-        return userTeamProjects;
+        return teamsRepository.findTeamProjects(teamID, userID);
     }
 
     @Transactional
