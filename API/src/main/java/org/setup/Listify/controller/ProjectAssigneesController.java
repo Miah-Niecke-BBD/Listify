@@ -1,15 +1,10 @@
 package org.setup.Listify.controller;
 
 
-import org.apache.catalina.User;
-import org.setup.Listify.assembler.ProjectAssigneesAssembler;
 import org.setup.Listify.exception.ErrorResponse;
 import org.setup.Listify.model.ProjectAssignees;
 import org.setup.Listify.service.ProjectAssigneesService;
 import org.setup.Listify.service.UserService;
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -20,61 +15,70 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/projectAssignees")
+@RequestMapping("/project/assignees")
 public class ProjectAssigneesController {
 
     private final ProjectAssigneesService projectAssigneesService;
     private final UserService userService;
-    private final ProjectAssigneesAssembler assembler;
 
-    public ProjectAssigneesController(ProjectAssigneesService projectAssigneesService, ProjectAssigneesAssembler assembler, UserService userService) {
+    public ProjectAssigneesController(ProjectAssigneesService projectAssigneesService, UserService userService) {
         this.projectAssigneesService = projectAssigneesService;
         this.userService = userService;
-        this.assembler = assembler;
     }
 
     @GetMapping
-    public CollectionModel<EntityModel<ProjectAssignees>> getAllProjectAssignees() {
+    public ResponseEntity<Object> getAllProjectAssignees() {
         List<ProjectAssignees> assignees = projectAssigneesService.getAllProjectAssignees();
-        return assembler.toCollectionModel(assignees);
+        return ResponseEntity.ok(assignees);
     }
 
-    @GetMapping("/{id}")
-    public EntityModel<ProjectAssignees> getProjectAssigneeById(@PathVariable Long id) {
-        ProjectAssignees assignee = projectAssigneesService.getProjectAssigneeById(id);
-        return assembler.toModel(assignee);
+    @GetMapping("/{assigneeID}")
+    public ResponseEntity<Object> getProjectAssigneeById(@PathVariable("assigneeID") Long assigneeID) {
+        ProjectAssignees assignee = projectAssigneesService.getProjectAssigneeById(assigneeID);
+        return ResponseEntity.ok(assignee);
     }
 
-    @GetMapping("/user/{userID}")
-    public CollectionModel<EntityModel<ProjectAssignees>> getProjectsAssignedToUser(@PathVariable Long userID) {
+    @GetMapping("/projects/{userID}")
+    public ResponseEntity<Object> getProjectsAssignedToUser(@PathVariable("userID") Long userID) {
         List<ProjectAssignees> projects = projectAssigneesService.getProjectsAssignedToSpecificUser(userID);
-        return assembler.toCollectionModel(projects);
+        return ResponseEntity.ok(projects);
     }
     
-    @PostMapping("/assign")
+    @PostMapping
     @Transactional
-    public ResponseEntity<?> assignUserToProject(@RequestParam int userID, @RequestParam int projectID) {
-        Long newProjectAssigneeID = projectAssigneesService.assignUserToProject(userID, projectID);
+    public ResponseEntity<?> assignUserToProject(@RequestParam(name = "teamLeaderID") int teamLeaderID,
+                                                 @RequestParam(name = "userID") int userID,
+                                                 @RequestParam(name = "projectID") int projectID) {
 
-        if (newProjectAssigneeID != null) {
-            ProjectAssignees newProjectAssignee = projectAssigneesService.getProjectAssigneeById(newProjectAssigneeID);
-            EntityModel<ProjectAssignees> entityModel = assembler.toModel(newProjectAssignee);
-            return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-                    .body(entityModel);
-        } else {
-            ErrorResponse errorResponse = new ErrorResponse("Failed to assign user to project.", HttpStatus.INTERNAL_SERVER_ERROR.value());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        if (userID == 0 || projectID == 0) {
+            ErrorResponse errorResponse = new ErrorResponse(" User ID and Project ID are required.", HttpStatus.BAD_REQUEST.value());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
+
+        Long newProjectAssigneeID = projectAssigneesService.assignUserToProject(teamLeaderID, userID, projectID);
+
+        ProjectAssignees newProjectAssignee = projectAssigneesService.getProjectAssigneeById(newProjectAssigneeID);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(newProjectAssignee);
+
     }
 
-    @DeleteMapping("/unassign")
+    @DeleteMapping("/{userID}")
     @Transactional
-    public ResponseEntity<?> deleteUserFromProject(@RequestParam int userID, @RequestParam int projectID, Authentication authentication) {
+    public ResponseEntity<?> deleteUserFromProject(@PathVariable("userID") Integer userID,
+                                                   @RequestParam(name = "projectID") Integer projectID,
+                                                   Authentication authentication) {
+
         Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
-        int teamLeaderIDInt = teamLeaderIDLong.intValue();
-        Integer teamLeaderID = Integer.valueOf(teamLeaderIDInt);
+        int teamLeaderID = teamLeaderIDLong.intValue();
+
+        if (teamLeaderID == 0 || userID == null || projectID == null) {
+            ErrorResponse errorResponse = new ErrorResponse("User ID, Team Leader ID, and Project ID are required.", HttpStatus.BAD_REQUEST.value());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
 
         projectAssigneesService.deleteUserFromProject(userID, projectID, teamLeaderID);
+
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(Map.of("message", "User " + userID + " has been removed from project " + projectID));
     }

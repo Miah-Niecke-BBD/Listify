@@ -38,8 +38,8 @@ public class ProjectAssigneesService {
         return projectsAssignedToUser;
     }
 
-    public Long assignUserToProject(int userID, int projectID) {
-        repository.assignUserToProject(userID, projectID);
+    public Long assignUserToProject(int teamLeaderID, int userID, int projectID) {
+        repository.assignUserToProject(teamLeaderID, userID, projectID);
 
         ProjectAssignees newlyAssignedProject = repository.findTopOrderByProjectAssigneeIDDesc();
         return newlyAssignedProject != null ? newlyAssignedProject.getProjectAssigneeID() : null;
