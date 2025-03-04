@@ -1,13 +1,11 @@
 package org.setup.listify.service;
 
+import org.setup.listify.exception.ForbiddenException;
 import org.setup.listify.exception.NotFoundException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.core.Authentication;
 import org.setup.listify.model.Users;
-import org.setup.listify.exception.DuplicateUserException;
-import org.setup.listify.exception.UserNotFoundException;
 import org.setup.listify.repo.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,17 +26,16 @@ public class UserService {
 
     public Users getUserByGitHubID(String gitHubID) {
         return usersRepo.findByGitHubID(gitHubID)
-                .orElseThrow(() -> new UserNotFoundException(
+                .orElseThrow(() -> new NotFoundException(
                         String.format("User with GitHub ID '%s' not found", gitHubID)));
     }
 
 
-    public Users createUser(String gitHubID) {
+    public void createUser(String gitHubID) {
         if (usersRepo.existsByGitHubID(gitHubID)) {
-            throw new DuplicateUserException(
+            throw new ForbiddenException(
                     String.format("User with GitHub ID '%s' already exists", gitHubID));
         }
-
 
         Users user = new Users();
         user.setGitHubID(gitHubID);
@@ -47,12 +44,11 @@ public class UserService {
 
         usersRepo.createUser(user.getGitHubID());
 
-        return user;
     }
 
     public void deleteUserByUserID(Long userID) {
         if (!usersRepo.existsByUserID(userID)) {
-            throw new UserNotFoundException(
+            throw new NotFoundException(
                     String.format("User with GitHub ID '%s' not found", userID));
         }
         usersRepo.deleteUserByUserID(userID);
@@ -68,7 +64,6 @@ public class UserService {
         OAuth2User oauth2User = oauthToken.getPrincipal();
 
         String gitHubID = oauth2User.getAttribute("id").toString();
-
         Optional<Users> user = usersRepo.findByGitHubID(gitHubID);
 
         if (user.isPresent()) {

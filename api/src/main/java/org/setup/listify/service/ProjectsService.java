@@ -1,58 +1,114 @@
 package org.setup.listify.service;
 
-import org.setup.listify.exception.ListNotFoundException;
-import org.setup.listify.exception.ProjectNotFoundException;
+import org.setup.listify.dto.ProjectOverviewDTO;
+import org.setup.listify.dto.ProjectSectionDTO;
+import org.setup.listify.dto.SectionTaskDTO;
+import org.setup.listify.exception.*;
 import org.setup.listify.model.Projects;
-import org.setup.listify.model.Sections;
 import org.setup.listify.repo.ProjectsRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ProjectsService {
 
-    private final ProjectsRepository repository;
+    private final ProjectsRepository projectsRepository;
+    private final TeamsService teamsService;
 
-    public ProjectsService(ProjectsRepository repository) {
-        this.repository = repository;
-    }
+    public ProjectsService(ProjectsRepository projectsRepository, TeamsService teamsService) {
+        this.projectsRepository = projectsRepository;
 
-    public List<Projects> getAllProjects() {
-        List<Projects> projects = repository.findAll();
-        if (projects.isEmpty()) {
-            throw new ListNotFoundException("projects");
-        }
-        return projects;
-    }
-
-    public Projects getProjectById(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new ProjectNotFoundException(id));
+        this.teamsService = teamsService;
     }
 
 
-    public List<Sections> getAllSectionsInProject(Long id) {
-        List<Sections> sections = repository.findAllSectionsInProject(id);
-        if (sections.isEmpty()) {
-            throw new ListNotFoundException("sections");
-        }
-        return sections;
+    public Projects getProjectById(Long projectID , Long userID) {
+
+        isUserInTheProject(userID, projectID);
+
+        return projectsRepository.findById(projectID)
+                .orElseThrow(() -> new NotFoundException("projectID not found"));
     }
 
-    public Long createProject(int teamLeader, int teamID,
+
+    public Long createProject(Long teamLeader, Long teamID,
                               String projectName, String projectDescription) {
-        repository.createProject(teamLeader, teamID, projectName, projectDescription);
-
-        Projects newlyCreatedProject = repository.findTopOrderByProjectIDDesc();
+        teamsService.findATeamByUserID(teamLeader, teamID);
+        projectsRepository.createProject(teamLeader, teamID, projectName, projectDescription);
+        Projects newlyCreatedProject = projectsRepository.findTopOrderByProjectIDDesc();
         return newlyCreatedProject != null ? newlyCreatedProject.getProjectID() : null;
     }
 
-    public void updateProject(Long id, Integer userID, String projectName, String projectDescription) {
-        repository.updateProject(id.intValue(), userID, projectName, projectDescription);
+    public void updateProject(Long projectID, Long userID, String projectName, String projectDescription) {
+
+
+        isUserInTheProject(userID, projectID);
+        projectsRepository.updateProject(projectID, userID, projectName, projectDescription);
+
     }
 
-    public void deleteProjectById(int id, int teamLeaderID) {
-        repository.deleteProject(id, teamLeaderID);
+    public void isUserInTheProject(Long userID, Long projectID) {
+
+         Long project = projectsRepository.isUserAssignedToProject(userID,projectID);
+
+        if (project == null) {
+            throw new ForbiddenException("User " + userID + " is not added to the Project " + projectID);
+        }
+
     }
+
+    public void deleteProjectById(Long projectID, Long teamLeaderID) {
+
+        isUserInTheProject(teamLeaderID, projectID);
+        projectsRepository.deleteProject(projectID, teamLeaderID);
+
+    }
+
+
+    public ProjectOverviewDTO getProjectDetails(Integer userID, Integer projectID) {
+        List<Object[]> projectDetails = projectsRepository.getProjectDetails(userID, projectID);
+
+        isUserInTheProject(userID.longValue(),projectID.longValue());
+
+        if (projectDetails.isEmpty()) {
+            throw new NotFoundException("No project details found");
+        }
+
+        ProjectOverviewDTO projectDTO = new ProjectOverviewDTO();
+        projectDTO.setProjectID(projectID);
+        projectDTO.setProjectName((String) projectDetails.get(0)[2]);
+
+        Map<Integer, ProjectSectionDTO> sectionMap = new HashMap<>();
+
+        for (Object[] row : projectDetails) {
+            Integer sectionID = (Integer) row[4];
+
+            if (!sectionMap.containsKey(sectionID)) {
+                ProjectSectionDTO newSection = new ProjectSectionDTO(
+                        sectionID,
+                        (String) row[5],
+                        ((Byte) row[6]).intValue(),
+                        new ArrayList<>()
+                );
+                sectionMap.put(sectionID, newSection);
+            }
+
+            SectionTaskDTO taskDTO = new SectionTaskDTO(
+                    (Integer) row[7],
+                    null,
+                    (String) row[8],
+                    (String) row[9],
+                    ((Byte) row[10]).intValue(),
+                    ((Byte) row[11]).intValue(),
+                    row[12] != null ? ((java.sql.Timestamp) row[12]).toLocalDateTime() : null,
+                    (Integer) row[13]
+            );
+
+            sectionMap.get(sectionID).getTasks().add(taskDTO);
+        }
+        projectDTO.setSections(new ArrayList<>(sectionMap.values()));
+        return projectDTO;
+    }
+
 }

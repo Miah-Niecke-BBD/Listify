@@ -15,7 +15,7 @@ import org.setup.listify.model.Users;
 import org.setup.listify.service.UserService;
 
 @RestController
-public class GitHubOAuthController {
+public class LoginController {
 
     @Autowired
     private UserService userService;
@@ -24,64 +24,60 @@ public class GitHubOAuthController {
     private OAuth2AuthorizedClientService authorizedClientService;
 
     @GetMapping("/home")
-    public ResponseEntity<?> showHomePage(@AuthenticationPrincipal OAuth2User principal,
+    public ResponseEntity<String> showHomePage(@AuthenticationPrincipal OAuth2User principal,
                                           OAuth2AuthenticationToken authenticationToken,
                                           HttpServletRequest request) {
         if (principal != null) {
-            Object idAttribute = principal.getAttribute("id");
-            String gitHubID;
-
-            if (idAttribute instanceof Integer) {
-                Integer id = principal.getAttribute("id");
-                gitHubID = id.toString();
-            } else if (idAttribute instanceof String) {
-                gitHubID = principal.getAttribute("id");
-            } else {
-                throw new IllegalArgumentException("Unexpected id type: " + idAttribute.getClass().getName());
-            }
+            String gitHubID = extractGitHubID(principal);
+            String gitHubToken = getGitHubToken(authenticationToken, request);
 
             if (!userService.userExistsByGitHubID(gitHubID)) {
                 userService.createUser(gitHubID);
             }
-            String gitHubToken;
 
-            Users user = userService.getUserByGitHubID(gitHubID);
-            if(extractGitHubToken(authenticationToken) != null) {gitHubToken = extractGitHubToken(authenticationToken);}
-            else {
-                gitHubToken = ExtractGitHubTokenFromSession(request);
-            }
+            storeGitHubTokenInSession(request, gitHubToken);
 
-
-
-            HttpSession session = request.getSession(true);
-            session.setAttribute("githubToken", gitHubToken);
-
-            return ResponseEntity.ok()
-                    .body("{\"token\":\"" + gitHubToken + "\"}");
+            return ResponseEntity.ok().body("{\"token\":\"" + gitHubToken + "\"}");
         }
 
         return ResponseEntity.status(401).body("Unauthorized");
     }
 
+    private String extractGitHubID(OAuth2User principal) {
+        Object idAttribute = principal.getAttribute("id");
+
+        if (idAttribute instanceof Integer) {
+            return idAttribute.toString();
+        } else if (idAttribute instanceof String) {
+            return (String) idAttribute;
+        }
+
+        throw new IllegalArgumentException("Unexpected id type: " + idAttribute.getClass().getName());
+    }
+
+    private String getGitHubToken(OAuth2AuthenticationToken authenticationToken, HttpServletRequest request) {
+        String token = extractGitHubToken(authenticationToken);
+        if (token == null) {
+            token = extractGitHubTokenFromSession(request);
+        }
+        return token;
+    }
 
     private String extractGitHubToken(OAuth2AuthenticationToken authenticationToken) {
         OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(
                 authenticationToken.getAuthorizedClientRegistrationId(),
                 authenticationToken.getName());
 
-        if (client != null && client.getAccessToken() != null) {
-            return client.getAccessToken().getTokenValue();
-        }
-
-        return null;
+        return (client != null && client.getAccessToken() != null) ? client.getAccessToken().getTokenValue() : null;
     }
-    private String ExtractGitHubTokenFromSession(HttpServletRequest request) {
+
+    private String extractGitHubTokenFromSession(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
-        if (session != null) {
-            return (String) session.getAttribute("githubToken");
-        }
-        return null;
+        return (session != null) ? (String) session.getAttribute("githubToken") : null;
     }
 
+    private void storeGitHubTokenInSession(HttpServletRequest request, String gitHubToken) {
+        HttpSession session = request.getSession(true);
+        session.setAttribute("githubToken", gitHubToken);
+    }
 }
-
