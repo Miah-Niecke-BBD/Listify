@@ -1,6 +1,7 @@
 package org.setup.listify.controller;
 
 import org.setup.listify.exception.ErrorResponse;
+import org.setup.listify.exception.NotFoundException;
 import org.setup.listify.exception.UserNotFoundException;
 import org.setup.listify.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,20 +23,9 @@ public class UserController {
     @DeleteMapping
     @Transactional
     public ResponseEntity<Object> deleteUser(@RequestParam("userID") Long userID) {
-        if (userID == null) {
-            ErrorResponse errorResponse = new ErrorResponse("User ID is required.", HttpStatus.BAD_REQUEST.value());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        }
 
-        try {
             userService.deleteUserByUserID(userID);
-            return ResponseEntity.status(HttpStatus.OK).build();
-        } catch (UserNotFoundException e) {
-            ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND.value());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-        } catch (Exception e) {
-            ErrorResponse errorResponse = new ErrorResponse("An error occurred while trying to delete the user.", HttpStatus.INTERNAL_SERVER_ERROR.value());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-        }
+            return ResponseEntity.ok().build();
+
     }
 }

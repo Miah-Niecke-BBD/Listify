@@ -51,7 +51,7 @@ public class GitHubTokenFilter implements Filter {
 
         String gitHubToken = extractGitHubToken(httpServletRequest);
         if (gitHubToken == null) {
-            sendUnauthorizedResponse(httpServletResponse, "Unauthorized: No GitHub OAuth token found.");
+            sendUnauthorizedResponse(httpServletResponse, "Unauthorized.");
             return;
         }
 
@@ -104,7 +104,7 @@ public class GitHubTokenFilter implements Filter {
             String gitHubID = jsonResponse.get("id").asText();
 
             if (!userService.userExistsByGitHubID(gitHubID)) {
-                throw new BadCredentialsException("GitHub user ID not found in the database.");
+                throw new BadCredentialsException("User not found.");
             }
 
         } catch (Exception e) {

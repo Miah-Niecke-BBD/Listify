@@ -3,14 +3,12 @@ package org.setup.listify.dto;
 import java.util.List;
 
 public class ProjectSectionDTO {
-
-    private Long sectionID;
+    private Integer sectionID;
     private String sectionName;
-    private Byte sectionPosition;
-    private List<SectionTaskDTO> tasks;  // List of tasks inside the section
+    private Integer sectionPosition;
+    private List<SectionTaskDTO> tasks;
 
-    // Constructor, Getters, and Setters
-    public ProjectSectionDTO(Long sectionID, String sectionName, Byte sectionPosition, List<SectionTaskDTO> tasks) {
+    public ProjectSectionDTO(Integer sectionID, String sectionName, Integer sectionPosition, List<SectionTaskDTO> tasks) {
         this.sectionID = sectionID;
         this.sectionName = sectionName;
         this.sectionPosition = sectionPosition;
@@ -18,11 +16,11 @@ public class ProjectSectionDTO {
     }
 
     // Getters and Setters
-    public Long getSectionID() {
+    public Integer getSectionID() {
         return sectionID;
     }
 
-    public void setSectionID(Long sectionID) {
+    public void setSectionID(Integer sectionID) {
         this.sectionID = sectionID;
     }
 
@@ -34,11 +32,11 @@ public class ProjectSectionDTO {
         this.sectionName = sectionName;
     }
 
-    public Byte getSectionPosition() {
+    public Integer getSectionPosition() {
         return sectionPosition;
     }
 
-    public void setSectionPosition(Byte sectionPosition) {
+    public void setSectionPosition(Integer sectionPosition) {
         this.sectionPosition = sectionPosition;
     }
 

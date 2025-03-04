@@ -3,19 +3,16 @@ package org.setup.listify.dto;
 import java.time.LocalDateTime;
 
 public class SectionTaskDTO {
-
-    private Long taskID;
-    private Long parentTaskID;
+    private Integer taskID;
+    private Integer parentTaskID;
     private String taskName;
     private String taskDescription;
-    private Long taskPriority;
-    private Byte taskPosition;
+    private Integer taskPriority;
+    private Integer taskPosition;
     private LocalDateTime dueDate;
-    private Long userID; // Assignee
+    private Integer userID;
 
-    // Constructor, Getters, and Setters
-    public SectionTaskDTO(Long taskID, Long parentTaskID, String taskName, String taskDescription, Long taskPriority,
-                   Byte taskPosition, LocalDateTime dueDate, Long userID) {
+    public SectionTaskDTO(Integer taskID, Integer parentTaskID, String taskName, String taskDescription, Integer taskPriority, Integer taskPosition, LocalDateTime dueDate, Integer userID) {
         this.taskID = taskID;
         this.parentTaskID = parentTaskID;
         this.taskName = taskName;
@@ -26,20 +23,19 @@ public class SectionTaskDTO {
         this.userID = userID;
     }
 
-    // Getters and Setters
-    public Long getTaskID() {
+    public Integer getTaskID() {
         return taskID;
     }
 
-    public void setTaskID(Long taskID) {
+    public void setTaskID(Integer taskID) {
         this.taskID = taskID;
     }
 
-    public Long getParentTaskID() {
+    public Integer getParentTaskID() {
         return parentTaskID;
     }
 
-    public void setParentTaskID(Long parentTaskID) {
+    public void setParentTaskID(Integer parentTaskID) {
         this.parentTaskID = parentTaskID;
     }
 
@@ -59,19 +55,19 @@ public class SectionTaskDTO {
         this.taskDescription = taskDescription;
     }
 
-    public Long getTaskPriority() {
+    public Integer getTaskPriority() {
         return taskPriority;
     }
 
-    public void setTaskPriority(Long taskPriority) {
+    public void setTaskPriority(Integer taskPriority) {
         this.taskPriority = taskPriority;
     }
 
-    public Byte getTaskPosition() {
+    public Integer getTaskPosition() {
         return taskPosition;
     }
 
-    public void setTaskPosition(Byte taskPosition) {
+    public void setTaskPosition(Integer taskPosition) {
         this.taskPosition = taskPosition;
     }
 
@@ -83,11 +79,11 @@ public class SectionTaskDTO {
         this.dueDate = dueDate;
     }
 
-    public Long getUserID() {
+    public Integer getUserID() {
         return userID;
     }
 
-    public void setUserID(Long userID) {
+    public void setUserID(Integer userID) {
         this.userID = userID;
     }
 }

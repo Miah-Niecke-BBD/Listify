@@ -3,27 +3,16 @@ package org.setup.listify.dto;
 import java.util.List;
 
 public class ProjectOverviewDTO {
-
-    private Long projectID;
+    private Integer projectID;
     private String projectName;
     private List<ProjectSectionDTO> sections;
 
 
-    public ProjectOverviewDTO(Long projectID, String projectName, List<ProjectSectionDTO> sections) {
-        this.projectID = projectID;
-        this.projectName = projectName;
-        this.sections = sections;
-    }
-
-        public ProjectOverviewDTO()
-        {}
-
-
-    public Long getProjectID() {
+    public Integer getProjectID() {
         return projectID;
     }
 
-    public void setProjectID(Long projectID) {
+    public void setProjectID(Integer projectID) {
         this.projectID = projectID;
     }
 

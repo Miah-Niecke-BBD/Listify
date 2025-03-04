@@ -26,10 +26,8 @@ public class SecurityConfig {
                 ).oauth2Login(oauth2 -> oauth2
                         .defaultSuccessUrl("/home")
                         .failureUrl("/error")
-                ).logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/")
-                );
+                )
+                .csrf(csrf -> csrf.disable());
 
         return http.build();
     }

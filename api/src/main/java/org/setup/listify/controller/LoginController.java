@@ -15,7 +15,7 @@ import org.setup.listify.model.Users;
 import org.setup.listify.service.UserService;
 
 @RestController
-public class GitHubOAuthController {
+public class LoginController {
 
     @Autowired
     private UserService userService;
