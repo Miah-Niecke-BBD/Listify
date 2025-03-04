@@ -1,9 +1,9 @@
-package org.setup.Listify.assembler;
+package org.setup.listify.assembler;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
-import org.setup.Listify.controller.TasksController;
-import org.setup.Listify.model.Tasks;
+import org.setup.listify.controller.TasksController;
+import org.setup.listify.model.Tasks;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;

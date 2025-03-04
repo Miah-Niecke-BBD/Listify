@@ -1,4 +1,4 @@
-package org.setup.Listify;
+package org.setup.listify;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

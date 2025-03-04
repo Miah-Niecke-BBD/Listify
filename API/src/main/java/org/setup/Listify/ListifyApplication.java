@@ -1,4 +1,4 @@
-package org.setup.Listify;
+package org.setup.listify;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

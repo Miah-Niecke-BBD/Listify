@@ -1,7 +1,7 @@
-package org.setup.Listify.assembler;
+package org.setup.listify.assembler;
 
-import org.setup.Listify.controller.SectionsController;
-import org.setup.Listify.model.Sections;
+import org.setup.listify.controller.SectionsController;
+import org.setup.listify.model.Sections;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;

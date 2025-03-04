@@ -1,10 +1,10 @@
-package org.setup.Listify.service;
+package org.setup.listify.service;
 
-import org.setup.Listify.exception.ListNotFoundException;
-import org.setup.Listify.exception.SectionNotFoundException;
-import org.setup.Listify.model.Sections;
-import org.setup.Listify.model.Tasks;
-import org.setup.Listify.repo.SectionsRepository;
+import org.setup.listify.exception.ListNotFoundException;
+import org.setup.listify.exception.SectionNotFoundException;
+import org.setup.listify.model.Sections;
+import org.setup.listify.model.Tasks;
+import org.setup.listify.repo.SectionsRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

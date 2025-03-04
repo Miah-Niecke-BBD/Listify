@@ -1,4 +1,4 @@
-package org.setup.Listify.handler;
+package org.setup.listify.handler;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

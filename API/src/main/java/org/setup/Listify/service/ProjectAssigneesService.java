@@ -2,6 +2,7 @@ package org.setup.listify.service;
 
 import org.setup.listify.exception.ListNotFoundException;
 import org.setup.listify.exception.AssignedProjectNotFoundException;
+import org.setup.listify.exception.ResourceNotFoundException;
 import org.setup.listify.model.ProjectAssignees;
 import org.setup.listify.repo.ProjectAssigneesRepository;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ public class ProjectAssigneesService {
     public List<ProjectAssignees> getAllProjectAssignees() {
         List<ProjectAssignees> projectAssigneesList = repository.findAll();
         if (projectAssigneesList.isEmpty()) {
-            throw new ListNotFoundException("Project Assignees");
+            throw new ResourceNotFoundException("Project Assignees");
         }
         return projectAssigneesList;
     }

@@ -1,8 +1,8 @@
-package org.setup.Listify.repo;
+package org.setup.listify.repo;
 
-import org.setup.Listify.model.Tasks;
-import org.setup.Listify.model.UserTeamProjects;
-import org.setup.Listify.model.Teams;
+import org.setup.listify.model.Tasks;
+import org.setup.listify.model.UserTeamProjects;
+import org.setup.listify.model.Teams;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;

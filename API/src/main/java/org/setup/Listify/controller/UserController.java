@@ -1,9 +1,9 @@
-package org.setup.Listify.controller;
+package org.setup.listify.controller;
 
-import org.setup.Listify.exception.ErrorResponse;
-import org.setup.Listify.response.SuccessResponse;
-import org.setup.Listify.exception.UserNotFoundException;
-import org.setup.Listify.service.UserService;
+import org.setup.listify.exception.ErrorResponse;
+import org.setup.listify.response.SuccessResponse;
+import org.setup.listify.exception.UserNotFoundException;
+import org.setup.listify.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;

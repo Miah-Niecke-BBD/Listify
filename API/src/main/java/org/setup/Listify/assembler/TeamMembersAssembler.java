@@ -1,10 +1,10 @@
-package org.setup.Listify.assembler;
+package org.setup.listify.assembler;
 
-import org.setup.Listify.model.TeamMembers;
+import org.setup.listify.model.TeamMembers;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
-import org.setup.Listify.controller.TeamsController;
+import org.setup.listify.controller.TeamsController;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @Component

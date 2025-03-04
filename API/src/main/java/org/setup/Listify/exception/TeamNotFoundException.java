@@ -1,4 +1,4 @@
-package org.setup.Listify.exception;
+package org.setup.listify.exception;
 
 public class TeamNotFoundException extends RuntimeException {
 

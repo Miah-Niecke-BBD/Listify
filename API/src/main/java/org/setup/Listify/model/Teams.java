@@ -1,4 +1,4 @@
-package org.setup.Listify.model;
+package org.setup.listify.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

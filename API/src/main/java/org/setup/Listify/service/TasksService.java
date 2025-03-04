@@ -1,11 +1,10 @@
-package org.setup.Listify.service;
+package org.setup.listify.service;
 
-import org.setup.Listify.exception.ListNotFoundException;
-import org.setup.Listify.exception.SectionNotFoundException;
-import org.setup.Listify.exception.TaskDependencyNotFoundException;
-import org.setup.Listify.model.Tasks;
-import org.setup.Listify.repo.TasksRepository;
-import org.setup.Listify.exception.TaskNotFoundException;
+import org.setup.listify.exception.ListNotFoundException;
+import org.setup.listify.exception.TaskDependencyNotFoundException;
+import org.setup.listify.model.Tasks;
+import org.setup.listify.repo.TasksRepository;
+import org.setup.listify.exception.TaskNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;

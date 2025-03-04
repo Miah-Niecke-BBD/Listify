@@ -1,13 +1,12 @@
-package org.setup.Listify.service;
+package org.setup.listify.service;
 
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.core.Authentication;
-import org.setup.Listify.model.Users;
-import org.setup.Listify.exception.DuplicateUserException;
-import org.setup.Listify.exception.UserNotFoundException;
-import org.setup.Listify.repo.UsersRepository;
+import org.setup.listify.model.Users;
+import org.setup.listify.exception.DuplicateUserException;
+import org.setup.listify.exception.UserNotFoundException;
+import org.setup.listify.repo.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

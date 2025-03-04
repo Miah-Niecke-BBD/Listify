@@ -1,8 +1,8 @@
-package org.setup.Listify.assembler;
+package org.setup.listify.assembler;
 
 
-import org.setup.Listify.controller.TaskDependenciesController;
-import org.setup.Listify.model.TaskDependencies;
+import org.setup.listify.controller.TaskDependenciesController;
+import org.setup.listify.model.TaskDependencies;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;

@@ -1,4 +1,4 @@
-package org.setup.Listify.exception;
+package org.setup.listify.exception;
 
 
 import org.slf4j.Logger;

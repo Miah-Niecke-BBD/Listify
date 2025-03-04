@@ -1,12 +1,12 @@
-package org.setup.Listify.controller;
+package org.setup.listify.controller;
 
-import org.setup.Listify.assembler.SectionsModelAssembler;
-import org.setup.Listify.assembler.TasksModelAssembler;
-import org.setup.Listify.exception.ErrorResponse;
-import org.setup.Listify.model.Sections;
-import org.setup.Listify.model.Tasks;
-import org.setup.Listify.service.SectionsService;
-import org.setup.Listify.service.UserService;
+import org.setup.listify.assembler.SectionsModelAssembler;
+import org.setup.listify.assembler.TasksModelAssembler;
+import org.setup.listify.exception.ErrorResponse;
+import org.setup.listify.model.Sections;
+import org.setup.listify.model.Tasks;
+import org.setup.listify.service.SectionsService;
+import org.setup.listify.service.UserService;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;

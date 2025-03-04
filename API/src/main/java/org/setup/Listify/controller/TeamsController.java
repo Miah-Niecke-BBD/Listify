@@ -1,14 +1,14 @@
-package org.setup.Listify.controller;
+package org.setup.listify.controller;
 
-import org.setup.Listify.assembler.TeamMembersAssembler;
-import org.setup.Listify.assembler.TeamProjectsAssembler;
-import org.setup.Listify.exception.ErrorResponse;
-import org.setup.Listify.model.TeamMembers;
-import org.setup.Listify.model.UserTeamProjects;
-import org.setup.Listify.model.Teams;
-import org.setup.Listify.service.TeamsService;
-import org.setup.Listify.assembler.TeamsAssembler;
-import org.setup.Listify.service.UserService;
+import org.setup.listify.assembler.TeamMembersAssembler;
+import org.setup.listify.assembler.TeamProjectsAssembler;
+import org.setup.listify.exception.ErrorResponse;
+import org.setup.listify.model.TeamMembers;
+import org.setup.listify.model.UserTeamProjects;
+import org.setup.listify.model.Teams;
+import org.setup.listify.service.TeamsService;
+import org.setup.listify.assembler.TeamsAssembler;
+import org.setup.listify.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
