@@ -25,12 +25,6 @@ public class SectionsController {
     }
 
 
-    @GetMapping("{sectionID}/tasks")
-    public ResponseEntity<Object> getTaskBySectionId(@PathVariable("sectionID") Long sectionID) {
-        List<Tasks> tasksList = sectionsService.getTaskBySectionId(sectionID);
-        return ResponseEntity.ok(tasksList);
-    }
-
     @PostMapping
     @Transactional
     public ResponseEntity<Object> newSection(Authentication authentication,

@@ -31,7 +31,4 @@ public interface SectionsRepository extends JpaRepository<Sections, Long> {
     void deleteSectionById(@Param("teamLeaderID")Long teamLeaderID,
                            @Param("sectionID") Long sectionID
     );
-
-    @Query("SELECT t FROM Tasks t WHERE t.sectionID = :id")
-    List<Tasks> findTasksBySectionID(@Param("id") Long id);
 }

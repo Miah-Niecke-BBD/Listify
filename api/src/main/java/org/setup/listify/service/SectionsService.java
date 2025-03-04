@@ -22,14 +22,6 @@ public class SectionsService {
                 .orElseThrow();
     }
 
-    public List<Tasks> getTaskBySectionId(Long sectionId) {
-        List<Tasks> tasks = repository.findTasksBySectionID(sectionId);
-        if (tasks.isEmpty()) {
-            throw new NotFoundException("There are no tasks in this section");
-        }
-        return tasks;
-    }
-
     public Long createSection(Long teamLeaderID, Long projectID,
                               String sectionName, Byte sectionPosition) {
         repository.createSection(teamLeaderID, projectID, sectionName, sectionPosition);
