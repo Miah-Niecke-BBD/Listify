@@ -1,10 +1,10 @@
-package org.setup.Listify.controller;
+package org.setup.listify.controller;
 
 
-import org.setup.Listify.exception.ErrorResponse;
-import org.setup.Listify.model.ProjectAssignees;
-import org.setup.Listify.service.ProjectAssigneesService;
-import org.setup.Listify.service.UserService;
+import org.setup.listify.exception.ErrorResponse;
+import org.setup.listify.model.ProjectAssignees;
+import org.setup.listify.service.ProjectAssigneesService;
+import org.setup.listify.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

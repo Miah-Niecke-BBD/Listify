@@ -1,9 +1,9 @@
-package org.setup.Listify.service;
+package org.setup.listify.service;
 
-import org.setup.Listify.exception.ListNotFoundException;
-import org.setup.Listify.exception.AssignedProjectNotFoundException;
-import org.setup.Listify.model.ProjectAssignees;
-import org.setup.Listify.repo.ProjectAssigneesRepository;
+import org.setup.listify.exception.ListNotFoundException;
+import org.setup.listify.exception.AssignedProjectNotFoundException;
+import org.setup.listify.model.ProjectAssignees;
+import org.setup.listify.repo.ProjectAssigneesRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
