@@ -9,9 +9,8 @@ import org.setup.listify.model.Users;
 import org.setup.listify.repo.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
-import java.util.Optional;
+
 
 @Service
 public class UserService {
@@ -25,16 +24,20 @@ public class UserService {
     }
 
     public Users getUserByGitHubID(String gitHubID) {
-        return usersRepo.findByGitHubID(gitHubID)
-                .orElseThrow(() -> new NotFoundException(
-                        String.format("User with GitHub ID '%s' not found", gitHubID)));
+
+        if(userExistsByGitHubID(gitHubID)) {
+            return usersRepo.findByGitHubID(gitHubID);
+        }
+        else {
+            throw new NotFoundException("User with GitHub ID '%s' not found" + gitHubID);
+        }
+
     }
 
 
     public void createUser(String gitHubID) {
         if (usersRepo.existsByGitHubID(gitHubID)) {
-            throw new ForbiddenException(
-                    String.format("User with GitHub ID '%s' already exists", gitHubID));
+            throw new ForbiddenException("User with GitHub ID '%s' already exists" + gitHubID);
         }
 
         Users user = new Users();
@@ -46,10 +49,9 @@ public class UserService {
 
     }
 
-    public void deleteUserByUserID(Long userID) {
-        if (!usersRepo.existsByUserID(userID)) {
-            throw new NotFoundException(
-                    String.format("User with GitHub ID '%s' not found", userID));
+    public void deleteUserByUserID(Long userID , Long currentUserID) {
+        if (!usersRepo.existsByUserID(userID) || !currentUserID.equals(userID)) {
+            throw new ForbiddenException("Not allowed to delete User "+ userID);
         }
         usersRepo.deleteUserByUserID(userID);
     }
@@ -58,33 +60,50 @@ public class UserService {
     public boolean userExistsByGitHubID(String gitHubID) {
         return usersRepo.existsByGitHubID(gitHubID);
     }
+    public boolean userExistsByUserID(Long userID) {
+        return usersRepo.existsByUserID(userID);
+    }
+
 
     public Long getUserIDFromAuthentication(Authentication authentication) {
         OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
         OAuth2User oauth2User = oauthToken.getPrincipal();
 
-        String gitHubID = oauth2User.getAttribute("id").toString();
-        Optional<Users> user = usersRepo.findByGitHubID(gitHubID);
+        String googleID = oauth2User.getAttribute("sub");
+        Users user = usersRepo.findByGitHubID(googleID);
 
-        if (user.isPresent()) {
-            return user.get().getUserID();
+        if (userExistsByGitHubID(googleID)) {
+            return user.getUserID();
         } else {
-            throw new RuntimeException("User not found for GitHub ID: " + gitHubID);
+            throw new NotFoundException("User not found for GitHub ID: " + googleID);
         }
     }
 
     public LocalDateTime getUserCreatedAt(Long userID) {
-        Users user = usersRepo.findByUserID(userID).orElseThrow(() -> new NotFoundException("User not found"));
+        Users user = usersRepo.findByUserID(userID);
         return user.getCreatedAt();
     }
 
     public Long getUserIDFromGithubID(String githubID) {
-        Optional<Users> users = usersRepo.findByGitHubID(githubID);
-        if (users.isEmpty()) {
+        if(userExistsByGitHubID(githubID)) {
+            Users users = usersRepo.findByGitHubID(githubID);
+            return users.getUserID();
+        }
+        else
+        {
             throw new NotFoundException("User with github ID: " + githubID + " not found");
         }
 
-        return users.get().getUserID();
+    }
+
+    public Users getUserByUserID(Long userID) {
+        if(userExistsByUserID(userID)) {
+            return usersRepo.findByUserID(userID);
+        }else
+        {
+            throw new NotFoundException("User with user ID: " + userID + " not found");
+        }
     }
 }
+
 
