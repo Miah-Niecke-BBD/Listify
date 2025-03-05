@@ -1,5 +1,6 @@
 package org.setup.listify.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -7,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Tasks", schema = "listify")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Tasks {
 
     @Id

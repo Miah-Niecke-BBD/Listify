@@ -3,6 +3,7 @@ package org.setup.listify.model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "PriorityLabels", schema = "listify")
 public class PriorityLabels {
 
     @Id
