@@ -79,9 +79,9 @@ public class TeamsService {
 
         List<TeamMemberInfoDTO> teamMembersInfo = teamMembers.stream().map(member -> {
 
-            Optional<Users> user = usersRepository.findByUserID(member.getUserID());
+            Users user = usersRepository.findByUserID(member.getUserID());
 
-            return new TeamMemberInfoDTO(member.getUserID(), user.get().getGitHubID(), member.isTeamLeader());
+            return new TeamMemberInfoDTO(member.getUserID(), user.getGitHubID(), member.isTeamLeader());
         }).collect(Collectors.toList());
 
         return teamMembersInfo;

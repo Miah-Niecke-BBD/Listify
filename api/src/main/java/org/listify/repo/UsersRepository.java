@@ -5,14 +5,13 @@ import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
 
 @Repository
 public interface UsersRepository extends JpaRepository<Users, String> {
 
-    Optional<Users> findByGitHubID(String gitHubID);
+    Users findByGitHubID(String gitHubID);
 
-    Optional<Users> findByUserID(Long userID);
+    Users findByUserID(Long userID);
 
     boolean existsByGitHubID(String gitHubID);
 
