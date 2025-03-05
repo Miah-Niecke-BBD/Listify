@@ -24,7 +24,7 @@ public class SectionsController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<Object> newSection(Authentication authentication,
+    public ResponseEntity<Sections> newSection(Authentication authentication,
                                         @RequestParam(name = "projectID") Long projectID,
                                         @RequestParam(name = "sectionName") String sectionName,
                                         @RequestParam(name = "sectionPosition") Byte sectionPosition) {
@@ -36,7 +36,7 @@ public class SectionsController {
 
     @PutMapping("/{sectionID}")
     @Transactional
-    public ResponseEntity<Object> updateSection(@PathVariable("sectionID") Long sectionID,
+    public ResponseEntity<Sections> updateSection(@PathVariable("sectionID") Long sectionID,
                                            Authentication authentication,
                                            @RequestParam("newSectionName") String newSectionName) {
         Long loggedInUserID = userService.getUserIDFromAuthentication(authentication);
@@ -47,7 +47,7 @@ public class SectionsController {
 
     @PutMapping("/{sectionID}/position")
     @Transactional
-    public ResponseEntity<Object> updateSectionPosition(@PathVariable("sectionID") Long sectionID,
+    public ResponseEntity<Sections> updateSectionPosition(@PathVariable("sectionID") Long sectionID,
                                                         Authentication authentication,
                                                         @RequestParam("newSectionPostion") Integer newSectionPosition) {
         Long loggedInUserID = userService.getUserIDFromAuthentication(authentication);
@@ -58,7 +58,7 @@ public class SectionsController {
 
     @DeleteMapping("/{sectionID}")
     @Transactional
-    public ResponseEntity<Object> deleteSectionById(@PathVariable("sectionID") Long sectionID,
+    public ResponseEntity<?> deleteSectionById(@PathVariable("sectionID") Long sectionID,
                                                Authentication authentication) {
         Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
         sectionsService.deleteSectionById(teamLeaderID, sectionID);

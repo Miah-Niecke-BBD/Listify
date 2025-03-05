@@ -46,4 +46,12 @@ public interface SectionsRepository extends JpaRepository<Sections, Long> {
             "AND pa.userID = :userID")
     boolean isSectionAndUserInSameProject(@Param("sectionID") Long sectionID,
                                           @Param("userID") Long userID);
+
+    @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END " +
+            "FROM listify.ProjectAssignees pa " +
+            "JOIN listify.Projects p ON pa.projectID = p.projectID " +
+            "JOIN listify.Sections s ON p.projectID = s.projectID " +
+            "WHERE pa.userID = :userID " +
+            "AND s.sectionID = :sectionID", nativeQuery = true)
+    Integer userHasAccessToSection(Long userID, Long sectionID);
 }
