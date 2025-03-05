@@ -27,7 +27,7 @@ public class TaskAssigneesController {
 
 
     @GetMapping("/{taskID}")
-    public ResponseEntity<Object> getUsersAssignedToTask(@PathVariable("taskID") Long taskID,
+    public ResponseEntity<List<Users>> getUsersAssignedToTask(@PathVariable("taskID") Long taskID,
                                                          Authentication authentication) {
         Long loggedInUserID = userService.getUserIDFromAuthentication(authentication);
         List<Users> usersAssignedToTask = taskAssigneesService.getUsersAssignedToTask(taskID, loggedInUserID);
@@ -37,7 +37,7 @@ public class TaskAssigneesController {
 
     @PostMapping("/{taskID}")
     @Transactional
-    public ResponseEntity<Object> assignTask(@PathVariable("taskID") Long taskID,
+    public ResponseEntity<TaskAssignees> assignTask(@PathVariable("taskID") Long taskID,
                                          Authentication authentication,
                                         @RequestParam(name = "githubID") String githubID) {
 
@@ -50,7 +50,7 @@ public class TaskAssigneesController {
 
     @DeleteMapping("/{taskID}")
     @Transactional
-    public ResponseEntity<Object> deleteTaskAssignment(@PathVariable("taskID") Long taskID,
+    public ResponseEntity<?> deleteTaskAssignment(@PathVariable("taskID") Long taskID,
                                                   @RequestParam(name = "userID") Long userID,
                                                   Authentication authentication) {
         Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);

@@ -56,4 +56,12 @@ public interface TaskAssigneesRepository extends JpaRepository<TaskAssignees, Lo
             "JOIN TaskAssignees ta ON u.userID = ta.userID " +
             "WHERE ta.taskID = :taskID")
     List<Users> getUsersAssignedToTask(@Param("taskID") Long taskID);
+
+
+    @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END " +
+            "FROM Users u " +
+            "JOIN TaskAssignees ta ON u.userID = ta.userID " +
+            "WHERE ta.taskID = :taskID AND ta.userID = :userID")
+    boolean isUserAssignedToTask(@Param("taskID") Long taskID, @Param("userID") Long userID);
+
 }

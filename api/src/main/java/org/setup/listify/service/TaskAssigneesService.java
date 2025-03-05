@@ -42,6 +42,9 @@ public class TaskAssigneesService {
         if (!repository.findUserAndTaskInProject(userID, taskID)) {
             throw new ForbiddenException("Tasks and Users should both exist in the project");
         }
+        if (!isUserAssignedToTask(taskID, userID)) {
+            throw new ForbiddenException("User "+userID+" is not assigned to task: "+taskID);
+        }
         repository.deleteUserFromTask(userID, taskID, teamLeaderID);
     }
 
@@ -54,5 +57,9 @@ public class TaskAssigneesService {
             throw new NotFoundException("There no users assigned to task: "+taskID);
         }
         return usersAssignedToTask;
+    }
+
+    public boolean isUserAssignedToTask(Long taskID, Long userID) {
+        return repository.isUserAssignedToTask(taskID, userID);
     }
 }
