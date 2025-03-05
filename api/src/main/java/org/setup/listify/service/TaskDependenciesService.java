@@ -1,5 +1,6 @@
 package org.setup.listify.service;
 
+import org.setup.listify.exception.BadRequestException;
 import org.setup.listify.exception.NotFoundException;
 import org.setup.listify.model.TaskDependencies;
 import org.setup.listify.repo.TaskDependenciesRepository;
@@ -9,9 +10,11 @@ import org.springframework.stereotype.Service;
 public class TaskDependenciesService {
 
     private final TaskDependenciesRepository repository;
+    private final TasksService tasksService;
 
-    public TaskDependenciesService(TaskDependenciesRepository repository) {
+    public TaskDependenciesService(TaskDependenciesRepository repository, TasksService tasksService) {
         this.repository = repository;
+        this.tasksService = tasksService;
     }
 
     public TaskDependencies getTaskDependencyById(Long taskDependencyID) {
@@ -20,6 +23,8 @@ public class TaskDependenciesService {
     }
 
     public Long newTaskDependency(Long teamLeaderID, Long taskID, Long dependentTaskID) {
+        tasksService.validateUserAccessToTask(teamLeaderID, taskID);
+        tasksService.validateUserAccessToTask(teamLeaderID, dependentTaskID);
         repository.newTaskDependency(teamLeaderID, taskID, dependentTaskID);
 
         TaskDependencies latestTaskDependency = repository.findTopOrderByTaskIDDesc();
@@ -27,6 +32,11 @@ public class TaskDependenciesService {
     }
 
     public void deleteTaskDependencyByDependencyId(Long taskID, Long taskDependencyID, Long teamLeaderID) {
+        tasksService.validateUserAccessToTask(teamLeaderID, taskID);
+        tasksService.validateUserAccessToTask(teamLeaderID, taskDependencyID);
+        if (!repository.isTaskDependent(taskID, taskDependencyID)) {
+            throw new BadRequestException("Task: "+taskID+" is not dependent on task: "+taskDependencyID);
+        }
         repository.deleteTaskDependency(taskID, taskDependencyID, teamLeaderID);
     }
 }

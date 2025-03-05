@@ -1,6 +1,5 @@
 package org.setup.listify.controller;
 
-import org.setup.listify.exception.ErrorResponse;
 import org.setup.listify.model.TaskDependencies;
 import org.setup.listify.service.TaskDependenciesService;
 import org.setup.listify.service.UserService;
@@ -25,7 +24,7 @@ public class TaskDependenciesController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<Object> newTaskDependency(Authentication authentication,
+    public ResponseEntity<TaskDependencies> createTaskDependency(Authentication authentication,
                                             @RequestParam(name = "taskID") Long taskID,
                                             @RequestParam(name = "dependentTaskID") Long dependentTaskID) {
 
@@ -38,7 +37,7 @@ public class TaskDependenciesController {
 
     @DeleteMapping("/{dependentTaskID}")
     @Transactional
-    public ResponseEntity<Object> deleteTaskDependencyByDependencyId(@PathVariable("dependentTaskID") Long dependentTaskID,
+    public ResponseEntity<?> deleteTaskDependencyByDependencyId(@PathVariable("dependentTaskID") Long dependentTaskID,
                                                                 @RequestParam(name = "taskID") Long taskID,
                                                                 Authentication authentication) {
         Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);

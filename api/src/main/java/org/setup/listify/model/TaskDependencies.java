@@ -1,9 +1,11 @@
 package org.setup.listify.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "TaskDependencies", schema = "listify")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TaskDependencies {
 
     @Id
