@@ -65,7 +65,7 @@ public interface TasksRepository extends JpaRepository<Tasks, Long> {
     @Query("SELECT t FROM Tasks t WHERE t.taskID = (SELECT td.dependentTaskID FROM TaskDependencies td WHERE td.taskID = :taskID)")
     Tasks findDependentTaskByTaskID(@Param("taskID") Long taskID);
 
-    @Query("SELECT new org.setup.listify.dto.SimpleTaskDTO(t.taskID, t.taskName) FROM Tasks t "+
+    @Query("SELECT new org.listify.dto.SimpleTaskDTO(t.taskID, t.taskName) FROM Tasks t "+
             "WHERE t.taskID = (SELECT td.dependentTaskID FROM TaskDependencies td WHERE td.taskID = :taskID)")
     SimpleTaskDTO getDependantTaskByTaskID(@Param("taskID") Long taskID);
 
@@ -77,7 +77,7 @@ public interface TasksRepository extends JpaRepository<Tasks, Long> {
     List<Tasks> findTasksByUserID(Long userID);
 
 
-    @Query("SELECT new org.setup.listify.dto.ViewTaskDTO(" +
+    @Query("SELECT new org.listify.dto.ViewTaskDTO(" +
             "t.taskID, t.taskName, t.taskDescription, pl.priorityLabelName, t.createdAt, " +
             "t.updatedAt, t.dueDate, null, null) " +
             "FROM Tasks t " +
@@ -86,7 +86,7 @@ public interface TasksRepository extends JpaRepository<Tasks, Long> {
     ViewTaskDTO getTaskInformation(@Param("taskID") Long taskID);
 
 
-    @Query("SELECT new org.setup.listify.dto.SimpleUserDTO(u.userID, u.gitHubID) " +
+    @Query("SELECT new org.listify.dto.SimpleUserDTO(u.userID, u.gitHubID) " +
             "FROM Users u " +
             "JOIN TaskAssignees ta ON u.userID = ta.userID " +
             "WHERE ta.taskID = :taskID")
