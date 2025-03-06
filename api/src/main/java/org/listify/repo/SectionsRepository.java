@@ -1,10 +1,13 @@
 package org.listify.repo;
 
 import org.listify.model.Sections;
+import org.listify.model.Tasks;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 public interface SectionsRepository extends JpaRepository<Sections, Long> {
 
@@ -51,4 +54,8 @@ public interface SectionsRepository extends JpaRepository<Sections, Long> {
             "WHERE pa.userID = :userID " +
             "AND s.sectionID = :sectionID", nativeQuery = true)
     Integer userHasAccessToSection(Long userID, Long sectionID);
+
+
+    @Query("SELECT t FROM Tasks t WHERE t.sectionID = :id")
+    List<Tasks> findTasksBySectionID(@Param("id") Long id);
 }
