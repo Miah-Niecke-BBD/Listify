@@ -1,12 +1,15 @@
 package org.listify.dto;
 
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DueTasksDTO {
     private Long taskID;
     private String taskName;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSSSSS")
     private LocalDateTime dueDate;
 
     public DueTasksDTO(Long taskID, String taskName, LocalDateTime dueDate) {
