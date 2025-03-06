@@ -1,9 +1,9 @@
 package org.listify.repo;
 
-import org..listify.dto.SimpleTaskDTO;
-import org..listify.dto.SimpleUserDTO;
-import org..listify.dto.ViewTaskDTO;
-import org..listify.model.Tasks;
+import org.listify.dto.SimpleTaskDTO;
+import org.listify.dto.SimpleUserDTO;
+import org.listify.dto.ViewTaskDTO;
+import org.listify.model.Tasks;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
