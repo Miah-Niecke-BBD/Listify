@@ -1,17 +1,26 @@
 package org.listify.service;
 
+import org.listify.dto.ViewTaskDTO;
+import org.listify.exception.BadRequestException;
 import org.listify.exception.ForbiddenException;
+import org.listify.exception.NotFoundException;
 import org.listify.model.Sections;
+import org.listify.model.Tasks;
 import org.listify.repo.SectionsRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class SectionsService {
 
     private final SectionsRepository repository;
+    private final TasksService tasksService;
 
-    public SectionsService(SectionsRepository repository) {
+    public SectionsService(SectionsRepository repository, TasksService tasksService) {
         this.repository = repository;
+        this.tasksService = tasksService;
     }
 
     public Sections getSectionById(Long id) {
@@ -19,8 +28,30 @@ public class SectionsService {
                 .orElseThrow();
     }
 
+    public List<ViewTaskDTO> getTasksBySectionId(Long sectionID, Long userID) {
+        Integer userAccessToTask = repository.userHasAccessToSection(userID, sectionID);
+        if (userAccessToTask == null || userAccessToTask == 0) {
+            throw new ForbiddenException("User does not have access to this section");
+        }
+
+        List<Tasks> tasks = repository.findTasksBySectionID(sectionID);
+        if (tasks.isEmpty()) {
+            throw new NotFoundException("There are no tasks in this section");
+        }
+
+        List<ViewTaskDTO> taskDTOs = new ArrayList<>();
+        for (Tasks task : tasks) {
+            ViewTaskDTO taskDTO = tasksService.mapTaskToViewTaskDTO(task);
+            taskDTOs.add(taskDTO);
+        }
+        return taskDTOs;
+    }
+
     public Long createSection(Long teamLeaderID, Long projectID,
                               String sectionName, Byte sectionPosition) {
+        if (sectionName.length() > 100) {
+            throw new BadRequestException("Section name has a maximum of 100 characters");
+        }
         repository.createSection(teamLeaderID, projectID, sectionName, sectionPosition);
 
         Sections newlyCreatedSection = repository.findTopOrderBySectionIDDesc();
@@ -28,6 +59,10 @@ public class SectionsService {
     }
 
     public void updateSection(Long sectionID, Long userID, String newSectionName) {
+        if (newSectionName.length() > 100) {
+            throw new BadRequestException("Section name has a maximum of 100 characters");
+        }
+
         if (!repository.isSectionAndUserInSameProject(sectionID, userID)) {
             throw new ForbiddenException("Only sections within your project can be updated.");
         }
@@ -35,6 +70,10 @@ public class SectionsService {
     }
 
     public void deleteSectionById(Long teamLeaderID, Long sectionID) {
+        Integer userAccessToTask = repository.userHasAccessToSection(teamLeaderID, sectionID);
+        if (userAccessToTask == null || userAccessToTask == 0) {
+            throw new ForbiddenException("User does not have access to this section");
+        }
         repository.deleteSectionById(teamLeaderID, sectionID);
     }
 

@@ -1,10 +1,13 @@
 package org.listify.repo;
 
 import org.listify.model.Sections;
+import org.listify.model.Tasks;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 public interface SectionsRepository extends JpaRepository<Sections, Long> {
 
@@ -43,4 +46,16 @@ public interface SectionsRepository extends JpaRepository<Sections, Long> {
             "AND pa.userID = :userID")
     boolean isSectionAndUserInSameProject(@Param("sectionID") Long sectionID,
                                           @Param("userID") Long userID);
+
+    @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END " +
+            "FROM listify.ProjectAssignees pa " +
+            "JOIN listify.Projects p ON pa.projectID = p.projectID " +
+            "JOIN listify.Sections s ON p.projectID = s.projectID " +
+            "WHERE pa.userID = :userID " +
+            "AND s.sectionID = :sectionID", nativeQuery = true)
+    Integer userHasAccessToSection(Long userID, Long sectionID);
+
+
+    @Query("SELECT t FROM Tasks t WHERE t.sectionID = :id")
+    List<Tasks> findTasksBySectionID(@Param("id") Long id);
 }

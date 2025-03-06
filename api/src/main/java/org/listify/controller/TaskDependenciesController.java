@@ -24,7 +24,7 @@ public class TaskDependenciesController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<Object> newTaskDependency(Authentication authentication,
+    public ResponseEntity<TaskDependencies> createTaskDependency(Authentication authentication,
                                             @RequestParam(name = "taskID") Long taskID,
                                             @RequestParam(name = "dependentTaskID") Long dependentTaskID) {
 
@@ -37,7 +37,7 @@ public class TaskDependenciesController {
 
     @DeleteMapping("/{dependentTaskID}")
     @Transactional
-    public ResponseEntity<Object> deleteTaskDependencyByDependencyId(@PathVariable("dependentTaskID") Long dependentTaskID,
+    public ResponseEntity<?> deleteTaskDependencyByDependencyId(@PathVariable("dependentTaskID") Long dependentTaskID,
                                                                 @RequestParam(name = "taskID") Long taskID,
                                                                 Authentication authentication) {
         Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
