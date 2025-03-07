@@ -96,11 +96,12 @@ public class TasksService {
                            String taskName, String taskDescription,
                            Byte taskPriority, Byte taskPosition) {
 
+        validateTeamLeader(teamLeaderID, projectID);
         if (taskName.length() > 100) {
             throw new BadRequestException("Task name has a maximum of 100 characters");
         }
 
-        if (taskDescription.length() > 500) {
+        if (taskDescription != null && taskDescription.length() > 500) {
             throw new BadRequestException("Task description has a maximum of 500 characters");
         }
 
@@ -117,6 +118,7 @@ public class TasksService {
     }
 
     public Long createSubTask(Long teamLeaderID, Long parentTaskID, String taskName, String taskDescription, Long sectionID, LocalDateTime dueDate) {
+
         validateInputs(taskName, taskDescription, dueDate);
         repository.createSubTask(teamLeaderID, parentTaskID, taskName, taskDescription, sectionID, dueDate);
 
@@ -182,6 +184,12 @@ public class TasksService {
         }
     }
 
+    public void validateTeamLeader(Long userID, Long taskID) {
+        Integer isTeamLeader = repository.userIsTeamLeader(userID, taskID);
+        if (isTeamLeader == null || isTeamLeader == 0) {
+            throw new ForbiddenException("User: "+userID+" is not a team leader");
+        }
+    }
 
     private void validateInputs(String taskName, String taskDescription, LocalDateTime dueDate) {
         if (taskName.length() > 100) {

@@ -97,6 +97,16 @@ public interface TasksRepository extends JpaRepository<Tasks, Long> {
             "WHERE v.userID = :userID AND v.taskID = :taskID", nativeQuery = true)
     Integer userHasAccessToTask(Long userID, Long taskID);
 
+
+    @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END " +
+            "FROM listify.Projects p " +
+            "JOIN listify.TeamMembers tm ON p.teamID = tm.teamID " +
+            "WHERE tm.userID = :userID " +
+            "AND p.projectID = :projectID " +
+            "AND tm.isTeamLeader = 1", nativeQuery = true)
+    Integer userIsTeamLeader(Long userID, Long projectID);
+
+
     @Query("SELECT pl.priorityLabelName " +
             "FROM PriorityLabels pl " +
             "JOIN Tasks t ON t.taskPriority = pl.priorityLabelID " +
