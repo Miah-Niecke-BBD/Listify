@@ -56,6 +56,6 @@ public interface SectionsRepository extends JpaRepository<Sections, Long> {
     Integer userHasAccessToSection(Long userID, Long sectionID);
 
 
-    @Query("SELECT t FROM Tasks t WHERE t.sectionID = :id")
-    List<Tasks> findTasksBySectionID(@Param("id") Long id);
+    @Query("SELECT t FROM Tasks t WHERE t.sectionID = ?1")
+    List<Tasks> findTasksBySectionID(Long sectionID);
 }

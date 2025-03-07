@@ -1,6 +1,6 @@
 package org.listify.service;
 
-import org.listify.dto.ViewTaskDTO;
+import org.listify.dto.SectionTaskDTO;
 import org.listify.exception.BadRequestException;
 import org.listify.exception.ForbiddenException;
 import org.listify.exception.NotFoundException;
@@ -16,11 +16,9 @@ import java.util.List;
 public class SectionsService {
 
     private final SectionsRepository repository;
-    private final TasksService tasksService;
 
-    public SectionsService(SectionsRepository repository, TasksService tasksService) {
+    public SectionsService(SectionsRepository repository) {
         this.repository = repository;
-        this.tasksService = tasksService;
     }
 
     public Sections getSectionById(Long id) {
@@ -28,7 +26,7 @@ public class SectionsService {
                 .orElseThrow();
     }
 
-    public List<ViewTaskDTO> getTasksBySectionId(Long sectionID, Long userID) {
+    public List<SectionTaskDTO> getTasksBySectionId(Long sectionID, Long userID) {
         Integer userAccessToTask = repository.userHasAccessToSection(userID, sectionID);
         if (userAccessToTask == null || userAccessToTask == 0) {
             throw new ForbiddenException("User does not have access to this section");
@@ -39,9 +37,9 @@ public class SectionsService {
             throw new NotFoundException("There are no tasks in this section");
         }
 
-        List<ViewTaskDTO> taskDTOs = new ArrayList<>();
+        List<SectionTaskDTO> taskDTOs = new ArrayList<>();
         for (Tasks task : tasks) {
-            ViewTaskDTO taskDTO = tasksService.mapTaskToViewTaskDTO(task);
+            SectionTaskDTO taskDTO = mapTaskToSectionTaskDTO(task);
             taskDTOs.add(taskDTO);
         }
         return taskDTOs;
@@ -82,5 +80,16 @@ public class SectionsService {
             throw new ForbiddenException("Only sections within your project can be updated.");
         }
         repository.updateSectionPosition(loggedInUserID, sectionID, newSectionPosition);
+    }
+
+    private SectionTaskDTO mapTaskToSectionTaskDTO(Tasks task) {
+        return new SectionTaskDTO(
+              task.getTaskID(),
+              task.getTaskName(),
+              task.getParentTaskID(),
+              task.getTaskPosition(),
+              task.getCreatedAt(),
+              task.getDueDate()
+        );
     }
 }
