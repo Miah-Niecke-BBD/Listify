@@ -12,6 +12,10 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 @Component
 public class JwtTokenFilter implements Filter {
 
@@ -50,11 +53,9 @@ public class JwtTokenFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        if (httpRequest.getRequestURI().startsWith("/swagger-ui/") ||
-                httpRequest.getRequestURI().startsWith("/v3/api-docs") ||
-                httpRequest.getRequestURI().startsWith("/getToken") ||
-                httpRequest.getRequestURI().equals("/login") ||
-                httpRequest.getRequestURI().startsWith("/login/oauth2/code/google")) {
+        String requestUri = httpRequest.getRequestURI();
+
+        if (isExcludedPath(requestUri)) {
             chain.doFilter(request, response);
             return;
         }
@@ -62,13 +63,18 @@ public class JwtTokenFilter implements Filter {
         String token = extractJwtToken(httpRequest);
         if (token == null) {
             httpResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
-            httpResponse.getWriter().write("Token is not Found");
+            httpResponse.getWriter().write("Token not found");
             return;
         }
 
         try {
-            validateJwtToken(token);
+            String sub = validateJwtToken(token);
+            List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+            Authentication authentication = new UsernamePasswordAuthenticationToken(sub, null, authorities);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            httpRequest.setAttribute("sub", sub);
             chain.doFilter(request, response);
+            System.out.println("work");
         } catch (BadCredentialsException e) {
             httpResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
             httpResponse.getWriter().write("Invalid JWT token: " + e.getMessage());
@@ -83,7 +89,16 @@ public class JwtTokenFilter implements Filter {
         return null;
     }
 
-    private void validateJwtToken(String token) throws BadCredentialsException {
+    private boolean isExcludedPath(String requestUri) {
+        return requestUri.startsWith("/login") ||
+                requestUri.startsWith("/swagger-ui/") ||
+                requestUri.startsWith("/v3/api-docs") ||
+                requestUri.startsWith("/oauth2/callback/google") ||
+                requestUri.startsWith("/authentication") ||
+                requestUri.equals("/swagger-ui/index.html");
+    }
+
+    private String validateJwtToken(String token) throws BadCredentialsException {
         try {
             JWT jwt = JWTParser.parse(token);
 
@@ -95,6 +110,8 @@ public class JwtTokenFilter implements Filter {
                 }
 
                 validateJwtClaims(claimsSet);
+                return claimsSet.getSubject();
+
             } else {
                 throw new BadCredentialsException("Invalid JWT structure.");
             }
@@ -115,13 +132,15 @@ public class JwtTokenFilter implements Filter {
 
         if (publicKey != null) {
             RSASSAVerifier verifier = new RSASSAVerifier((RSAPublicKey) publicKey);
-            return signedJWT.verify(verifier);
+            boolean signatureValid = signedJWT.verify(verifier);
+            return signatureValid;
         }
 
         return false;
     }
 
     private PublicKey fetchAndCachePublicKey(String kid) {
+
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.exchange(GOOGLE_JWT_PUBLIC_KEYS_URL, HttpMethod.GET, null, String.class);
 
@@ -133,6 +152,8 @@ public class JwtTokenFilter implements Filter {
                 cachePublicKey(kid, publicKey);
             }
             return publicKey;
+        } else {
+            System.out.println("Failed to fetch public keys, status code: " + response.getStatusCode());
         }
 
         return null;
@@ -140,16 +161,19 @@ public class JwtTokenFilter implements Filter {
 
     private void validateJwtClaims(JWTClaimsSet claimsSet) throws BadCredentialsException {
         long exp = claimsSet.getExpirationTime().getTime();
+
         if (System.currentTimeMillis() > exp) {
             throw new BadCredentialsException("JWT token has expired.");
         }
 
         String issuer = claimsSet.getIssuer();
-        if (!googleAccountUrl.toString().equals(issuer)) {
+
+        if (!googleAccountUrl.equals(issuer)) {
             throw new BadCredentialsException("Invalid JWT token issuer.");
         }
 
         List<String> audience = claimsSet.getAudience();
+
         if (audience == null || !audience.contains(googleClientID)) {
             throw new BadCredentialsException("Invalid JWT token audience.");
         }
@@ -172,7 +196,7 @@ public class JwtTokenFilter implements Filter {
                 }
             }
         } catch (Exception e) {
-            throw new BadCredentialsException("Unable to extract public key from google cert.");
+            throw new BadCredentialsException("Unable to extract public key from google cert.", e);
         }
         return null;
     }

@@ -1,7 +1,10 @@
 package org.listify.service;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.listify.exception.BadRequestException;
 import org.listify.exception.ForbiddenException;
 import org.listify.exception.NotFoundException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.core.Authentication;
@@ -50,6 +53,11 @@ public class UserService {
     }
 
     public void deleteUserByUserID(Long userID , Long currentUserID) {
+
+        if (userID > Long.MAX_VALUE / 2) {
+            throw new BadRequestException("Number is too large.");
+        }
+
         if (!usersRepo.existsByUserID(userID) || !currentUserID.equals(userID)) {
             throw new ForbiddenException("Not allowed to delete User "+ userID);
         }
@@ -65,18 +73,31 @@ public class UserService {
     }
 
 
-    public Long getUserIDFromAuthentication(Authentication authentication) {
-        OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
-        OAuth2User oauth2User = oauthToken.getPrincipal();
+    public Long getUserIDFromAuthentication(HttpServletRequest request) {
 
-        String googleID = oauth2User.getAttribute("sub");
-        Users user = usersRepo.findByGitHubID(googleID);
+        if(request!=null)
+        {
+            String googleID = (String) request.getAttribute("sub");
 
-        if (userExistsByGitHubID(googleID)) {
-            return user.getUserID();
-        } else {
-            throw new NotFoundException("User not found for GitHub ID: " + googleID);
+            if(googleID!=null)
+            {
+                Users user = usersRepo.findByGitHubID(googleID);
+
+                if (userExistsByGitHubID(googleID)) {
+                    return user.getUserID();
+                } else {
+                    throw new NotFoundException("User not found for GitHub ID: " + googleID);
+                }
+            }else
+            {
+                throw new NotFoundException("User not found for Google ID: " + googleID);
+            }
         }
+        else
+        {
+            throw new ForbiddenException("Request is null");
+        }
+
     }
 
     public LocalDateTime getUserCreatedAt(Long userID) {
