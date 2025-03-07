@@ -1,30 +1,32 @@
 package org.listify.service;
 
-import org.listify.dto.ProjectOverviewDTO;
-import org.listify.dto.ProjectSectionDTO;
-import org.listify.dto.SectionTaskDTO;
+import org.listify.dto.*;
 import org.listify.exception.ForbiddenException;
 import org.listify.exception.NotFoundException;
 import org.listify.model.Projects;
+import org.listify.model.Sections;
+import org.listify.model.Tasks;
 import org.listify.repo.ProjectsRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjectsService {
 
     private final ProjectsRepository projectsRepository;
     private final TeamsService teamsService;
+    private final UserService userService;
 
-    public ProjectsService(ProjectsRepository projectsRepository, TeamsService teamsService) {
+    public ProjectsService(ProjectsRepository projectsRepository, TeamsService teamsService, UserService userService) {
         this.projectsRepository = projectsRepository;
-
         this.teamsService = teamsService;
+        this.userService = userService;
     }
 
 
-    public Projects getProjectById(Long projectID , Long userID) {
+    public Projects getProjectById(Long projectID, Long userID) {
 
         isUserInTheProject(userID, projectID);
 
@@ -36,23 +38,41 @@ public class ProjectsService {
     public Long createProject(Long teamLeader, Long teamID,
                               String projectName, String projectDescription) {
         teamsService.findATeamByUserID(teamLeader, teamID);
+        if (projectName.length() > 100) {
+            throw new IllegalArgumentException("Project name cannot exceed 100 characters.");
+        }
+
+        if ((projectDescription != null) && projectDescription.length() > 500) {
+            throw new IllegalArgumentException("Project description cannot exceed 500 characters");
+        }
+
+
         projectsRepository.createProject(teamLeader, teamID, projectName, projectDescription);
         Projects newlyCreatedProject = projectsRepository.findTopOrderByProjectIDDesc();
         return newlyCreatedProject != null ? newlyCreatedProject.getProjectID() : null;
     }
 
     public void updateProject(Long projectID, Long userID, String projectName, String projectDescription) {
+        if ((projectName != null) && projectName.length() > 100) {
+            throw new IllegalArgumentException("Project name cannot exceed 100 characters.");
+        }
 
+        if ((projectDescription != null) && projectDescription.length() > 500) {
+            throw new IllegalArgumentException("Project description cannot exceed 500 characters");
+        }
 
         isUserInTheProject(userID, projectID);
+
+        if (!projectsRepository.getTeamLeaderForProject(projectID).equals(userID)) {
+            throw new ForbiddenException("User " + userID + " is not a team leader, only team leaders are allowed to delete projects");
+        }
+
         projectsRepository.updateProject(projectID, userID, projectName, projectDescription);
 
     }
 
     public void isUserInTheProject(Long userID, Long projectID) {
-
-         Long project = projectsRepository.isUserAssignedToProject(userID,projectID);
-
+        Long project = projectsRepository.isUserAssignedToProject(userID, projectID);
         if (project == null) {
             throw new ForbiddenException("User " + userID + " is not added to the Project " + projectID);
         }
@@ -60,56 +80,34 @@ public class ProjectsService {
     }
 
     public void deleteProjectById(Long projectID, Long teamLeaderID) {
-
         isUserInTheProject(teamLeaderID, projectID);
+        if (!projectsRepository.getTeamLeaderForProject(projectID).equals(teamLeaderID)) {
+            throw new ForbiddenException("User " + teamLeaderID + " is not a team leader, only team leaders are allowed to delete projects");
+        }
+
+        if (getProjectById(projectID, teamLeaderID).getCreatedAt().equals(userService.getUserByUserID(teamLeaderID).getCreatedAt())) {
+            throw new ForbiddenException("Can't delete initial personal projects");
+        }
         projectsRepository.deleteProject(projectID, teamLeaderID);
-
     }
 
+    public List<ProjectSectionsDTO> getAllSectionsByProjectID(Long userID, Long projectID) {
+        isUserInTheProject(userID, projectID);
 
-    public ProjectOverviewDTO getProjectDetails(Integer userID, Integer projectID) {
-        List<Object[]> projectDetails = projectsRepository.getProjectDetails(userID, projectID);
+        List<Sections> sections = projectsRepository.findAllSectionsInProject(projectID);
 
-        isUserInTheProject(userID.longValue(),projectID.longValue());
-
-        if (projectDetails.isEmpty()) {
-            throw new NotFoundException("No project details found");
-        }
-
-        ProjectOverviewDTO projectDTO = new ProjectOverviewDTO();
-        projectDTO.setProjectID(projectID);
-        projectDTO.setProjectName((String) projectDetails.get(0)[2]);
-
-        Map<Integer, ProjectSectionDTO> sectionMap = new HashMap<>();
-
-        for (Object[] row : projectDetails) {
-            Integer sectionID = (Integer) row[4];
-
-            if (!sectionMap.containsKey(sectionID)) {
-                ProjectSectionDTO newSection = new ProjectSectionDTO(
-                        sectionID,
-                        (String) row[5],
-                        ((Byte) row[6]).intValue(),
-                        new ArrayList<>()
-                );
-                sectionMap.put(sectionID, newSection);
-            }
-
-            SectionTaskDTO taskDTO = new SectionTaskDTO(
-                    (Integer) row[7],
-                    null,
-                    (String) row[8],
-                    (String) row[9],
-                    ((Byte) row[10]).intValue(),
-                    ((Byte) row[11]).intValue(),
-                    row[12] != null ? ((java.sql.Timestamp) row[12]).toLocalDateTime() : null,
-                    (Integer) row[13]
-            );
-
-            sectionMap.get(sectionID).getTasks().add(taskDTO);
-        }
-        projectDTO.setSections(new ArrayList<>(sectionMap.values()));
-        return projectDTO;
+        return sections.stream().map((section) ->
+                new ProjectSectionsDTO(section.getSectionID(), section.getSectionName(),
+                        section.getSectionPosition(), section.getCreatedAt(), section.getUpdatesAt())).toList();
     }
 
+    public List<DueTasksDTO> getAllProjectDueTasks(Long userID, Long projectID) {
+        isUserInTheProject(userID, projectID);
+
+        List<Tasks> tasks = projectsRepository.findProjectsDueTasks(userID, projectID);
+
+        return tasks.stream().map((task) ->
+                new DueTasksDTO(task.getTaskID(), task.getTaskName(), task.getDueDate())
+        ).collect(Collectors.toList());
+    }
 }
