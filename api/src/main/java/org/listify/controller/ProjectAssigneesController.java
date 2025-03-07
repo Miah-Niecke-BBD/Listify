@@ -24,13 +24,6 @@ public class ProjectAssigneesController {
         this.userService = userService;
     }
 
-    @GetMapping
-    public ResponseEntity<Object> getAllProjectAssignees() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Long userID = userService.getUserIDFromAuthentication(authentication);
-        List<ProjectAssigneeDTO> assignees = projectAssigneesService.getAllProjectAssignees(userID);
-        return ResponseEntity.ok(assignees);
-    }
 
     @GetMapping("/{assigneeID}")
     public ResponseEntity<Object> getProjectAssigneeById(@PathVariable("assigneeID") Long assigneeID) {

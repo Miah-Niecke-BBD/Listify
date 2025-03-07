@@ -31,4 +31,6 @@ public interface ProjectAssigneesRepository extends JpaRepository<ProjectAssigne
 
     @Query("SELECT p FROM ProjectAssignees p ORDER BY p.projectAssigneeID DESC LIMIT 1")
     ProjectAssignees findTopOrderByProjectAssigneeIDDesc();
+
+    boolean existsByProjectID(Long projectID);
 }

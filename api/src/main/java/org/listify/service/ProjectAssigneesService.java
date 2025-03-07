@@ -1,5 +1,6 @@
 package org.listify.service;
 
+import jakarta.transaction.Transactional;
 import org.listify.dto.ProjectAssigneeDTO;
 import org.listify.exception.AssignedProjectNotFoundException;
 import org.listify.exception.ListNotFoundException;
@@ -8,6 +9,7 @@ import org.listify.model.ProjectAssignees;
 import org.listify.model.Projects;
 import org.listify.repo.ProjectAssigneesRepository;
 import org.listify.repo.ProjectsRepository;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,7 +35,6 @@ public class ProjectAssigneesService {
         String githubID = "user" + projectAssignee.getUserID() + "_github";
 
         return new ProjectAssigneeDTO(
-                projectAssignee.getProjectID(),
                 project.getProjectName(),
                 githubID
         );
@@ -42,7 +43,7 @@ public class ProjectAssigneesService {
     public List<ProjectAssigneeDTO> getAllProjectAssignees(Long userID) {
         List<ProjectAssignees> projectAssigneesList = repository.findAll();
         if (projectAssigneesList.isEmpty()) {
-            throw new ListNotFoundException("Project Assignee not found");
+            throw new ListNotFoundException("No projects assigned");
         }
         return projectAssigneesList.stream()
                 .map(this::convertToDTO)
@@ -71,7 +72,8 @@ public class ProjectAssigneesService {
         return newlyAssignedProject != null ? newlyAssignedProject.getProjectAssigneeID() : null;
     }
 
+
     public void deleteUserFromProject(Long userID, Long projectID, Long teamLeaderID) {
         repository.deleteUserFromProject(userID, projectID, teamLeaderID);
+        }
     }
-}
