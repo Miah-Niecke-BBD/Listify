@@ -42,10 +42,10 @@ public class ProjectAssigneesController {
         return ResponseEntity.status(HttpStatus.CREATED).body(newProjectAssignee);
     }
 
-    @DeleteMapping("/{projectID}")
+    @DeleteMapping("/{userID}")
     @Transactional
-    public ResponseEntity<?> deleteUserFromProject(@PathVariable("projectID") Long projectID,
-                                                   @RequestParam(name = "userID") Long userID,
+    public ResponseEntity<?> deleteUserFromProject(@PathVariable("userID") Long userID,
+                                                   @RequestParam(name = "projectID") Long projectID,
                                                    Authentication authentication) {
         Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
         projectAssigneesService.deleteUserFromProject(userID, projectID, teamLeaderID);
