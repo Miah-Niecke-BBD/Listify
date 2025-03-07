@@ -1,6 +1,9 @@
 package org.listify.controller;
 
-import org.listify.dto.ProjectOverviewDTO;
+import jakarta.servlet.http.HttpServletRequest;
+import org.listify.dto.DueTasksDTO;
+import org.listify.dto.ProjectSectionsDTO;
+import org.listify.dto.ProjectsInfoDTO;
 import org.listify.model.Projects;
 import org.listify.service.ProjectsService;
 import org.listify.service.UserService;
@@ -8,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -23,62 +28,62 @@ public class ProjectsController {
     }
 
     @GetMapping("/{projectID}")
-    public ResponseEntity<Object> getProjectsById(@PathVariable("projectID") Long projectID,Authentication authentication) {
-        Long userID= userService.getUserIDFromAuthentication(authentication);
-        Projects project = projectsService.getProjectById(projectID , userID);
-        return ResponseEntity.ok(project);
+    public ResponseEntity<ProjectsInfoDTO> getProjectsById(@PathVariable("projectID") Long projectID, HttpServletRequest request) {
+        Long userID = userService.getUserIDFromAuthentication(request);
+        Projects project = projectsService.getProjectById(projectID, userID);
+
+        return ResponseEntity.ok(new ProjectsInfoDTO(project.getProjectName(), project.getProjectDescription(), project.getCreatedAt(), project.getUpdatedAt()));
     }
 
     @PostMapping
-    public ResponseEntity<Object> newProject(Authentication authentication,
-                                        @RequestParam(name = "teamID") Long teamID,
-                                        @RequestParam(name = "projectName") String projectName,
-                                        @RequestParam(name = "projectDescription") String projectDescription) {
-        Long teamLeaderIDLong = userService.getUserIDFromAuthentication(authentication);
+    public ResponseEntity<Projects> newProject(HttpServletRequest request,
+                                               @RequestParam(name = "teamID") Long teamID,
+                                               @RequestParam(name = "projectName") String projectName,
+                                               @RequestParam(name = "projectDescription", required = false) String projectDescription) {
+        Long teamLeaderIDLong = userService.getUserIDFromAuthentication(request);
         Long newProjectID = projectsService.createProject(teamLeaderIDLong, teamID, projectName, projectDescription);
-        Projects project = projectsService.getProjectById(newProjectID ,teamLeaderIDLong);
+        Projects project = projectsService.getProjectById(newProjectID, teamLeaderIDLong);
         return ResponseEntity.ok(project);
     }
-
-
-    @PostMapping("/hello")
-    public ResponseEntity<Object> testing() {
-
-        return ResponseEntity.ok("hello world");
-    }
-
     @PutMapping("/{projectID}")
     @Transactional
-    public ResponseEntity<Object> updateProject(@PathVariable("projectID") Long projectID,
-                                          Authentication authentication,
-                                           @RequestParam(name = "projectName",required = false) String projectName,
-                                           @RequestParam(name = "projectDescription",required = false) String projectDescription) {
-
-        Long userID= userService.getUserIDFromAuthentication(authentication);
+    public ResponseEntity<ProjectsInfoDTO> updateProject(@PathVariable("projectID") Long projectID,
+                                                         HttpServletRequest request,
+                                                         @RequestParam(name = "projectName", required = false) String projectName,
+                                                         @RequestParam(name = "projectDescription", required = false) String projectDescription) {
+        Long userID = userService.getUserIDFromAuthentication(request);
         projectsService.updateProject(projectID, userID, projectName, projectDescription);
-        Projects updatedProject = projectsService.getProjectById(projectID,userID);
+        Projects updatedProject = projectsService.getProjectById(projectID, userID);
 
-        return ResponseEntity.ok(updatedProject);
+        return ResponseEntity.ok(new ProjectsInfoDTO(updatedProject.getProjectName(), updatedProject.getProjectDescription(), updatedProject.getCreatedAt(), updatedProject.getUpdatedAt()));
     }
 
     @DeleteMapping("/{projectID}")
     @Transactional
-    public ResponseEntity<Object> deleteProjectById(@PathVariable("projectID") Long projectID,
-                                               Authentication authentication) {
-        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
+    public ResponseEntity<?> deleteProjectById(@PathVariable("projectID") Long projectID,
+                                               HttpServletRequest request) {
+        Long teamLeaderID = userService.getUserIDFromAuthentication(request);
 
         projectsService.deleteProjectById(projectID, teamLeaderID);
-        return ResponseEntity.ok("Project with id: "+ projectID +" has been successfully deleted");
+        return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/{projectID}/sections")
+    public ResponseEntity<List<ProjectSectionsDTO>> getProjectSections(@PathVariable("projectID") Long projectID, HttpServletRequest request) {
 
-    @GetMapping("/{projectID}/details")
-    public ResponseEntity<Object> getProjectDetails(@PathVariable("projectID") Integer projectID,
-                                                                        Authentication authentication) {
-        Long userID = userService.getUserIDFromAuthentication(authentication);
-        ProjectOverviewDTO projectOverview = projectsService.getProjectDetails(Math.toIntExact(userID), projectID);
+        Long userID = userService.getUserIDFromAuthentication(request);
 
-        return ResponseEntity.ok(projectOverview);
+        List<ProjectSectionsDTO> projectSectionsDTO = projectsService.getAllSectionsByProjectID(userID, projectID);
+
+        return ResponseEntity.ok(projectSectionsDTO);
+    }
+
+    @GetMapping("/{projectID}/dueTasks")
+    public ResponseEntity<List<DueTasksDTO>> getAllProjectDueTasks(@PathVariable("projectID") Long projectID, HttpServletRequest request) {
+        Long userID = userService.getUserIDFromAuthentication(request);
+
+        List<DueTasksDTO> dueTasksDTOS = projectsService.getAllProjectDueTasks(userID, projectID);
+        return ResponseEntity.ok(dueTasksDTOS);
     }
 
 }

@@ -1,12 +1,16 @@
 package org.listify.dto;
 
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TeamInfoDTO {
     private String teamName;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSSSSS")
     private LocalDateTime createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSSSSS")
     private LocalDateTime updatedAt;
 
     public TeamInfoDTO(String teamName, LocalDateTime createdAt, LocalDateTime updatedAt) {

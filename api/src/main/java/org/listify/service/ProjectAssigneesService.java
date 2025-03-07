@@ -1,51 +1,65 @@
 package org.listify.service;
 
-import org.listify.exception.ListNotFoundException;
-import org.listify.exception.AssignedProjectNotFoundException;
+import org.listify.dto.ProjectAssigneeDTO;
+import org.listify.exception.ForbiddenException;
+import org.listify.exception.NotFoundException;
 import org.listify.model.ProjectAssignees;
+import org.listify.model.Projects;
 import org.listify.repo.ProjectAssigneesRepository;
+import org.listify.repo.ProjectsRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjectAssigneesService {
 
     private final ProjectAssigneesRepository repository;
+    private final ProjectsRepository projectRepository;
 
-    public ProjectAssigneesService(ProjectAssigneesRepository repository) {
+    public ProjectAssigneesService(ProjectAssigneesRepository repository, ProjectsRepository projectRepository) {
         this.repository = repository;
+        this.projectRepository = projectRepository;
     }
 
-    public List<ProjectAssignees> getAllProjectAssignees() {
-        List<ProjectAssignees> projectAssigneesList = repository.findAll();
-        if (projectAssigneesList.isEmpty()) {
-            throw new ListNotFoundException("Project Assignees");
-        }
-        return projectAssigneesList;
+    private ProjectAssigneeDTO convertToDTO(ProjectAssignees projectAssignee) {
+
+        Projects project = projectRepository.findById(projectAssignee.getProjectID())
+                .orElseThrow(() -> new NotFoundException("Project assignee with id " + projectAssignee.getProjectID() + " not found"));
+
+
+        String githubID = "user" + projectAssignee.getUserID() + "_github";
+
+        return new ProjectAssigneeDTO(
+                project.getProjectID(),
+                project.getProjectName(),
+                githubID
+        );
     }
 
-    public ProjectAssignees getProjectAssigneeById(Long projectAssigneeID) {
-        return repository.findById(projectAssigneeID)
-                .orElseThrow(() -> new AssignedProjectNotFoundException(projectAssigneeID));
+    public List<ProjectAssigneeDTO> getAllProjectsAssignees(Long projectID) {
+        List<ProjectAssignees> projectAssigneesList = repository.findProjectsAssignedUsers(projectID);
+
+        return projectAssigneesList.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
-    public List<ProjectAssignees> getProjectsAssignedToSpecificUser(Long userID) {
-        List<ProjectAssignees> projectsAssignedToUser = repository.findProjectsAssignedToUser(userID);
-        if (projectsAssignedToUser.isEmpty()) {
-            throw new ListNotFoundException("projects assigned to user");
-        }
-        return projectsAssignedToUser;
+    public ProjectAssigneeDTO getProjectAssigneeById(Long projectID) {
+        ProjectAssignees assignee = repository.findById(projectID)
+                .orElseThrow(() -> new NotFoundException("Project assignee id " + projectID + " not found"));
+        return convertToDTO(assignee);
     }
 
-    public Long assignUserToProject(int userID, int projectID) {
-        repository.assignUserToProject(userID, projectID);
-
+    public Long assignUserToProject(Long teamLeaderID, Long userID, Long projectID) {
+        repository.assignUserToProject(teamLeaderID, userID, projectID);
         ProjectAssignees newlyAssignedProject = repository.findTopOrderByProjectAssigneeIDDesc();
         return newlyAssignedProject != null ? newlyAssignedProject.getProjectAssigneeID() : null;
     }
 
-    public void deleteUserFromProject(int userID, int projectID, int teamLeaderID) {
+
+    public void deleteUserFromProject(Long userID, Long projectID, Long teamLeaderID) {
         repository.deleteUserFromProject(userID, projectID, teamLeaderID);
     }
 }

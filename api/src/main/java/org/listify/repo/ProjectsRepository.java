@@ -2,6 +2,7 @@ package org.listify.repo;
 
 import org.listify.model.Projects;
 import org.listify.model.Sections;
+import org.listify.model.Tasks;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
@@ -19,7 +20,12 @@ public interface ProjectsRepository extends JpaRepository<Projects, Long> {
             @Param("projectDescription") String projectDescription
     );
 
-    @Query(value = "SELECT listify.fnGetTeamLeaderForProject(projectID)", nativeQuery = true)
+    @Query(value = "SELECT tm.userID " +
+            "FROM listify.Projects p " +
+            "INNER JOIN listify.Teams t ON t.teamID = p.teamID " +
+            "INNER JOIN listify.TeamMembers tm ON tm.teamID = t.teamID " +
+            "WHERE p.projectID = :projectID AND tm.isTeamLeader = 1",
+            nativeQuery = true)
     Long getTeamLeaderForProject(@Param("projectID") Long projectID);
 
     @Query(value = "SELECT userID FROM listify.ProjectAssignees pa WHERE pa.userID = ?1 AND pa.projectID = ?2", nativeQuery = true)
@@ -45,21 +51,10 @@ public interface ProjectsRepository extends JpaRepository<Projects, Long> {
     @Query("SELECT s FROM Sections s WHERE s.projectID = :id")
     List<Sections> findAllSectionsInProject(@Param("id") Long id);
 
-    @Query(value = "SELECT \n" +
-            "    tm.teamID, \n" +
-            "    p.projectID, p.projectName, p.projectDescription, \n" +
-            "    s.sectionID, s.sectionName, CAST(s.sectionPosition AS TINYINT) AS sectionPosition, \n" +
-            "    t.taskID, t.taskName, t.taskDescription, \n" +
-            "    CAST(t.taskPriority AS TINYINT) AS taskPriority, \n" +
-            "    t.taskPosition, t.dueDate, \n" +
-            "    ta.userID AS assigneeUserID \n" +
-            "FROM listify.TeamMembers tm\n" +
-            "JOIN listify.Projects p ON tm.teamID = p.teamID \n" +
-            "JOIN listify.Sections s ON p.projectID = s.projectID \n" +
-            "JOIN listify.Tasks t ON s.sectionID = t.sectionID \n" +
-            "LEFT JOIN listify.TaskAssignees ta ON t.taskID = ta.taskID \n" +
-            "WHERE tm.userID = ?1 \n" +
-            "AND p.projectID = ?2", nativeQuery = true)
-    List<Object[]> getProjectDetails(@Param("userID") Integer userID, @Param("projectID") Integer projectID);
-
+    @Query(value = "SELECT " +
+            "t.taskID, t.sectionID, t.parentTaskID, t.taskName, t.taskDescription, t.taskPriority, t.taskPosition, t.dateCompleted, t.dueDate, t.createdAt, t.updatedAt " +
+            "FROM listify.vUserTeamProjectsTasks v " +
+            "INNER JOIN listify.Tasks t ON v.taskID = t.taskID " +
+            "WHERE v.userID = ?1 AND t.dueDate IS NOT NULL AND t.dateCompleted IS NULL AND v.projectID = ?2", nativeQuery = true)
+    List<Tasks> findProjectsDueTasks(Long userID, Long projectID);
 }

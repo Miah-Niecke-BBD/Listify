@@ -1,3 +1,11 @@
+ALTER TABLE listify.Teams
+    ALTER COLUMN createdAt DATETIMEOFFSET;
+ALTER TABLE listify.Teams
+	ALTER COLUMN updatedAt DATETIMEOFFSET;
+
+IF OBJECT_ID('listify.uspCreateTeam', 'P') IS NOT NULL
+    DROP PROCEDURE listify.uspCreateTeam;
+GO
 
 CREATE PROCEDURE listify.uspCreateTeam
     @userID INT,
@@ -10,7 +18,7 @@ BEGIN
     BEGIN TRY
 
         INSERT INTO listify.Teams (teamName, createdAt)
-        VALUES (@teamName, SYSDATETIME());
+        VALUES (@teamName, SYSDATETIMEOFFSET());
 
 		SET @teamID = SCOPE_IDENTITY();
 
@@ -22,7 +30,6 @@ BEGIN
     BEGIN CATCH
         ROLLBACK;
         DECLARE @ErrorMessage NVARCHAR(MAX) = ERROR_MESSAGE();
-        PRINT 'Error occurred: ' + @ErrorMessage;
-        THROW;
+        THROW 5001, 'Error occurred: ', @ErrorMessage;
     END CATCH
 END;

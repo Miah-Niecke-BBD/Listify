@@ -1,38 +1,27 @@
-package org.listify.model;
+package org.listify.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "Sections", schema = "listify")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Sections {
+public class ProjectSectionsDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long sectionID;
-    @Column(name = "projectID", nullable = false)
-    private Long projectID;
-    @Column(name = "sectionName", nullable = false, length = 100)
     private String sectionName;
-    @Column(name = "sectionPosition", nullable = false)
     private int sectionPosition;
-    @Column(name = "createdAt", nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSSSSS")
     private LocalDateTime createdAt;
-    @Column(name = "updatedAt", nullable = true)
-    private LocalDateTime updatesAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSSSSS")
+    private  LocalDateTime updatedAt;
 
-    protected Sections() {};
-
-    public Sections(Long sectionID, Long projectID, String sectionName, int sectionPosition, LocalDateTime createdAt, LocalDateTime updatesAt) {
+    public ProjectSectionsDTO(Long sectionID, String sectionName, int sectionPosition, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.sectionID = sectionID;
-        this.projectID = projectID;
         this.sectionName = sectionName;
         this.sectionPosition = sectionPosition;
         this.createdAt = createdAt;
-        this.updatesAt = updatesAt;
+        this.updatedAt = updatedAt;
     }
 
     public Long getSectionID() {
@@ -41,14 +30,6 @@ public class Sections {
 
     public void setSectionID(Long sectionID) {
         this.sectionID = sectionID;
-    }
-
-    public Long getProjectID() {
-        return projectID;
-    }
-
-    public void setProjectID(Long projectID) {
-        this.projectID = projectID;
     }
 
     public String getSectionName() {
@@ -75,12 +56,11 @@ public class Sections {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatesAt() {
-        return updatesAt;
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setUpdatesAt(LocalDateTime updatesAt) {
-        this.updatesAt = updatesAt;
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
-

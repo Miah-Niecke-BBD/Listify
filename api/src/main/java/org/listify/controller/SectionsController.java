@@ -1,13 +1,18 @@
 package org.listify.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.listify.dto.SectionTaskDTO;
 import org.listify.model.Sections;
 import org.listify.service.SectionsService;
 import org.listify.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/sections")
@@ -21,14 +26,21 @@ public class SectionsController {
         this.userService = userService;
     }
 
+    @GetMapping("/{sectionID}/tasks")
+    public ResponseEntity<List<SectionTaskDTO>> getTasksBySectionID(@PathVariable("sectionID") Long sectionID , HttpServletRequest request) {
+        Long userID = userService.getUserIDFromAuthentication(request);
+        List<SectionTaskDTO> taskDTOS = sectionsService.getTasksBySectionId(sectionID, userID);
+        return ResponseEntity.ok(taskDTOS);
+    }
+
 
     @PostMapping
     @Transactional
-    public ResponseEntity<Object> newSection(Authentication authentication,
+    public ResponseEntity<Sections> newSection(HttpServletRequest request,
                                         @RequestParam(name = "projectID") Long projectID,
                                         @RequestParam(name = "sectionName") String sectionName,
                                         @RequestParam(name = "sectionPosition") Byte sectionPosition) {
-        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
+        Long teamLeaderID = userService.getUserIDFromAuthentication(request);
         Long newSectionID = sectionsService.createSection(teamLeaderID, projectID, sectionName, sectionPosition);
         Sections section = sectionsService.getSectionById(newSectionID);
         return ResponseEntity.status(HttpStatus.CREATED).body(section);
@@ -36,10 +48,10 @@ public class SectionsController {
 
     @PutMapping("/{sectionID}")
     @Transactional
-    public ResponseEntity<Object> updateSection(@PathVariable("sectionID") Long sectionID,
-                                           Authentication authentication,
+    public ResponseEntity<Sections> updateSection(@PathVariable("sectionID") Long sectionID,
+                                                  HttpServletRequest request,
                                            @RequestParam("newSectionName") String newSectionName) {
-        Long loggedInUserID = userService.getUserIDFromAuthentication(authentication);
+        Long loggedInUserID = userService.getUserIDFromAuthentication(request);
         sectionsService.updateSection(sectionID, loggedInUserID, newSectionName);
         Sections updatedSection = sectionsService.getSectionById(sectionID);
         return ResponseEntity.status(HttpStatus.CREATED).body(updatedSection);
@@ -47,10 +59,10 @@ public class SectionsController {
 
     @PutMapping("/{sectionID}/position")
     @Transactional
-    public ResponseEntity<Object> updateSectionPosition(@PathVariable("sectionID") Long sectionID,
-                                                        Authentication authentication,
-                                                        @RequestParam("newSectionPostion") Integer newSectionPosition) {
-        Long loggedInUserID = userService.getUserIDFromAuthentication(authentication);
+    public ResponseEntity<Sections> updateSectionPosition(@PathVariable("sectionID") Long sectionID,
+                                                          HttpServletRequest request,
+                                                        @RequestParam("newSectionPosition") Integer newSectionPosition) {
+        Long loggedInUserID = userService.getUserIDFromAuthentication(request);
         sectionsService.updateSectionPosition(sectionID, loggedInUserID, newSectionPosition);
         Sections updatedSection = sectionsService.getSectionById(sectionID);
         return ResponseEntity.status(HttpStatus.CREATED).body(updatedSection);
@@ -58,9 +70,9 @@ public class SectionsController {
 
     @DeleteMapping("/{sectionID}")
     @Transactional
-    public ResponseEntity<Object> deleteSectionById(@PathVariable("sectionID") Long sectionID,
-                                               Authentication authentication) {
-        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
+    public ResponseEntity<?> deleteSectionById(@PathVariable("sectionID") Long sectionID,
+                                               HttpServletRequest request) {
+        Long teamLeaderID = userService.getUserIDFromAuthentication(request);
         sectionsService.deleteSectionById(teamLeaderID, sectionID);
         return ResponseEntity.noContent().build();
     }

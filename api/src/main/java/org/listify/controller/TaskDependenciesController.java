@@ -1,5 +1,6 @@
 package org.listify.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.listify.model.TaskDependencies;
 import org.listify.service.TaskDependenciesService;
 import org.listify.service.UserService;
@@ -24,11 +25,11 @@ public class TaskDependenciesController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<Object> newTaskDependency(Authentication authentication,
-                                            @RequestParam(name = "taskID") Long taskID,
-                                            @RequestParam(name = "dependentTaskID") Long dependentTaskID) {
+    public ResponseEntity<TaskDependencies> createTaskDependency(HttpServletRequest request,
+                                                                 @RequestParam(name = "taskID") Long taskID,
+                                                                 @RequestParam(name = "dependentTaskID") Long dependentTaskID) {
 
-        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
+        Long teamLeaderID = userService.getUserIDFromAuthentication(request);
         Long newTaskDependencyID = taskDependenciesService.newTaskDependency(teamLeaderID, taskID, dependentTaskID);
         TaskDependencies newTaskDependency = taskDependenciesService.getTaskDependencyById(newTaskDependencyID);
         return ResponseEntity.status(HttpStatus.CREATED).body(newTaskDependency);
@@ -37,10 +38,10 @@ public class TaskDependenciesController {
 
     @DeleteMapping("/{dependentTaskID}")
     @Transactional
-    public ResponseEntity<Object> deleteTaskDependencyByDependencyId(@PathVariable("dependentTaskID") Long dependentTaskID,
+    public ResponseEntity<?> deleteTaskDependencyByDependencyId(@PathVariable("dependentTaskID") Long dependentTaskID,
                                                                 @RequestParam(name = "taskID") Long taskID,
-                                                                Authentication authentication) {
-        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
+                                                                HttpServletRequest request) {
+        Long teamLeaderID = userService.getUserIDFromAuthentication(request);
         taskDependenciesService.deleteTaskDependencyByDependencyId(taskID, dependentTaskID, teamLeaderID);
         return ResponseEntity.noContent().build();
     }

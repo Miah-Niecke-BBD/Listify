@@ -1,5 +1,6 @@
 package org.listify.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.listify.model.TaskAssignees;
 import org.listify.model.Users;
 import org.listify.service.TaskAssigneesService;
@@ -27,9 +28,9 @@ public class TaskAssigneesController {
 
 
     @GetMapping("/{taskID}")
-    public ResponseEntity<Object> getUsersAssignedToTask(@PathVariable("taskID") Long taskID,
-                                                         Authentication authentication) {
-        Long loggedInUserID = userService.getUserIDFromAuthentication(authentication);
+    public ResponseEntity<List<Users>> getUsersAssignedToTask(@PathVariable("taskID") Long taskID,
+                                                              HttpServletRequest request) {
+        Long loggedInUserID = userService.getUserIDFromAuthentication(request);
         List<Users> usersAssignedToTask = taskAssigneesService.getUsersAssignedToTask(taskID, loggedInUserID);
         return ResponseEntity.ok(usersAssignedToTask);
     }
@@ -37,11 +38,11 @@ public class TaskAssigneesController {
 
     @PostMapping("/{taskID}")
     @Transactional
-    public ResponseEntity<Object> assignTask(@PathVariable("taskID") Long taskID,
-                                         Authentication authentication,
+    public ResponseEntity<TaskAssignees> assignTask(@PathVariable("taskID") Long taskID,
+                                                    HttpServletRequest request,
                                         @RequestParam(name = "githubID") String githubID) {
 
-        Long loggedInUserID = userService.getUserIDFromAuthentication(authentication);
+        Long loggedInUserID = userService.getUserIDFromAuthentication(request);
         Long newAssignedTaskID = taskAssigneesService.assignTaskToUser(githubID, loggedInUserID, taskID);
         TaskAssignees newTaskAssignee = taskAssigneesService.getAssignedTaskById(newAssignedTaskID);
         return ResponseEntity.status(HttpStatus.CREATED).body(newTaskAssignee);
@@ -50,10 +51,10 @@ public class TaskAssigneesController {
 
     @DeleteMapping("/{taskID}")
     @Transactional
-    public ResponseEntity<Object> deleteTaskAssignment(@PathVariable("taskID") Long taskID,
+    public ResponseEntity<?> deleteTaskAssignment(@PathVariable("taskID") Long taskID,
                                                   @RequestParam(name = "userID") Long userID,
-                                                  Authentication authentication) {
-        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
+                                                  HttpServletRequest request) {
+        Long teamLeaderID = userService.getUserIDFromAuthentication(request);
         taskAssigneesService.deleteUserFromTask(userID, taskID, teamLeaderID);
         return ResponseEntity.noContent().build();
     }

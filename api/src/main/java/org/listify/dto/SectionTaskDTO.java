@@ -1,42 +1,35 @@
 package org.listify.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.time.LocalDateTime;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SectionTaskDTO {
-    private Integer taskID;
-    private Integer parentTaskID;
-    private String taskName;
-    private String taskDescription;
-    private Integer taskPriority;
-    private Integer taskPosition;
-    private LocalDateTime dueDate;
-    private Integer userID;
 
-    public SectionTaskDTO(Integer taskID, Integer parentTaskID, String taskName, String taskDescription, Integer taskPriority, Integer taskPosition, LocalDateTime dueDate, Integer userID) {
+    private Long taskID;
+    private String taskName;
+    private Long parentTaskID;
+    private Integer taskPosition;
+    private LocalDateTime createdAt;
+    private LocalDateTime dueDate;
+
+    public SectionTaskDTO(Long taskID, String taskName, Long parentTaskID, Integer taskPosition, LocalDateTime createdAt,
+                          LocalDateTime dueDate) {
         this.taskID = taskID;
-        this.parentTaskID = parentTaskID;
         this.taskName = taskName;
-        this.taskDescription = taskDescription;
-        this.taskPriority = taskPriority;
+        this.parentTaskID = parentTaskID;
         this.taskPosition = taskPosition;
+        this.createdAt = createdAt;
         this.dueDate = dueDate;
-        this.userID = userID;
     }
 
-    public Integer getTaskID() {
+    public Long getTaskID() {
         return taskID;
     }
 
-    public void setTaskID(Integer taskID) {
+    public void setTaskID(Long taskID) {
         this.taskID = taskID;
-    }
-
-    public Integer getParentTaskID() {
-        return parentTaskID;
-    }
-
-    public void setParentTaskID(Integer parentTaskID) {
-        this.parentTaskID = parentTaskID;
     }
 
     public String getTaskName() {
@@ -47,28 +40,20 @@ public class SectionTaskDTO {
         this.taskName = taskName;
     }
 
-    public String getTaskDescription() {
-        return taskDescription;
+    public Long getParentTaskID() {
+        return parentTaskID;
     }
 
-    public void setTaskDescription(String taskDescription) {
-        this.taskDescription = taskDescription;
+    public void setParentTaskID(Long parentTaskID) {
+        this.parentTaskID = parentTaskID;
     }
 
-    public Integer getTaskPriority() {
-        return taskPriority;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setTaskPriority(Integer taskPriority) {
-        this.taskPriority = taskPriority;
-    }
-
-    public Integer getTaskPosition() {
-        return taskPosition;
-    }
-
-    public void setTaskPosition(Integer taskPosition) {
-        this.taskPosition = taskPosition;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public LocalDateTime getDueDate() {
@@ -79,11 +64,11 @@ public class SectionTaskDTO {
         this.dueDate = dueDate;
     }
 
-    public Integer getUserID() {
-        return userID;
+    public Integer getTaskPosition() {
+        return taskPosition;
     }
 
-    public void setUserID(Integer userID) {
-        this.userID = userID;
+    public void setTaskPosition(Integer taskPosition) {
+        this.taskPosition = taskPosition;
     }
 }

@@ -23,4 +23,10 @@ public interface TaskDependenciesRepository extends JpaRepository<TaskDependenci
             @Param("taskID") Long taskID,
             @Param("taskDependencyID") Long taskDependencyID,
             @Param("teamLeaderID") Long teamLeaderID);
+
+
+    @Query("SELECT CASE WHEN COUNT(td) > 0 THEN true ELSE false END " +
+            "FROM TaskDependencies td " +
+            "WHERE td.taskID = :taskID AND td.dependentTaskID = :dependentTaskID")
+    boolean isTaskDependent(@Param("taskID") Long taskID, @Param("dependentTaskID") Long dependentTaskID);
 }
