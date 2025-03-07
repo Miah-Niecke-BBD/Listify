@@ -1,6 +1,6 @@
 package org.listify.controller;
 
-import org.listify.dto.ViewTaskDTO;
+import org.listify.dto.SectionTaskDTO;
 import org.listify.model.Sections;
 import org.listify.service.SectionsService;
 import org.listify.service.UserService;
@@ -26,10 +26,10 @@ public class SectionsController {
     }
 
     @GetMapping("/{sectionID}/tasks")
-    public ResponseEntity<List<ViewTaskDTO>> getTasksBySectionID(@PathVariable("sectionID") Long sectionID) {
+    public ResponseEntity<List<SectionTaskDTO>> getTasksBySectionID(@PathVariable("sectionID") Long sectionID) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Long userID = userService.getUserIDFromAuthentication(authentication);
-        List<ViewTaskDTO> taskDTOS = sectionsService.getTasksBySectionId(sectionID, userID);
+        List<SectionTaskDTO> taskDTOS = sectionsService.getTasksBySectionId(sectionID, userID);
         return ResponseEntity.ok(taskDTOS);
     }
 
@@ -61,7 +61,7 @@ public class SectionsController {
     @Transactional
     public ResponseEntity<Sections> updateSectionPosition(@PathVariable("sectionID") Long sectionID,
                                                         Authentication authentication,
-                                                        @RequestParam("newSectionPostion") Integer newSectionPosition) {
+                                                        @RequestParam("newSectionPosition") Integer newSectionPosition) {
         Long loggedInUserID = userService.getUserIDFromAuthentication(authentication);
         sectionsService.updateSectionPosition(sectionID, loggedInUserID, newSectionPosition);
         Sections updatedSection = sectionsService.getSectionById(sectionID);

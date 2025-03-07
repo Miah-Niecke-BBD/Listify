@@ -56,8 +56,7 @@ public class TasksController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<ViewTaskDTO> newTask(@RequestParam(name = "teamLeaderID") Long teamLeaderID,
-                                     Authentication authentication,
+    public ResponseEntity<ViewTaskDTO> newTask(Authentication authentication,
                                      @RequestParam(name = "projectID") Long projectID,
                                      @RequestParam(name = "sectionID") Long sectionID,
                                      @RequestParam(name = "taskName") String taskName,
@@ -66,7 +65,7 @@ public class TasksController {
                                      @RequestParam(name = "taskPosition") Byte taskPosition) {
 
         Long userID = userService.getUserIDFromAuthentication(authentication);
-        Long newTaskID = tasksService.createTask(teamLeaderID, projectID, sectionID, taskName, taskDescription, taskPriority, taskPosition);
+        Long newTaskID = tasksService.createTask(userID, projectID, sectionID, taskName, taskDescription, taskPriority, taskPosition);
         ViewTaskDTO newTask = tasksService.getTaskById(newTaskID, userID);
         return ResponseEntity.status(HttpStatus.CREATED).body(newTask);
     }
