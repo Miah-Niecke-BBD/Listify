@@ -10,11 +10,6 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ListNotFoundException.class)
-    public ResponseEntity<String> handleListNotFoundException(ListNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<String> handleConversionException(MethodArgumentTypeMismatchException ex) {
         return new ResponseEntity<>("Invalid input: expected a number", HttpStatus.BAD_REQUEST);
