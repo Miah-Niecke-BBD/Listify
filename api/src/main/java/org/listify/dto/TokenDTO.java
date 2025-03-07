@@ -1,7 +1,8 @@
 package org.listify.dto;
-
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.security.web.csrf.CsrfToken;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TokenDTO {
     private String jwtToken;
     private CsrfToken csrfToken;
@@ -10,6 +11,10 @@ public class TokenDTO {
     public TokenDTO(String jwtToken, CsrfToken csrfToken) {
         this.jwtToken = jwtToken;
         this.csrfToken = csrfToken;
+    }
+
+    public TokenDTO() {
+
     }
 
 

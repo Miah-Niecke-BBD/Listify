@@ -1,5 +1,6 @@
 package org.listify.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.listify.dto.ProjectAssigneeDTO;
 import org.listify.service.ProjectAssigneesService;
 import org.listify.service.UserService;
@@ -24,8 +25,8 @@ public class ProjectAssigneesController {
     }
 
     @GetMapping("/{projectID}")
-    public ResponseEntity<List<ProjectAssigneeDTO>> getProjectAssigneeById(@PathVariable("projectID") Long projectID, Authentication authentication) {
-        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
+    public ResponseEntity<List<ProjectAssigneeDTO>> getProjectAssigneeById(@PathVariable("projectID") Long projectID, HttpServletRequest request) {
+        Long teamLeaderID = userService.getUserIDFromAuthentication(request);
        return ResponseEntity.status(HttpStatus.OK).body(projectAssigneesService.getAllProjectsAssignees(projectID));
     }
 
@@ -34,8 +35,8 @@ public class ProjectAssigneesController {
     @Transactional
     public ResponseEntity<ProjectAssigneeDTO> assignUserToProject(@RequestParam(name = "userID") Long userID,
                                                  @RequestParam(name = "projectID") Long projectID,
-                                                 Authentication authentication) {
-        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
+                                                                  HttpServletRequest request) {
+        Long teamLeaderID = userService.getUserIDFromAuthentication(request);
         Long newProjectAssigneeID = projectAssigneesService.assignUserToProject(teamLeaderID, userID, projectID);
         ProjectAssigneeDTO newProjectAssignee = projectAssigneesService.getProjectAssigneeById(newProjectAssigneeID);
 
@@ -46,8 +47,8 @@ public class ProjectAssigneesController {
     @Transactional
     public ResponseEntity<?> deleteUserFromProject(@PathVariable("userID") Long userID,
                                                    @RequestParam(name = "projectID") Long projectID,
-                                                   Authentication authentication) {
-        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
+                                                   HttpServletRequest request) {
+        Long teamLeaderID = userService.getUserIDFromAuthentication(request);
         projectAssigneesService.deleteUserFromProject(userID, projectID, teamLeaderID);
         return ResponseEntity.noContent().build();
     }

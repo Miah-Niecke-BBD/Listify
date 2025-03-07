@@ -3,15 +3,11 @@ package org.listify.config;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-
 @Configuration
 public class SwaggerConfig {
-
 
     @Bean
     public OpenAPI customOpenAPI() {
@@ -32,5 +28,7 @@ public class SwaggerConfig {
                 .addSecurityItem(new io.swagger.v3.oas.models.security.SecurityRequirement()
                         .addList("csrfAuth"));
     }
-
 }
+
+
+

@@ -1,5 +1,6 @@
 package org.listify.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.listify.dto.ViewTaskDTO;
 import org.listify.service.TasksService;
 import org.listify.service.UserService;
@@ -26,37 +27,37 @@ public class TasksController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ViewTaskDTO>> getAllTasks() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Long userID = userService.getUserIDFromAuthentication(authentication);
+    public ResponseEntity<List<ViewTaskDTO>> getAllTasks(HttpServletRequest request) {
+
+        Long userID = userService.getUserIDFromAuthentication(request);
         List<ViewTaskDTO> tasks = tasksService.getAllTasks(userID);
         return ResponseEntity.ok(tasks);
     }
 
     @GetMapping("/{taskID}")
-    public ResponseEntity<ViewTaskDTO> getTaskById(@PathVariable("taskID") Long taskID, Authentication authentication) {
-        Long userID = userService.getUserIDFromAuthentication(authentication);
+    public ResponseEntity<ViewTaskDTO> getTaskById(@PathVariable("taskID") Long taskID, HttpServletRequest request) {
+        Long userID = userService.getUserIDFromAuthentication(request);
         ViewTaskDTO task = tasksService.getTaskDetails(userID, taskID);
         return ResponseEntity.ok(task);
     }
 
     @GetMapping("/{parentTaskID}/subtask")
-    public ResponseEntity<List<ViewTaskDTO>> getAllSubtasksOfTask(@PathVariable("parentTaskID") Long parentTaskID, Authentication authentication) {
-        Long userID = userService.getUserIDFromAuthentication(authentication);
+    public ResponseEntity<List<ViewTaskDTO>> getAllSubtasksOfTask(@PathVariable("parentTaskID") Long parentTaskID, HttpServletRequest request) {
+        Long userID = userService.getUserIDFromAuthentication(request);
         List<ViewTaskDTO> subtasks = tasksService.getAllSubtasksOfTask(parentTaskID, userID);
         return ResponseEntity.ok(subtasks);
     }
 
     @GetMapping("/{taskID}/dependent")
-    public ResponseEntity<ViewTaskDTO> getDependentTaskByTaskId(@PathVariable("taskID") Long taskID, Authentication authentication) {
-        Long userID = userService.getUserIDFromAuthentication(authentication);
+    public ResponseEntity<ViewTaskDTO> getDependentTaskByTaskId(@PathVariable("taskID") Long taskID, HttpServletRequest request) {
+        Long userID = userService.getUserIDFromAuthentication(request);
         ViewTaskDTO dependentTask = tasksService.getDependentTaskById(taskID, userID);
         return ResponseEntity.ok(dependentTask);
     }
 
     @PostMapping
     @Transactional
-    public ResponseEntity<ViewTaskDTO> newTask(Authentication authentication,
+    public ResponseEntity<ViewTaskDTO> newTask(HttpServletRequest request,
                                      @RequestParam(name = "projectID") Long projectID,
                                      @RequestParam(name = "sectionID") Long sectionID,
                                      @RequestParam(name = "taskName") String taskName,
@@ -64,7 +65,7 @@ public class TasksController {
                                      @RequestParam(name = "taskPriority") Byte taskPriority,
                                      @RequestParam(name = "taskPosition") Byte taskPosition) {
 
-        Long userID = userService.getUserIDFromAuthentication(authentication);
+        Long userID = userService.getUserIDFromAuthentication(request);
         Long newTaskID = tasksService.createTask(userID, projectID, sectionID, taskName, taskDescription, taskPriority, taskPosition);
         ViewTaskDTO newTask = tasksService.getTaskById(newTaskID, userID);
         return ResponseEntity.status(HttpStatus.CREATED).body(newTask);
@@ -73,13 +74,13 @@ public class TasksController {
     @PostMapping("/{parentTaskID}/subtask")
     @Transactional
     public ResponseEntity<ViewTaskDTO> newSubTask(@PathVariable("parentTaskID") Long parentTaskID,
-                                        Authentication authentication,
+                                                  HttpServletRequest request,
                                         @RequestParam(name = "taskName") String taskName,
                                         @RequestParam(name = "taskDescription") String taskDescription,
                                         @RequestParam(name = "sectionID") Long sectionID,
                                         @RequestParam(name = "dueDate", required = false) LocalDateTime dueDate) {
 
-        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
+        Long teamLeaderID = userService.getUserIDFromAuthentication(request);
         Long newTaskID = tasksService.createSubTask(teamLeaderID, parentTaskID, taskName, taskDescription, sectionID, dueDate);
         ViewTaskDTO newTask = tasksService.getTaskById(newTaskID, teamLeaderID);
         return ResponseEntity.status(HttpStatus.CREATED).body(newTask);
@@ -88,13 +89,13 @@ public class TasksController {
     @PutMapping("/{taskID}")
     @Transactional
     ResponseEntity<ViewTaskDTO> updateTask(@PathVariable("taskID") Long taskID,
-                                 Authentication authentication,
+                                           HttpServletRequest request,
                                  @RequestParam(value = "newTaskName", required = false) String newTaskName,
                                  @RequestParam(value = "newTaskDescription", required = false) String newTaskDescription,
                                  @RequestParam(value = "newTaskPriority", required = false) Byte newTaskPriority,
                                  @RequestParam(value = "newDueDate", required = false) LocalDateTime newDueDate) {
 
-        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
+        Long teamLeaderID = userService.getUserIDFromAuthentication(request);
         tasksService.updateTaskDetails(taskID, teamLeaderID, newTaskName, newTaskDescription, newTaskPriority, newDueDate);
         ViewTaskDTO updatedTask = tasksService.getTaskById(taskID, teamLeaderID);
         return ResponseEntity.status(HttpStatus.CREATED).body(updatedTask);
@@ -104,11 +105,11 @@ public class TasksController {
     @PutMapping("/{taskID}/position")
     @Transactional
     ResponseEntity<ViewTaskDTO> updateTaskPosition(@PathVariable("taskID") Long taskID,
-                                         Authentication authentication,
+                                                   HttpServletRequest request,
                                          @RequestParam(name = "newTaskPosition") Long newTaskPosition,
                                          @RequestParam(name = "sectionID") Long sectionID) {
 
-        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
+        Long teamLeaderID = userService.getUserIDFromAuthentication(request);
         tasksService.updateTaskPosition(teamLeaderID, taskID, newTaskPosition, sectionID);
         ViewTaskDTO updatedTask = tasksService.getTaskById(taskID, teamLeaderID);
         return ResponseEntity.status(HttpStatus.CREATED).body(updatedTask);
@@ -117,8 +118,8 @@ public class TasksController {
 
     @DeleteMapping("/{taskID}")
     @Transactional
-    ResponseEntity<?> deleteTask(@PathVariable("taskID") Long taskID, Authentication authentication) {
-        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
+    ResponseEntity<?> deleteTask(@PathVariable("taskID") Long taskID, HttpServletRequest request) {
+        Long teamLeaderID = userService.getUserIDFromAuthentication(request);
         tasksService.deleteTaskById(taskID, teamLeaderID);
         return ResponseEntity.noContent().build();
     }

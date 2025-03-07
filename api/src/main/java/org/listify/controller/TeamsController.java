@@ -1,6 +1,7 @@
 package org.listify.controller;
 
 import com.nimbusds.jose.shaded.json.JSONObject;
+import jakarta.servlet.http.HttpServletRequest;
 import org.listify.dto.DueTasksDTO;
 import org.listify.dto.TeamInfoDTO;
 import org.listify.dto.TeamMemberInfoDTO;
@@ -28,75 +29,63 @@ public class TeamsController {
     private UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<Teams>> getAllTeams() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Long userID = userService.getUserIDFromAuthentication(authentication);
+    public ResponseEntity<List<Teams>> getAllTeams(HttpServletRequest request) {
+        Long userID = userService.getUserIDFromAuthentication(request);
         List<Teams> teams = teamService.getAllUserTeams(userID);
 
         return ResponseEntity.ok(teams);
     }
 
     @PostMapping
-    public ResponseEntity<Teams> addTeam(@RequestParam("teamName") String teamName) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public ResponseEntity<Teams> addTeam(@RequestParam("teamName") String teamName,HttpServletRequest request) {
 
-        Long userID = userService.getUserIDFromAuthentication(authentication);
-
+        Long userID = userService.getUserIDFromAuthentication(request);
         Long newTeamID = teamService.addTeam(userID, teamName);
-
         Teams createdTeam = teamService.findATeamByUserID(userID, newTeamID);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTeam);
     }
 
     @GetMapping("/{teamID}")
-    public ResponseEntity<TeamInfoDTO> getTeamById(@PathVariable("teamID") Long teamID) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public ResponseEntity<TeamInfoDTO> getTeamById(@PathVariable("teamID") Long teamID,HttpServletRequest request) {
 
-        Long userID = userService.getUserIDFromAuthentication(authentication);
-
+        Long userID = userService.getUserIDFromAuthentication(request);
         Teams team = teamService.findATeamByUserID(userID, teamID);
 
         return ResponseEntity.status(HttpStatus.OK).body(new TeamInfoDTO(team.getTeamName(), team.getCreatedAt(), team.getUpdatedAt()));
     }
 
     @DeleteMapping("/{teamID}")
-    public ResponseEntity<Void> deleteTeam(@PathVariable("teamID") Long teamID) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public ResponseEntity<Void> deleteTeam(@PathVariable("teamID") Long teamID,HttpServletRequest request) {
 
-        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
-
+        Long teamLeaderID = userService.getUserIDFromAuthentication(request);
         teamService.deleteTeam(teamID, teamLeaderID);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PutMapping("/{teamID}")
-    public ResponseEntity<TeamInfoDTO> updateTeam(@PathVariable("teamID") Long teamID, @RequestParam("newTeamName") String newTeamName) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public ResponseEntity<TeamInfoDTO> updateTeam(@PathVariable("teamID") Long teamID, @RequestParam("newTeamName") String newTeamName,HttpServletRequest request) {
 
-        Long userID = userService.getUserIDFromAuthentication(authentication);
+        Long userID = userService.getUserIDFromAuthentication(request);
         TeamInfoDTO updatedTeam = teamService.updateTeamDetails(userID, teamID, newTeamName);
 
         return ResponseEntity.status(HttpStatus.OK).body(updatedTeam);
     }
 
     @GetMapping("/{teamID}/members")
-    public ResponseEntity<List<TeamMemberInfoDTO>> getTeamMembersByTeamId(@PathVariable("teamID") Long teamID) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public ResponseEntity<List<TeamMemberInfoDTO>> getTeamMembersByTeamId(@PathVariable("teamID") Long teamID,HttpServletRequest request) {
 
-        Long userID = userService.getUserIDFromAuthentication(authentication);
+        Long userID = userService.getUserIDFromAuthentication(request);
         List<TeamMemberInfoDTO> teamMembers = teamService.getTeamMembersByTeamID(teamID, userID);
 
         return ResponseEntity.ok(teamMembers);
     }
 
     @PostMapping("/{teamID}/members")
-    public ResponseEntity<List<TeamMemberInfoDTO>> assignMemberToTeam( @RequestParam("githubID") String githubID, @PathVariable("teamID") Long teamID) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public ResponseEntity<List<TeamMemberInfoDTO>> assignMemberToTeam( @RequestParam("githubID") String githubID, @PathVariable("teamID") Long teamID,HttpServletRequest request) {
 
-        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
-
+        Long teamLeaderID = userService.getUserIDFromAuthentication(request);
         teamService.assignMemberToTeam(teamLeaderID, githubID, teamID);
         List<TeamMemberInfoDTO> teamMembers = teamService.getTeamMembersByTeamID(teamID, teamLeaderID);
 
@@ -104,21 +93,18 @@ public class TeamsController {
     }
 
     @DeleteMapping("/{teamID}/members")
-    public ResponseEntity<Void> deleteMemberFromTeam(@RequestParam("githubID") String githubID, @PathVariable("teamID") Long teamID) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public ResponseEntity<Void> deleteMemberFromTeam(@RequestParam("githubID") String githubID, @PathVariable("teamID") Long teamID,HttpServletRequest request) {
 
-        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
-
+        Long teamLeaderID = userService.getUserIDFromAuthentication(request);
         teamService.deleteMemberFromTeam(githubID, teamID, teamLeaderID);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PutMapping("/{teamID}/members")
-    public ResponseEntity<JSONObject> updateTeamLeader(@PathVariable("teamID") Long teamID, @RequestParam("newTeamLeaderGithubID") String newTeamLeaderGithubID) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public ResponseEntity<JSONObject> updateTeamLeader(@PathVariable("teamID") Long teamID, @RequestParam("newTeamLeaderGithubID") String newTeamLeaderGithubID,HttpServletRequest request) {
 
-        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
+        Long teamLeaderID = userService.getUserIDFromAuthentication(request);
 
         teamService.updateTeamLeader(teamLeaderID, teamID, newTeamLeaderGithubID);
         JSONObject response = new JSONObject();
@@ -128,21 +114,17 @@ public class TeamsController {
     }
 
     @GetMapping("/{teamID}/projects")
-    public ResponseEntity<List<TeamProjectsDTO>> findProjectsByTeamID(@PathVariable("teamID") Long teamID) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public ResponseEntity<List<TeamProjectsDTO>> findProjectsByTeamID(@PathVariable("teamID") Long teamID,HttpServletRequest request) {
 
-        Long loggedInUser = userService.getUserIDFromAuthentication(authentication);
-
+        Long loggedInUser = userService.getUserIDFromAuthentication(request);
         List<TeamProjectsDTO> projects = teamService.findProjectsByTeamID(loggedInUser, teamID);
         return ResponseEntity.ok(projects);
     }
 
     @GetMapping("/{teamID}/dueTasks")
-    public ResponseEntity<List<DueTasksDTO>> findTeamsDueTasks(@PathVariable("teamID") Long teamID) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public ResponseEntity<List<DueTasksDTO>> findTeamsDueTasks(@PathVariable("teamID") Long teamID,HttpServletRequest request) {
 
-        Long loggedInUser = userService.getUserIDFromAuthentication(authentication);
-
+        Long loggedInUser = userService.getUserIDFromAuthentication(request);
         List<DueTasksDTO> tasks = teamService.findTeamsDueTasks(loggedInUser, teamID);
         return ResponseEntity.ok(tasks);
     }
