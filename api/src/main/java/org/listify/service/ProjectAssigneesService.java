@@ -32,35 +32,24 @@ public class ProjectAssigneesService {
         String githubID = "user" + projectAssignee.getUserID() + "_github";
 
         return new ProjectAssigneeDTO(
+                project.getProjectID(),
                 project.getProjectName(),
                 githubID
         );
     }
 
-    public List<ProjectAssigneeDTO> getAllProjectAssignees(Long userID) {
-        List<ProjectAssignees> projectAssigneesList = repository.findAll();
-        if (projectAssigneesList.isEmpty()) {
-            throw new ForbiddenException("No projects assigned");
-        }
+    public List<ProjectAssigneeDTO> getAllProjectsAssignees(Long projectID) {
+        List<ProjectAssignees> projectAssigneesList = repository.findProjectsAssignedUsers(projectID);
+
         return projectAssigneesList.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
-    public ProjectAssigneeDTO getProjectAssigneeById(Long projectAssigneeID) {
-        ProjectAssignees assignee = repository.findById(projectAssigneeID)
-                .orElseThrow(() -> new NotFoundException("Project assignee id " + projectAssigneeID + " not found"));
+    public ProjectAssigneeDTO getProjectAssigneeById(Long projectID) {
+        ProjectAssignees assignee = repository.findById(projectID)
+                .orElseThrow(() -> new NotFoundException("Project assignee id " + projectID + " not found"));
         return convertToDTO(assignee);
-    }
-
-    public List<ProjectAssigneeDTO> getProjectsAssignedToSpecificUser(Long userID) {
-        List<ProjectAssignees> projectsAssignedToUser = repository.findProjectsAssignedToUser(userID);
-        if (projectsAssignedToUser.isEmpty()) {
-            throw new ForbiddenException("projects assigned to user not found");
-        }
-        return projectsAssignedToUser.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
     }
 
     public Long assignUserToProject(Long teamLeaderID, Long userID, Long projectID) {

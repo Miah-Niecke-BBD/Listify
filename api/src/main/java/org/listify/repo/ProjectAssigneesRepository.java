@@ -12,8 +12,8 @@ import java.util.List;
 @Repository
 public interface ProjectAssigneesRepository extends JpaRepository<ProjectAssignees, Long> {
 
-    @Query("SELECT p FROM ProjectAssignees p WHERE p.userID = :userID")
-    List<ProjectAssignees> findProjectsAssignedToUser(@Param("userID") Long userID);
+    @Query("SELECT p FROM ProjectAssignees p WHERE p.projectID = :projectID")
+    List<ProjectAssignees> findProjectsAssignedUsers(@Param("projectID") Long projectID);
 
 
     @Procedure("listify.uspAssignUserToProject")

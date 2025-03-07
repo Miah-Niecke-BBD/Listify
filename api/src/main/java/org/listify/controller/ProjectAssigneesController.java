@@ -23,22 +23,16 @@ public class ProjectAssigneesController {
         this.userService = userService;
     }
 
-
-    @GetMapping("/{assigneeID}")
-    public ResponseEntity<Object> getProjectAssigneeById(@PathVariable("assigneeID") Long assigneeID) {
-        ProjectAssigneeDTO assignee = projectAssigneesService.getProjectAssigneeById(assigneeID);
-        return ResponseEntity.ok(assignee);
+    @GetMapping("/{projectID}")
+    public ResponseEntity<List<ProjectAssigneeDTO>> getProjectAssigneeById(@PathVariable("projectID") Long projectID, Authentication authentication) {
+        Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
+       return ResponseEntity.status(HttpStatus.OK).body(projectAssigneesService.getAllProjectsAssignees(projectID));
     }
 
-    @GetMapping("/projects/{userID}")
-    public ResponseEntity<Object> getProjectsAssignedToUser(@PathVariable("userID") Long userID) {
-        List<ProjectAssigneeDTO> projects = projectAssigneesService.getProjectsAssignedToSpecificUser(userID);
-        return ResponseEntity.ok(projects);
-    }
 
     @PostMapping
     @Transactional
-    public ResponseEntity<?> assignUserToProject(@RequestParam(name = "userID") Long userID,
+    public ResponseEntity<ProjectAssigneeDTO> assignUserToProject(@RequestParam(name = "userID") Long userID,
                                                  @RequestParam(name = "projectID") Long projectID,
                                                  Authentication authentication) {
         Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
@@ -48,10 +42,10 @@ public class ProjectAssigneesController {
         return ResponseEntity.status(HttpStatus.CREATED).body(newProjectAssignee);
     }
 
-    @DeleteMapping("/{userID}")
+    @DeleteMapping("/{projectID}")
     @Transactional
-    public ResponseEntity<?> deleteUserFromProject(@PathVariable("userID") Long userID,
-                                                   @RequestParam(name = "projectID") Long projectID,
+    public ResponseEntity<?> deleteUserFromProject(@PathVariable("projectID") Long projectID,
+                                                   @RequestParam(name = "userID") Long userID,
                                                    Authentication authentication) {
         Long teamLeaderID = userService.getUserIDFromAuthentication(authentication);
         projectAssigneesService.deleteUserFromProject(userID, projectID, teamLeaderID);
