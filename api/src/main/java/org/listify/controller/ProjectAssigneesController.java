@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -27,14 +28,14 @@ public class ProjectAssigneesController {
     @GetMapping("/{projectID}")
     public ResponseEntity<List<ProjectAssigneeDTO>> getProjectAssigneeById(@PathVariable("projectID") Long projectID, HttpServletRequest request) {
         Long teamLeaderID = userService.getUserIDFromAuthentication(request);
-       return ResponseEntity.status(HttpStatus.OK).body(projectAssigneesService.getAllProjectsAssignees(projectID));
+       return ResponseEntity.status(HttpStatus.OK).body(Collections.singletonList(projectAssigneesService.getProjectAssigneeById(projectID)));
     }
 
 
     @PostMapping
     @Transactional
     public ResponseEntity<ProjectAssigneeDTO> assignUserToProject(@RequestParam(name = "userID") Long userID,
-                                                 @RequestParam(name = "projectID") Long projectID,
+                                                                    @RequestParam(name = "projectID") Long projectID,
                                                                   HttpServletRequest request) {
         Long teamLeaderID = userService.getUserIDFromAuthentication(request);
         Long newProjectAssigneeID = projectAssigneesService.assignUserToProject(teamLeaderID, userID, projectID);
