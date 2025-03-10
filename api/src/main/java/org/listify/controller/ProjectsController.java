@@ -4,6 +4,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.listify.dto.DueTasksDTO;
 import org.listify.dto.ProjectSectionsDTO;
 import org.listify.dto.ProjectsInfoDTO;
+import org.listify.dto.UpdateProjectDTO;
+import org.listify.exception.BadRequestException;
 import org.listify.model.Projects;
 import org.listify.service.ProjectsService;
 import org.listify.service.UserService;
@@ -49,14 +51,22 @@ public class ProjectsController {
     @Transactional
     public ResponseEntity<ProjectsInfoDTO> updateProject(@PathVariable("projectID") Long projectID,
                                                          HttpServletRequest request,
-                                                         @RequestParam(name = "projectName", required = false) String projectName,
-                                                         @RequestParam(name = "projectDescription", required = false) String projectDescription) {
+                                                         @RequestBody UpdateProjectDTO updateProjectRequestDTO) {
         Long userID = userService.getUserIDFromAuthentication(request);
+
+        String projectName = updateProjectRequestDTO.getProjectName();
+        String projectDescription = updateProjectRequestDTO.getProjectDescription();
+
+        if ((projectName== null ||projectName.trim().isEmpty()) && (projectDescription == null || projectDescription.trim().isEmpty())) {
+            throw new BadRequestException("Please pass in either a projectName or a ProjectDescription or both");
+        }
+
         projectsService.updateProject(projectID, userID, projectName, projectDescription);
         Projects updatedProject = projectsService.getProjectById(projectID, userID);
 
         return ResponseEntity.ok(new ProjectsInfoDTO(updatedProject.getProjectName(), updatedProject.getProjectDescription(), updatedProject.getCreatedAt(), updatedProject.getUpdatedAt()));
     }
+
 
     @DeleteMapping("/{projectID}")
     @Transactional
