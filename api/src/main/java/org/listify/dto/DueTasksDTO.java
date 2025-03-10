@@ -1,6 +1,6 @@
 package org.listify.dto;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -10,9 +10,9 @@ public class DueTasksDTO {
     private Long taskID;
     private String taskName;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSSSSS")
-    private LocalDateTime dueDate;
+    private OffsetDateTime dueDate;
 
-    public DueTasksDTO(Long taskID, String taskName, LocalDateTime dueDate) {
+    public DueTasksDTO(Long taskID, String taskName, OffsetDateTime dueDate) {
         this.taskID = taskID;
         this.taskName = taskName;
         this.dueDate = dueDate;
@@ -34,11 +34,11 @@ public class DueTasksDTO {
         this.taskName = taskName;
     }
 
-    public LocalDateTime getDueDate() {
+    public OffsetDateTime getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(LocalDateTime dueDate) {
+    public void setDueDate(OffsetDateTime dueDate) {
         this.dueDate = dueDate;
     }
 }
