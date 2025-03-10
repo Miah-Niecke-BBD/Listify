@@ -8,6 +8,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationCodeGrantFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 
 @Configuration
@@ -19,14 +21,14 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-            http.addFilterBefore(jwtTokenFilter, OAuth2AuthorizationCodeGrantFilter.class)
-                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/login", "/oauth2/callback/google","/authentication","/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+        http.authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                        .requestMatchers("/login", "/oauth2/callback/google", "/authentication", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
-                );
-
-
-
+                ).addFilterBefore(jwtTokenFilter, OAuth2AuthorizationCodeGrantFilter.class)
+                .csrf()
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler());
         return http.build();
     }
+
 }

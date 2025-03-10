@@ -1,7 +1,8 @@
 package org.listify.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -14,13 +15,13 @@ public class Teams {
     @Column(name = "teamName", nullable = false, length = 100)
     private String teamName;
     @Column(name = "createdAt", nullable = false)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
     @Column(name = "updatedAt", nullable = true)
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 
     protected Teams () {}
 
-    public Teams(Long teamID, String teamName, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Teams(Long teamID, String teamName, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         this.teamID = teamID;
         this.teamName = teamName;
         this.createdAt = createdAt;
@@ -43,19 +44,19 @@ public class Teams {
         this.teamName = teamName;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public OffsetDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public OffsetDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 }
