@@ -1,6 +1,7 @@
 package org.listify.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.listify.dto.UserDTO;
 import org.listify.model.Users;
 import org.listify.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-
     @DeleteMapping
     @Transactional
     public ResponseEntity<?> deleteUser(@RequestParam("userID") Long userID , HttpServletRequest request) {
@@ -28,7 +28,7 @@ public class UserController {
     }
 
 
-    @PostMapping
+    @GetMapping("/create")
     public ResponseEntity<Users> createUser(HttpServletRequest request) {
 
         String googleID = (String) request.getAttribute("sub");
@@ -37,6 +37,20 @@ public class UserController {
             userService.createUser(googleID);
         }
         Users user = userService.getUserByGitHubID(googleID);
+        return ResponseEntity.ok(user);
+
+    }
+
+    @GetMapping
+    public ResponseEntity<UserDTO> getUser(HttpServletRequest request) {
+
+        String googleID = (String) request.getAttribute("sub");
+        String name = (String) request.getAttribute("name");
+        UserDTO user = null;
+        if (userService.userExistsByGitHubID(googleID)) {
+            user = new UserDTO();
+            user.setUsername(name);
+        }
         return ResponseEntity.ok(user);
 
     }
