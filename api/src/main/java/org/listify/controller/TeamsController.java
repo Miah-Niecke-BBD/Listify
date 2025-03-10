@@ -2,19 +2,16 @@ package org.listify.controller;
 
 import com.nimbusds.jose.shaded.json.JSONObject;
 import jakarta.servlet.http.HttpServletRequest;
-import org.listify.dto.DueTasksDTO;
-import org.listify.dto.TeamInfoDTO;
-import org.listify.dto.TeamMemberInfoDTO;
-import org.listify.dto.TeamProjectsDTO;
+import jakarta.validation.Valid;
+import org.listify.dto.*;
+import org.listify.exception.BadRequestException;
 import org.listify.model.Teams;
 import org.listify.service.TeamsService;
 import org.listify.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -65,9 +62,19 @@ public class TeamsController {
     }
 
     @PutMapping("/{teamID}")
-    public ResponseEntity<TeamInfoDTO> updateTeam(@PathVariable("teamID") Long teamID, @RequestParam("newTeamName") String newTeamName,HttpServletRequest request) {
+    public ResponseEntity<TeamInfoDTO> updateTeam(
+            @PathVariable("teamID") Long teamID,
+            @Valid @RequestBody UpdateTeamDTO updateTeamDTO,
+            HttpServletRequest request) {
 
         Long userID = userService.getUserIDFromAuthentication(request);
+
+        String newTeamName = updateTeamDTO.getNewTeamName();
+
+        if (newTeamName == null || newTeamName.trim().isEmpty()) {
+            throw new BadRequestException("newTeamName variable must not be empty or null");
+        }
+
         TeamInfoDTO updatedTeam = teamService.updateTeamDetails(userID, teamID, newTeamName);
 
         return ResponseEntity.status(HttpStatus.OK).body(updatedTeam);

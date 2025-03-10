@@ -12,7 +12,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<String> handleConversionException(MethodArgumentTypeMismatchException ex) {
-        return new ResponseEntity<>("Invalid input: expected a number", HttpStatus.BAD_REQUEST);
+        String errorMessage = "Invalid input for parameter '" + ex.getName() + "': expected " + ex.getRequiredType().getSimpleName();
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(BadRequestException.class)

@@ -168,7 +168,7 @@ public class TeamsService {
 
     @Transactional
     public TeamInfoDTO updateTeamDetails(Long userID, Long teamID, String newTeamName) {
-        Teams team = findATeamByUserID(userID, teamID);
+        findATeamByUserID(userID, teamID);
         boolean isTeamLeader = isTeamLeader(teamID, userID);
 
         if (newTeamName.length() > 100) {
@@ -183,7 +183,9 @@ public class TeamsService {
         entityManager.flush();
         entityManager.clear();
 
-        return new TeamInfoDTO(team.getTeamName(), team.getCreatedAt(), team.getUpdatedAt());
+        Teams updatedTeam = findATeamByUserID(userID, teamID);
+
+        return new TeamInfoDTO(updatedTeam.getTeamName(), updatedTeam.getCreatedAt(), updatedTeam.getUpdatedAt());
     }
 
     public void updateTeamLeader(Long teamLeaderID, Long teamID, String newTeamLeaderGithubID) {
