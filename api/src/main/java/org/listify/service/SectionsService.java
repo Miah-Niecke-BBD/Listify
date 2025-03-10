@@ -1,6 +1,8 @@
 package org.listify.service;
 
 import org.listify.dto.SectionTaskDTO;
+import org.listify.dto.UpdateSectionDTO;
+import org.listify.dto.UpdateSectionPositionDTO;
 import org.listify.exception.BadRequestException;
 import org.listify.exception.ForbiddenException;
 import org.listify.exception.NotFoundException;
@@ -56,15 +58,15 @@ public class SectionsService {
         return newlyCreatedSection != null ? newlyCreatedSection.getSectionID() : null;
     }
 
-    public void updateSection(Long sectionID, Long userID, String newSectionName) {
-        if (newSectionName.length() > 100) {
+    public void updateSection(Long sectionID, Long userID, UpdateSectionDTO updatedSection) {
+        if (updatedSection.getSectionName().length() > 100) {
             throw new BadRequestException("Section name has a maximum of 100 characters");
         }
 
         if (!repository.isSectionAndUserInSameProject(sectionID, userID)) {
             throw new ForbiddenException("Only sections within your project can be updated.");
         }
-        repository.updateSection(sectionID, userID, newSectionName);
+        repository.updateSection(sectionID, userID, updatedSection.getSectionName());
     }
 
     public void deleteSectionById(Long teamLeaderID, Long sectionID) {
@@ -75,11 +77,11 @@ public class SectionsService {
         repository.deleteSectionById(teamLeaderID, sectionID);
     }
 
-    public void updateSectionPosition(Long sectionID, Long loggedInUserID, Integer newSectionPosition) {
+    public void updateSectionPosition(Long sectionID, Long loggedInUserID, UpdateSectionPositionDTO updatedPosition) {
         if (!repository.isSectionAndUserInSameProject(sectionID, loggedInUserID)) {
             throw new ForbiddenException("Only sections within your project can be updated.");
         }
-        repository.updateSectionPosition(loggedInUserID, sectionID, newSectionPosition);
+        repository.updateSectionPosition(loggedInUserID, sectionID, updatedPosition.getSectionPosition());
     }
 
     private SectionTaskDTO mapTaskToSectionTaskDTO(Tasks task) {
