@@ -1,11 +1,14 @@
-	
+	IF OBJECT_ID('listify.uspCreateSubTask', 'P') IS NOT NULL
+        DROP PROCEDURE listify.uspCreateSubTask;
+    GO
+
 	CREATE PROCEDURE listify.uspCreateSubTask
 		@teamLeaderID INT,
 		@parentTaskID INT,  
 		@taskName VARCHAR(100),
 		@taskDescription VARCHAR(500),
 		@sectionID INT,
-		@dueDate DATETIME = NULL
+		@dueDate DATETIMEOFFSET = NULL
 	AS
 	BEGIN
 		DECLARE @teamID INT, @isTeamLeader BIT, @taskPosition TINYINT;
@@ -35,7 +38,7 @@
         WHERE parentTaskID = @parentTaskID;
 
         INSERT INTO listify.Tasks (taskName, taskDescription, sectionID, parentTaskID, taskPosition, dueDate, createdAt)
-        VALUES (@taskName, @taskDescription, @sectionID, @parentTaskID, @taskPosition, @dueDate, SYSDATETIME());
+        VALUES (@taskName, @taskDescription, @sectionID, @parentTaskID, @taskPosition, @dueDate, SYSDATETIMEOFFSET());
 
     END TRY
     BEGIN CATCH
