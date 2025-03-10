@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -68,18 +70,29 @@ public class JwtTokenFilter implements Filter {
         }
 
         try {
-            String sub = validateJwtToken(token);
+
+            Map<String, String> userClaims = validateJwtToken(token);
+            String sub = userClaims.get("sub");
+            String name = userClaims.get("name");
+
+
             List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+
+
             Authentication authentication = new UsernamePasswordAuthenticationToken(sub, null, authorities);
+
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
             httpRequest.setAttribute("sub", sub);
+            httpRequest.setAttribute("name", name);
+
             chain.doFilter(request, response);
-            System.out.println("work");
         } catch (BadCredentialsException e) {
             httpResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
             httpResponse.getWriter().write("Invalid JWT token: " + e.getMessage());
         }
     }
+
 
     private String extractJwtToken(HttpServletRequest request) {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -98,7 +111,7 @@ public class JwtTokenFilter implements Filter {
                 requestUri.equals("/swagger-ui/index.html");
     }
 
-    private String validateJwtToken(String token) throws BadCredentialsException {
+    private Map<String, String> validateJwtToken(String token) throws BadCredentialsException {
         try {
             JWT jwt = JWTParser.parse(token);
 
@@ -110,7 +123,13 @@ public class JwtTokenFilter implements Filter {
                 }
 
                 validateJwtClaims(claimsSet);
-                return claimsSet.getSubject();
+                String sub = claimsSet.getSubject();
+                String name = claimsSet.getStringClaim("name");
+
+                Map<String, String> userClaims = new HashMap<>();
+                userClaims.put("sub", sub);
+                userClaims.put("name", name);
+                return userClaims;
 
             } else {
                 throw new BadCredentialsException("Invalid JWT structure.");
@@ -121,6 +140,7 @@ public class JwtTokenFilter implements Filter {
             throw new BadCredentialsException("JWT token validation failed: " + e.getMessage(), e);
         }
     }
+
 
     private boolean validateJwtSignature(SignedJWT signedJWT) throws Exception {
         String kid = signedJWT.getHeader().getKeyID();

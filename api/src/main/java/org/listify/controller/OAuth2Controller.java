@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.listify.dto.TokenDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,9 +58,8 @@ public class OAuth2Controller {
         JsonNode jsonResponse = objectMapper.readTree(response);
 
         String jwtToken = jsonResponse.get("id_token").asText();
-        CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
 
-        TokenDTO tokenDTO = new TokenDTO(jwtToken,csrfToken);
+        TokenDTO tokenDTO = new TokenDTO(jwtToken);
 
         return ResponseEntity.ok(tokenDTO);
     }

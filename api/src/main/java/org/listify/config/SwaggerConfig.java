@@ -17,18 +17,13 @@ public class SwaggerConfig {
                                 .type(SecurityScheme.Type.HTTP)
                                 .scheme("bearer")
                                 .bearerFormat("JWT"))
-                        .addSecuritySchemes("csrfAuth", new SecurityScheme()
-                                .type(SecurityScheme.Type.APIKEY)
-                                .in(SecurityScheme.In.HEADER)
-                                .name("X-CSRF-TOKEN")
-                                .description("CSRF Token for secure requests"))
                 )
                 .addSecurityItem(new io.swagger.v3.oas.models.security.SecurityRequirement()
-                        .addList("bearerAuth"))
-                .addSecurityItem(new io.swagger.v3.oas.models.security.SecurityRequirement()
-                        .addList("csrfAuth"));
+                        .addList("bearerAuth"));
     }
 }
+
+
 
 
 
