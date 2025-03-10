@@ -1,6 +1,6 @@
 package org.listify.dto;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -8,12 +8,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TeamInfoDTO {
     private String teamName;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSSSSS")
-    private LocalDateTime createdAt;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSSSSS")
-    private LocalDateTime updatedAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSSSSSXXX")
+    private OffsetDateTime createdAt;
 
-    public TeamInfoDTO(String teamName, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSSSSSXXX")
+    private OffsetDateTime updatedAt;
+
+    public TeamInfoDTO(String teamName, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         this.teamName = teamName;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -27,19 +28,19 @@ public class TeamInfoDTO {
         this.teamName = teamName;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public OffsetDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public OffsetDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 }
