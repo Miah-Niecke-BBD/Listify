@@ -168,7 +168,9 @@ public class TasksService {
 
     private ViewTaskDTO mapTaskToViewTaskDTO(Tasks task) {
         String priorityLabelName = repository.getPriorityLabelNameByTaskID(task.getTaskID());
-        ViewTaskDTO taskDTO = new ViewTaskDTO(
+        List<SimpleUserDTO> assignees = repository.getUsersAssignedToTask(task.getTaskID());
+        SimpleTaskDTO dependentTask = getDependentTaskByTaskID(task.getTaskID());
+        return new ViewTaskDTO(
                 task.getTaskID(),
                 task.getTaskName(),
                 task.getTaskDescription(),
@@ -177,15 +179,9 @@ public class TasksService {
                 task.getUpdatedAt(),
                 task.getDueDate(),
                 task.getDateCompleted(),
-                null,
-                null
+                assignees,
+                dependentTask
         );
-
-        List<SimpleUserDTO> assignees = repository.getUsersAssignedToTask(task.getTaskID());
-        SimpleTaskDTO dependentTask = getDependentTaskByTaskID(task.getTaskID());
-        taskDTO.setTaskAssignees(assignees);
-        taskDTO.setDependantTask(dependentTask);
-        return taskDTO;
     }
 
 
