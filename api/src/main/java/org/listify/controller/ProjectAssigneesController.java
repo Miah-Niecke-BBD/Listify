@@ -44,7 +44,7 @@ public class ProjectAssigneesController {
         return ResponseEntity.status(HttpStatus.CREATED).body(newProjectAssignee);
     }
 
-    @DeleteMapping("/{userID}")
+    @DeleteMapping("/{projectID}")
     @Transactional
     public ResponseEntity<?> deleteUserFromProject(@PathVariable("projectID") Long projectID,
                                                    @RequestParam(name = "userID") Long userID,
