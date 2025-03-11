@@ -14,7 +14,7 @@ public class ProjectAssignees {
     @Column(name="projectID", nullable = false)
     private Long projectID;
 
-    protected ProjectAssignees () {}
+    public ProjectAssignees() {}
 
     public ProjectAssignees(Long projectAssigneeID, Long userID, Long projectID) {
         this.projectAssigneeID = projectAssigneeID;
@@ -46,3 +46,5 @@ public class ProjectAssignees {
         this.projectID = projectID;
     }
 }
+
+

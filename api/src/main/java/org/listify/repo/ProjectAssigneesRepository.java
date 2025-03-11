@@ -15,7 +15,6 @@ public interface ProjectAssigneesRepository extends JpaRepository<ProjectAssigne
     @Query("SELECT p FROM ProjectAssignees p WHERE p.projectID = :projectID")
     List<ProjectAssignees> findProjectsAssignedUsers(@Param("projectID") Long projectID);
 
-
     @Procedure("listify.uspAssignUserToProject")
     void assignUserToProject(
             @Param("teamLeaderID") Long teamLeaderID,
@@ -28,7 +27,9 @@ public interface ProjectAssigneesRepository extends JpaRepository<ProjectAssigne
             @Param("projectID") Long projectID,
             @Param("teamLeaderID") Long teamLeaderID);
 
-
-    @Query("SELECT p FROM ProjectAssignees p ORDER BY p.projectAssigneeID DESC LIMIT 1")
-    ProjectAssignees findTopOrderByProjectAssigneeIDDesc();
+    @Query("SELECT CASE WHEN COUNT(tm) > 0 THEN true ELSE false END " +
+            "FROM TeamMembers tm " +
+            "JOIN Projects p ON p.teamID = tm.teamID " +
+            "WHERE p.projectID = :projectID AND tm.userID = :userID AND tm.isTeamLeader = true")
+    boolean isTeamLeader(@Param("userID") Long userID, @Param("projectID") Long projectID);
 }

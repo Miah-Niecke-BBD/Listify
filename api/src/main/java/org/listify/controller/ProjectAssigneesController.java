@@ -23,29 +23,31 @@ public class ProjectAssigneesController {
         this.userService = userService;
     }
 
-    @GetMapping("/{projectID}")
-    public ResponseEntity<List<ProjectAssigneeDTO>> getProjectAssigneeById(@PathVariable("projectID") Long projectID, HttpServletRequest request) {
+    @GetMapping("/{assignees}")
+    public ResponseEntity<List<ProjectAssigneeDTO>> getProjectsAssignedUsers(@PathVariable("projectID") Long projectID,
+                                                                             HttpServletRequest request) {
         Long teamLeaderID = userService.getUserIDFromAuthentication(request);
-       return ResponseEntity.status(HttpStatus.OK).body(projectAssigneesService.getAllProjectsAssignees(projectID));
+        List<ProjectAssigneeDTO> assignedUsers = projectAssigneesService.getAllProjectsAssignees(projectID);
+        return ResponseEntity.ok(assignedUsers);
     }
 
-
-    @PostMapping
+    @PostMapping("/{projectID}")
     @Transactional
-    public ResponseEntity<ProjectAssigneeDTO> assignUserToProject(@RequestParam(name = "userID") Long userID,
-                                                 @RequestParam(name = "projectID") Long projectID,
+    public ResponseEntity<ProjectAssigneeDTO> assignUserToProject(@PathVariable("projectID") Long projectID,
+                                                                  @RequestParam(name = "userID") Long userID,
                                                                   HttpServletRequest request) {
         Long teamLeaderID = userService.getUserIDFromAuthentication(request);
-        Long newProjectAssigneeID = projectAssigneesService.assignUserToProject(teamLeaderID, userID, projectID);
-        ProjectAssigneeDTO newProjectAssignee = projectAssigneesService.getProjectAssigneeById(newProjectAssigneeID);
-
+        projectAssigneesService.assignUserToProject(teamLeaderID, userID, projectID);
+        String githubID = "user" + userID + "_github";
+        String projectName = projectAssigneesService.getAllProjectsAssignees(projectID).get(0).getProjectName();
+        ProjectAssigneeDTO newProjectAssignee = new ProjectAssigneeDTO(projectName, githubID);
         return ResponseEntity.status(HttpStatus.CREATED).body(newProjectAssignee);
     }
 
-    @DeleteMapping("/{userID}")
+    @DeleteMapping("/{projectID}")
     @Transactional
-    public ResponseEntity<?> deleteUserFromProject(@PathVariable("userID") Long userID,
-                                                   @RequestParam(name = "projectID") Long projectID,
+    public ResponseEntity<?> deleteUserFromProject(@PathVariable("projectID") Long projectID,
+                                                   @RequestParam(name = "userID") Long userID,
                                                    HttpServletRequest request) {
         Long teamLeaderID = userService.getUserIDFromAuthentication(request);
         projectAssigneesService.deleteUserFromProject(userID, projectID, teamLeaderID);
