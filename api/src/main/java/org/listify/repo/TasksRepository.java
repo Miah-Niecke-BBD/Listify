@@ -77,7 +77,6 @@ public interface TasksRepository extends JpaRepository<Tasks, Long> {
             "WHERE v.userID = ?1 ", nativeQuery = true)
     List<Tasks> findTasksByUserID(Long userID);
 
-
     @Query("SELECT new org.listify.dto.ViewTaskDTO(" +
             "t.taskID, t.taskName, t.taskDescription, pl.priorityLabelName, t.createdAt, " +
             "t.updatedAt, t.dueDate, t.dateCompleted, null, null) " +
@@ -85,7 +84,6 @@ public interface TasksRepository extends JpaRepository<Tasks, Long> {
             "JOIN PriorityLabels pl ON t.taskPriority = pl.priorityLabelID " +
             "WHERE t.taskID = :taskID")
     ViewTaskDTO getTaskInformation(@Param("taskID") Long taskID);
-
 
     @Query("SELECT new org.listify.dto.SimpleUserDTO(u.userID, u.gitHubID) " +
             "FROM Users u " +

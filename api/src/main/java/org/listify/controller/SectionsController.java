@@ -9,8 +9,6 @@ import org.listify.service.SectionsService;
 import org.listify.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +25,7 @@ public class SectionsController {
         this.sectionsService = sectionsService;
         this.userService = userService;
     }
+
 
     @GetMapping("/{sectionID}/tasks")
     public ResponseEntity<List<SectionTaskDTO>> getTasksBySectionID(@PathVariable("sectionID") Long sectionID , HttpServletRequest request) {
@@ -48,6 +47,7 @@ public class SectionsController {
         return ResponseEntity.status(HttpStatus.CREATED).body(section);
     }
 
+
     @PutMapping("/{sectionID}")
     @Transactional
     public ResponseEntity<Sections> updateSection(@PathVariable("sectionID") Long sectionID,
@@ -59,6 +59,7 @@ public class SectionsController {
         return ResponseEntity.status(HttpStatus.CREATED).body(updatedSection);
     }
 
+
     @PutMapping("/{sectionID}/position")
     @Transactional
     public ResponseEntity<Sections> updateSectionPosition(@PathVariable("sectionID") Long sectionID,
@@ -69,6 +70,7 @@ public class SectionsController {
         Sections updatedSection = sectionsService.getSectionById(sectionID);
         return ResponseEntity.status(HttpStatus.CREATED).body(updatedSection);
     }
+
 
     @DeleteMapping("/{sectionID}")
     @Transactional

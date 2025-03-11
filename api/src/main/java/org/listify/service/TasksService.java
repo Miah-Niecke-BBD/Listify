@@ -7,9 +7,10 @@ import org.listify.exception.NotFoundException;
 import org.listify.model.Tasks;
 import org.listify.repo.TasksRepository;
 import org.springframework.stereotype.Service;
+
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TasksService {
@@ -27,29 +28,20 @@ public class TasksService {
             throw new NotFoundException("No tasks found");
         }
 
-        List<ViewTaskDTO> taskDTOs = new ArrayList<>();
-        for (Tasks task : tasks) {
-            ViewTaskDTO taskDTO = mapTaskToViewTaskDTO(task);
-            taskDTOs.add(taskDTO);
-        }
-        return taskDTOs;
+        return tasks.stream()
+                .map(this::mapTaskToViewTaskDTO)
+                .collect(Collectors.toList());
     }
 
 
     public ViewTaskDTO getTaskById(Long taskID, Long userID) {
-        System.out.println(taskID);
         validateUserAccessToTask(userID, taskID);
 
-        ViewTaskDTO taskDTO = repository.getTaskInformation(taskID);
-        List<SimpleUserDTO> assignees = repository.getUsersAssignedToTask(taskID);
-        SimpleTaskDTO dependentTask = getDependentTaskByTaskID(taskID);
-        if (taskDTO == null) {
-            throw new NotFoundException("Task not found");
-        }
-        taskDTO.setTaskAssignees(assignees);
-        taskDTO.setDependantTask(dependentTask);
-        return taskDTO;
+        Tasks task = repository.findById(taskID)
+                .orElseThrow(() -> new NotFoundException("Task "+taskID+" is not found"));
+        return mapTaskToViewTaskDTO(task);
     }
+
 
     public ViewTaskDTO getTaskDetails(Long userID, Long taskID) {
         validateUserAccessToTask(userID, taskID);
@@ -72,13 +64,11 @@ public class TasksService {
         if (subtasks.isEmpty()) {
             throw new NotFoundException("There are no subtasks for task: "+parentTaskID);
         }
-        List<ViewTaskDTO> taskDTOs = new ArrayList<>();
-        for (Tasks task : subtasks) {
-            ViewTaskDTO taskDTO = mapTaskToViewTaskDTO(task);
-            taskDTOs.add(taskDTO);
-        }
-        return taskDTOs;
+        return subtasks.stream()
+                .map(this::mapTaskToViewTaskDTO)
+                .collect(Collectors.toList());
     }
+
 
     public ViewTaskDTO getDependentTaskById(Long taskID, Long userID) {
         validateUserAccessToTask(userID, taskID);
@@ -116,14 +106,13 @@ public class TasksService {
         return newlyAddedTask != null ? newlyAddedTask.getTaskID() : null;
     }
 
+
     public Long createSubTask(Long teamLeaderID, Long parentTaskID, String taskName, String taskDescription, Long sectionID, OffsetDateTime dueDate) {
 
         validateInputs(taskName, taskDescription, dueDate);
         repository.createSubTask(teamLeaderID, parentTaskID, taskName, taskDescription, sectionID, dueDate);
 
         Tasks newlyAddedTask = repository.findTopOrderByTaskIDDesc();
-        System.out.println(newlyAddedTask.getTaskID());
-        System.out.println(newlyAddedTask.getTaskName());
         return newlyAddedTask != null ? newlyAddedTask.getTaskID() : null;
     }
 
@@ -192,7 +181,7 @@ public class TasksService {
         return repository.getDependantTaskByTaskID(taskID);
     }
 
-    public ViewTaskDTO mapTaskToViewTaskDTO(Tasks task) {
+    private ViewTaskDTO mapTaskToViewTaskDTO(Tasks task) {
         String priorityLabelName = repository.getPriorityLabelNameByTaskID(task.getTaskID());
         ViewTaskDTO taskDTO = new ViewTaskDTO(
                 task.getTaskID(),
@@ -222,7 +211,7 @@ public class TasksService {
         }
     }
 
-    public void validateTeamLeader(Long userID, Long taskID) {
+    private void validateTeamLeader(Long userID, Long taskID) {
         Integer isTeamLeader = repository.userIsTeamLeader(userID, taskID);
         if (isTeamLeader == null || isTeamLeader == 0) {
             throw new ForbiddenException("User: "+userID+" is not a team leader");

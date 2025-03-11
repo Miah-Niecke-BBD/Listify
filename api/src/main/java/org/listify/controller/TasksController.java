@@ -27,6 +27,7 @@ public class TasksController {
         this.userService = userService;
     }
 
+
     @GetMapping
     public ResponseEntity<List<ViewTaskDTO>> getAllTasks(HttpServletRequest request) {
 
@@ -35,12 +36,14 @@ public class TasksController {
         return ResponseEntity.ok(tasks);
     }
 
+
     @GetMapping("/{taskID}")
     public ResponseEntity<ViewTaskDTO> getTaskById(@PathVariable("taskID") Long taskID, HttpServletRequest request) {
         Long userID = userService.getUserIDFromAuthentication(request);
         ViewTaskDTO task = tasksService.getTaskDetails(userID, taskID);
         return ResponseEntity.ok(task);
     }
+
 
     @GetMapping("/{parentTaskID}/subtask")
     public ResponseEntity<List<ViewTaskDTO>> getAllSubtasksOfTask(@PathVariable("parentTaskID") Long parentTaskID, HttpServletRequest request) {
@@ -49,12 +52,14 @@ public class TasksController {
         return ResponseEntity.ok(subtasks);
     }
 
+
     @GetMapping("/{taskID}/dependent")
     public ResponseEntity<ViewTaskDTO> getDependentTaskByTaskId(@PathVariable("taskID") Long taskID, HttpServletRequest request) {
         Long userID = userService.getUserIDFromAuthentication(request);
         ViewTaskDTO dependentTask = tasksService.getDependentTaskById(taskID, userID);
         return ResponseEntity.ok(dependentTask);
     }
+
 
     @PostMapping
     @Transactional
@@ -72,6 +77,7 @@ public class TasksController {
         return ResponseEntity.status(HttpStatus.CREATED).body(newTask);
     }
 
+
     @PostMapping("/{parentTaskID}/subtask")
     @Transactional
     public ResponseEntity<ViewTaskDTO> newSubTask(@PathVariable("parentTaskID") Long parentTaskID,
@@ -87,6 +93,7 @@ public class TasksController {
         return ResponseEntity.status(HttpStatus.CREATED).body(newTask);
     }
 
+
     @PutMapping("/{taskID}")
     @Transactional
     ResponseEntity<ViewTaskDTO> updateTask(@PathVariable("taskID") Long taskID,
@@ -97,6 +104,7 @@ public class TasksController {
         ViewTaskDTO taskDTO = tasksService.getTaskById(taskID, userID);
         return ResponseEntity.status(HttpStatus.CREATED).body(taskDTO);
     }
+
 
     @PutMapping("/{taskID}/position")
     @Transactional
