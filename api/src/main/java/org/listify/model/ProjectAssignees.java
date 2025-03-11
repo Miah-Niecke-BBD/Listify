@@ -3,7 +3,7 @@ package org.listify.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "\"ProjectAssignees\"", schema = "listify")
+@Table(name = "ProjectAssignees", schema = "listify")
 public class ProjectAssignees {
 
     @Id
