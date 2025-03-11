@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import org.listify.dto.UpdateTaskDTO;
 import org.listify.dto.UpdateTaskPositionDTO;
 import org.listify.dto.ViewTaskDTO;
+import org.listify.model.PriorityLabels;
 import org.listify.service.TasksService;
 import org.listify.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -58,6 +59,13 @@ public class TasksController {
         Long userID = userService.getUserIDFromAuthentication(request);
         ViewTaskDTO dependentTask = tasksService.getDependentTaskById(taskID, userID);
         return ResponseEntity.ok(dependentTask);
+    }
+
+
+    @GetMapping("/labels")
+    public ResponseEntity<List<PriorityLabels>> getAllLabels() {
+        List<PriorityLabels> labels = tasksService.getAllLabels();
+        return ResponseEntity.ok(labels);
     }
 
 
