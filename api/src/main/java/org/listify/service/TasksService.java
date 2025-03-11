@@ -4,6 +4,7 @@ import org.listify.dto.*;
 import org.listify.exception.BadRequestException;
 import org.listify.exception.ForbiddenException;
 import org.listify.exception.NotFoundException;
+import org.listify.model.PriorityLabels;
 import org.listify.model.Tasks;
 import org.listify.repo.TasksRepository;
 import org.springframework.stereotype.Service;
@@ -65,6 +66,13 @@ public class TasksService {
         return mapTaskToViewTaskDTO(task);
     }
 
+    public List<PriorityLabels> getAllLabels() {
+        List<PriorityLabels> labels = repository.getAllPriorityLabels();
+        if (labels.isEmpty()) {
+            throw new NotFoundException("Priority Labels not found");
+        }
+        return labels;
+    }
 
     public Long createTask(Long teamLeaderID, Long projectID, Long sectionID,
                            String taskName, String taskDescription,

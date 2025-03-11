@@ -3,6 +3,7 @@ package org.listify.repo;
 import org.listify.dto.SimpleTaskDTO;
 import org.listify.dto.SimpleUserDTO;
 import org.listify.dto.ViewTaskDTO;
+import org.listify.model.PriorityLabels;
 import org.listify.model.Tasks;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -104,6 +105,9 @@ public interface TasksRepository extends JpaRepository<Tasks, Long> {
             "JOIN Tasks t ON t.taskPriority = pl.priorityLabelID " +
             "WHERE t.taskID = :taskID")
     String getPriorityLabelNameByTaskID(@Param("taskID") Long taskID);
+
+    @Query("SELECT p FROM PriorityLabels p")
+    List<PriorityLabels> getAllPriorityLabels();
 
     @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END "+
                     "FROM listify.Tasks t "+
