@@ -1,7 +1,6 @@
 package org.listify.service;
 
 import org.listify.dto.ProjectAssigneeDTO;
-import org.listify.exception.ForbiddenException;
 import org.listify.exception.NotFoundException;
 import org.listify.model.ProjectAssignees;
 import org.listify.model.Projects;

@@ -1,9 +1,9 @@
 package org.listify.dto;
 
-import java.time.OffsetDateTime;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+
+import java.time.OffsetDateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DueTasksDTO {

@@ -1,9 +1,9 @@
 package org.listify.model;
 
-import jakarta.persistence.*;
-import java.time.OffsetDateTime;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.*;
+
+import java.time.OffsetDateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity

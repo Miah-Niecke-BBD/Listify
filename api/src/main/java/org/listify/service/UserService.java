@@ -4,14 +4,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.listify.exception.BadRequestException;
 import org.listify.exception.ForbiddenException;
 import org.listify.exception.NotFoundException;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.security.core.Authentication;
 import org.listify.model.Users;
 import org.listify.repo.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 
 
