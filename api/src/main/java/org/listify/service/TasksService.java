@@ -43,21 +43,6 @@ public class TasksService {
     }
 
 
-    public ViewTaskDTO getTaskDetails(Long userID, Long taskID) {
-        validateUserAccessToTask(userID, taskID);
-
-        ViewTaskDTO taskDTO = repository.getTaskInformation(taskID);
-        List<SimpleUserDTO> assignees = repository.getUsersAssignedToTask(taskID);
-        SimpleTaskDTO dependentTask = getDependentTaskByTaskID(taskID);
-        if (taskDTO == null) {
-            throw new NotFoundException("Task: "+taskID+" does not exist");
-        }
-        taskDTO.setTaskAssignees(assignees);
-        taskDTO.setDependantTask(dependentTask);
-        return taskDTO;
-    }
-
-
     public List<ViewTaskDTO> getAllSubtasksOfTask(Long parentTaskID, Long userID) {
         validateUserAccessToTask(userID, parentTaskID);
         List<Tasks> subtasks = repository.getAllSubtasksOfTask(parentTaskID);

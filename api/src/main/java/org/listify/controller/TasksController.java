@@ -40,7 +40,7 @@ public class TasksController {
     @GetMapping("/{taskID}")
     public ResponseEntity<ViewTaskDTO> getTaskById(@PathVariable("taskID") Long taskID, HttpServletRequest request) {
         Long userID = userService.getUserIDFromAuthentication(request);
-        ViewTaskDTO task = tasksService.getTaskDetails(userID, taskID);
+        ViewTaskDTO task = tasksService.getTaskById(taskID, userID);
         return ResponseEntity.ok(task);
     }
 
