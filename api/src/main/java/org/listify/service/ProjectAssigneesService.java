@@ -1,4 +1,3 @@
-
 package org.listify.service;
 
 import org.listify.dto.ProjectAssigneeDTO;
@@ -11,7 +10,8 @@ import org.listify.repo.ProjectsRepository;
 import org.listify.repo.UsersRepository;
 import org.springframework.stereotype.Service;
 
-
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjectAssigneesService {
@@ -20,7 +20,9 @@ public class ProjectAssigneesService {
     private final ProjectsRepository projectRepository;
     private final UsersRepository usersRepository;
 
-    public ProjectAssigneesService(ProjectAssigneesRepository repository, ProjectsRepository projectRepository, UsersRepository usersRepository) {
+    public ProjectAssigneesService(ProjectAssigneesRepository repository,
+                                   ProjectsRepository projectRepository,
+                                   UsersRepository usersRepository) {
         this.repository = repository;
         this.projectRepository = projectRepository;
         this.usersRepository = usersRepository;
@@ -32,46 +34,52 @@ public class ProjectAssigneesService {
 
         String githubID = "user" + projectAssignee.getUserID() + "_github";
 
-        return new ProjectAssigneeDTO(
-                project.getProjectName(),
-                githubID
-        );
+        return new ProjectAssigneeDTO(project.getProjectName(), githubID);
     }
 
+    public List<ProjectAssigneeDTO> getAllProjectsAssignees(Long projectID) {
+        if (!projectRepository.existsById(projectID)) {
+            throw new NotFoundException("Project with ID " + projectID + " not found");
+        }
 
-    public ProjectAssigneeDTO getProjectAssigneeById(Long projectID) {
-        ProjectAssignees assignee = repository.findById(projectID)
-                .orElseThrow(() -> new NotFoundException("Project assignee with ID " + projectID + " not found"));
-        return convertToDTO(assignee);
+        List<ProjectAssignees> projectAssigneesList = repository.findProjectsAssignedUsers(projectID);
+        if (projectAssigneesList.isEmpty()) {
+            throw new NotFoundException("No users assigned to project with ID: " + projectID);
+        }
+
+        return projectAssigneesList.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     public Long assignUserToProject(Long teamLeaderID, Long userID, Long projectID) {
         if (!usersRepository.existsById(String.valueOf(userID))) {
             throw new NotFoundException("User with ID " + userID + " does not exist");
         }
-
+        if (!projectRepository.existsById(projectID)) {
+            throw new NotFoundException("Project with ID " + projectID + " not found");
+        }
         if (!repository.isTeamLeader(teamLeaderID, projectID)) {
             throw new ForbiddenException("Only a team leader can assign users to a project");
         }
-
         repository.assignUserToProject(teamLeaderID, userID, projectID);
-        ProjectAssignees newlyAssignedProject = repository.findTopOrderByProjectAssigneeIDDesc();
-        return newlyAssignedProject != null ? newlyAssignedProject.getProjectAssigneeID() : null;
+        return userID; // Return the assigned userID as confirmation
     }
 
     public void deleteUserFromProject(Long userID, Long projectID, Long teamLeaderID) {
+        if (!projectRepository.existsById(projectID)) {
+            throw new NotFoundException("Project with ID " + projectID + " not found");
+        }
         if (!repository.isTeamLeader(teamLeaderID, projectID)) {
             throw new ForbiddenException("Only a team leader can remove users from a project");
         }
-
-        if (!repository.isUserAssignedToProject(userID, projectID)) {
+        if (repository.findProjectsAssignedUsers(projectID).stream()
+                .noneMatch(pa -> pa.getUserID().equals(userID))) {
             throw new NotFoundException("User with ID " + userID + " is not assigned to project " + projectID);
         }
-
-        if (repository.isTeamLeader(userID, projectID)) {
-            throw new ForbiddenException("A team leader cannot be removed from a project");
+        if (userID.equals(teamLeaderID)) {
+            throw new ForbiddenException("A team leader cannot remove themselves from a project");
         }
-
         repository.deleteUserFromProject(userID, projectID, teamLeaderID);
     }
 }
