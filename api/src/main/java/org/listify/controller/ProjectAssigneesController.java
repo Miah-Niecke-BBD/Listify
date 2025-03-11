@@ -40,7 +40,7 @@ public class ProjectAssigneesController {
         projectAssigneesService.assignUserToProject(teamLeaderID, userID, projectID);
         // Construct DTO manually since we know projectID and userID
         String githubID = "user" + userID + "_github";
-        String projectName = projectAssigneesService.getAllProjectsAssignees(projectID).get(0).getProjectName(); // Simplified; assumes projectName is consistent
+        String projectName = projectAssigneesService.getAllProjectsAssignees(projectID).get(0).getProjectName();
         ProjectAssigneeDTO newProjectAssignee = new ProjectAssigneeDTO(projectName, githubID);
         return ResponseEntity.status(HttpStatus.CREATED).body(newProjectAssignee);
     }
