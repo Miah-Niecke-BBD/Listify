@@ -3,7 +3,7 @@ package org.listify.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 
 @Entity
@@ -27,18 +27,18 @@ public class Tasks {
     @Column(name = "taskPosition", nullable = false)
     private Integer taskPosition;
     @Column(name = "dateCompleted", nullable = true)
-    private LocalDateTime dateCompleted;
+    private OffsetDateTime dateCompleted;
     @Column(name = "dueDate", nullable = true)
-    private LocalDateTime dueDate;
+    private OffsetDateTime dueDate;
     @Column(name = "createdAt", nullable = false)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
     @Column(name = "updatedAt", nullable = true)
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 
     protected Tasks() {
     }
 
-    public Tasks(Long taskID, Long sectionID, Long parentTaskID, String taskName, String taskDescription, Long taskPriority, Integer taskPosition, LocalDateTime dateCompleted, LocalDateTime dueDate, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Tasks(Long taskID, Long sectionID, Long parentTaskID, String taskName, String taskDescription, Long taskPriority, Integer taskPosition, OffsetDateTime dateCompleted, OffsetDateTime dueDate, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         this.taskID = taskID;
         this.sectionID = sectionID;
         this.parentTaskID = parentTaskID;
@@ -52,35 +52,35 @@ public class Tasks {
         this.updatedAt = updatedAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public OffsetDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public OffsetDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getDueDate() {
+    public OffsetDateTime getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(LocalDateTime dueDate) {
+    public void setDueDate(OffsetDateTime dueDate) {
         this.dueDate = dueDate;
     }
 
-    public LocalDateTime getDateCompleted() {
+    public OffsetDateTime getDateCompleted() {
         return dateCompleted;
     }
 
-    public void setDateCompleted(LocalDateTime dateCompleted) {
+    public void setDateCompleted(OffsetDateTime dateCompleted) {
         this.dateCompleted = dateCompleted;
     }
 

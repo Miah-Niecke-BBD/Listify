@@ -2,7 +2,7 @@ package org.listify.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -12,24 +12,25 @@ public class ViewTaskDTO {
     private String taskName;
     private String taskDescription;
     private String taskPriority;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private LocalDateTime dueDate;
+    private OffsetDateTime createdAt;
+    private OffsetDateTime updatedAt;
+    private OffsetDateTime dueDate;
+    private OffsetDateTime dateCompleted;
     private List<SimpleUserDTO> taskAssignees;
     private SimpleTaskDTO dependantTask;
 
 
-    public LocalDateTime getUpdatedAt() {
+    public OffsetDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 
     public ViewTaskDTO(Long taskID, String taskName, String taskDescription,
-                       String taskPriority, LocalDateTime createdAt, LocalDateTime updatedAt,
-                       LocalDateTime dueDate, List<SimpleUserDTO> taskAssignees, SimpleTaskDTO dependantTask) {
+                       String taskPriority, OffsetDateTime createdAt, OffsetDateTime updatedAt,
+                       OffsetDateTime dueDate, OffsetDateTime dateCompleted, List<SimpleUserDTO> taskAssignees, SimpleTaskDTO dependantTask) {
         this.taskID = taskID;
         this.taskName = taskName;
         this.taskDescription = taskDescription;
@@ -37,6 +38,7 @@ public class ViewTaskDTO {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.dueDate = dueDate;
+        this.dateCompleted = dateCompleted;
         this.taskAssignees = taskAssignees;
         this.dependantTask = dependantTask;
     }
@@ -74,19 +76,19 @@ public class ViewTaskDTO {
         this.taskPriority = taskPriority;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public OffsetDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getDueDate() {
+    public OffsetDateTime getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(LocalDateTime dueDate) {
+    public void setDueDate(OffsetDateTime dueDate) {
         this.dueDate = dueDate;
     }
 
@@ -104,5 +106,13 @@ public class ViewTaskDTO {
 
     public void setDependantTask(SimpleTaskDTO dependantTask) {
         this.dependantTask = dependantTask;
+    }
+
+    public OffsetDateTime getDateCompleted() {
+        return dateCompleted;
+    }
+
+    public void setDateCompleted(OffsetDateTime dateCompleted) {
+        this.dateCompleted = dateCompleted;
     }
 }

@@ -1,7 +1,8 @@
 package org.listify.model;
 
-import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
 @Entity

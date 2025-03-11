@@ -1,17 +1,16 @@
 package org.listify.service;
 
-import org.listify.dto.SimpleTaskDTO;
-import org.listify.dto.SimpleUserDTO;
-import org.listify.dto.ViewTaskDTO;
+import org.listify.dto.*;
 import org.listify.exception.BadRequestException;
 import org.listify.exception.ForbiddenException;
 import org.listify.exception.NotFoundException;
 import org.listify.model.Tasks;
 import org.listify.repo.TasksRepository;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TasksService {
@@ -29,41 +28,18 @@ public class TasksService {
             throw new NotFoundException("No tasks found");
         }
 
-        List<ViewTaskDTO> taskDTOs = new ArrayList<>();
-        for (Tasks task : tasks) {
-            ViewTaskDTO taskDTO = mapTaskToViewTaskDTO(task);
-            taskDTOs.add(taskDTO);
-        }
-        return taskDTOs;
+        return tasks.stream()
+                .map(this::mapTaskToViewTaskDTO)
+                .collect(Collectors.toList());
     }
 
 
     public ViewTaskDTO getTaskById(Long taskID, Long userID) {
         validateUserAccessToTask(userID, taskID);
 
-        ViewTaskDTO taskDTO = repository.getTaskInformation(taskID);
-        List<SimpleUserDTO> assignees = repository.getUsersAssignedToTask(taskID);
-        SimpleTaskDTO dependentTask = getDependentTaskByTaskID(taskID);
-        if (taskDTO == null) {
-            throw new NotFoundException("Task not found");
-        }
-        taskDTO.setTaskAssignees(assignees);
-        taskDTO.setDependantTask(dependentTask);
-        return taskDTO;
-    }
-
-    public ViewTaskDTO getTaskDetails(Long userID, Long taskID) {
-        validateUserAccessToTask(userID, taskID);
-
-        ViewTaskDTO taskDTO = repository.getTaskInformation(taskID);
-        List<SimpleUserDTO> assignees = repository.getUsersAssignedToTask(taskID);
-        SimpleTaskDTO dependentTask = getDependentTaskByTaskID(taskID);
-        if (taskDTO == null) {
-            throw new NotFoundException("Task: "+taskID+" does not exist");
-        }
-        taskDTO.setTaskAssignees(assignees);
-        taskDTO.setDependantTask(dependentTask);
-        return taskDTO;
+        Tasks task = repository.findById(taskID)
+                .orElseThrow(() -> new NotFoundException("Task "+taskID+" is not found"));
+        return mapTaskToViewTaskDTO(task);
     }
 
 
@@ -73,13 +49,11 @@ public class TasksService {
         if (subtasks.isEmpty()) {
             throw new NotFoundException("There are no subtasks for task: "+parentTaskID);
         }
-        List<ViewTaskDTO> taskDTOs = new ArrayList<>();
-        for (Tasks task : subtasks) {
-            ViewTaskDTO taskDTO = mapTaskToViewTaskDTO(task);
-            taskDTOs.add(taskDTO);
-        }
-        return taskDTOs;
+        return subtasks.stream()
+                .map(this::mapTaskToViewTaskDTO)
+                .collect(Collectors.toList());
     }
+
 
     public ViewTaskDTO getDependentTaskById(Long taskID, Long userID) {
         validateUserAccessToTask(userID, taskID);
@@ -94,7 +68,7 @@ public class TasksService {
 
     public Long createTask(Long teamLeaderID, Long projectID, Long sectionID,
                            String taskName, String taskDescription,
-                           Byte taskPriority, Byte taskPosition) {
+                           Byte taskPriority, OffsetDateTime dueDate) {
 
         validateTeamLeader(teamLeaderID, projectID);
         if (taskName.length() > 100) {
@@ -111,13 +85,14 @@ public class TasksService {
 
         repository.createTask(teamLeaderID, projectID,
                 sectionID, taskName, taskDescription,
-                taskPriority, taskPosition);
+                taskPriority, dueDate);
 
         Tasks newlyAddedTask = repository.findTopOrderByTaskIDDesc();
         return newlyAddedTask != null ? newlyAddedTask.getTaskID() : null;
     }
 
-    public Long createSubTask(Long teamLeaderID, Long parentTaskID, String taskName, String taskDescription, Long sectionID, LocalDateTime dueDate) {
+
+    public Long createSubTask(Long teamLeaderID, Long parentTaskID, String taskName, String taskDescription, Long sectionID, OffsetDateTime dueDate) {
 
         validateInputs(taskName, taskDescription, dueDate);
         repository.createSubTask(teamLeaderID, parentTaskID, taskName, taskDescription, sectionID, dueDate);
@@ -127,22 +102,58 @@ public class TasksService {
     }
 
 
-    public void updateTaskDetails(Long taskID, Long teamLeaderID, String newTaskName,
-                                  String newTaskDescription, Byte newTaskPriority,
-                                  LocalDateTime newDate) {
+    public void updateTaskDetails(Long userID, Long taskID, UpdateTaskDTO updatedTask) {
+        Tasks task = repository.findById(taskID)
+                    .orElseThrow(() -> new NotFoundException("Task :"+taskID+" not found"));
 
-        validateInputs(newTaskName, newTaskDescription, newDate);
-        repository.updateTaskDetails(taskID, teamLeaderID, newTaskName,
-                newTaskDescription, newTaskPriority, newDate);
+        String newTaskName = task.getTaskName();
+        String newTaskDescription = task.getTaskDescription();
+        Long newTaskPriority = task.getTaskPriority();
+        OffsetDateTime newDueDate = task.getDueDate();
+        OffsetDateTime dateCompleted = task.getDateCompleted();
+
+        if (updatedTask.getTaskName() != null) {
+            if (updatedTask.getTaskName().trim().length() > 100) {
+                throw new BadRequestException("Task name cannot be more than 100 characters");
+            }
+            newTaskName = updatedTask.getTaskName();
+        }
+
+        if (updatedTask.getTaskDescription() != null) {
+            if (updatedTask.getTaskDescription().trim().length() > 500) {
+                throw new BadRequestException("Task description cannot be more than 500 characters");
+            }
+            newTaskDescription = updatedTask.getTaskDescription();
+        }
+
+        if (updatedTask.getTaskPriority() != null) {
+            if (updatedTask.getTaskPriority() < 1 || updatedTask.getTaskPriority() > 3) {
+                throw new BadRequestException("Task Priority should be between 1 & 3");
+            }
+            newTaskPriority = Long.valueOf(updatedTask.getTaskPriority());
+        }
+
+        if (updatedTask.getDueDate() != null) {
+            if (updatedTask.getDueDate().isBefore(OffsetDateTime.now())) {
+                throw new BadRequestException("Due dates can only be in the future");
+            }
+            newDueDate = updatedTask.getDueDate();
+        }
+
+        if (updatedTask.getDateCompleted() != null) {
+            dateCompleted = updatedTask.getDateCompleted();
+        }
+
+        repository.updateTaskDetails(taskID, userID, newTaskName, newTaskDescription, newTaskPriority, newDueDate, dateCompleted);
     }
 
 
-    public void updateTaskPosition (Long teamLeaderID, Long taskID, Long newTaskPosition, Long sectionID) {
-        Integer taskInSection = repository.findTaskInSection(sectionID, taskID);
+    public void updateTaskPosition (Long teamLeaderID, Long taskID, UpdateTaskPositionDTO updatedPosition) {
+        Integer taskInSection = repository.findTaskInSection(updatedPosition.getSectionID(), taskID);
         if (taskInSection == null || taskInSection == 0) {
-            throw new BadRequestException("Task: "+taskID+" does not exist in section: "+sectionID);
+            throw new BadRequestException("Task: "+taskID+" does not exist in section: "+updatedPosition.getSectionID());
         }
-        repository.updateTaskPosition(teamLeaderID, taskID, newTaskPosition, sectionID);
+        repository.updateTaskPosition(teamLeaderID, taskID, updatedPosition.getTaskPosition(), updatedPosition.getSectionID());
     }
 
 
@@ -155,9 +166,11 @@ public class TasksService {
         return repository.getDependantTaskByTaskID(taskID);
     }
 
-    public ViewTaskDTO mapTaskToViewTaskDTO(Tasks task) {
+    private ViewTaskDTO mapTaskToViewTaskDTO(Tasks task) {
         String priorityLabelName = repository.getPriorityLabelNameByTaskID(task.getTaskID());
-        ViewTaskDTO taskDTO = new ViewTaskDTO(
+        List<SimpleUserDTO> assignees = repository.getUsersAssignedToTask(task.getTaskID());
+        SimpleTaskDTO dependentTask = getDependentTaskByTaskID(task.getTaskID());
+        return new ViewTaskDTO(
                 task.getTaskID(),
                 task.getTaskName(),
                 task.getTaskDescription(),
@@ -165,15 +178,10 @@ public class TasksService {
                 task.getCreatedAt(),
                 task.getUpdatedAt(),
                 task.getDueDate(),
-                null,
-                null
+                task.getDateCompleted(),
+                assignees,
+                dependentTask
         );
-
-        List<SimpleUserDTO> assignees = repository.getUsersAssignedToTask(task.getTaskID());
-        SimpleTaskDTO dependentTask = getDependentTaskByTaskID(task.getTaskID());
-        taskDTO.setTaskAssignees(assignees);
-        taskDTO.setDependantTask(dependentTask);
-        return taskDTO;
     }
 
 
@@ -184,23 +192,23 @@ public class TasksService {
         }
     }
 
-    public void validateTeamLeader(Long userID, Long taskID) {
+    private void validateTeamLeader(Long userID, Long taskID) {
         Integer isTeamLeader = repository.userIsTeamLeader(userID, taskID);
         if (isTeamLeader == null || isTeamLeader == 0) {
             throw new ForbiddenException("User: "+userID+" is not a team leader");
         }
     }
 
-    private void validateInputs(String taskName, String taskDescription, LocalDateTime dueDate) {
+    private void validateInputs(String taskName, String taskDescription, OffsetDateTime dueDate) {
         if (taskName.length() > 100) {
             throw new BadRequestException("Task name has a maximum of 100 characters");
         }
 
-        if (taskDescription.length() > 500) {
+        if (taskDescription != null && taskDescription.length() > 500) {
             throw new BadRequestException("Task description has a maximum of 500 characters");
         }
 
-        if (dueDate.isBefore(LocalDateTime.now())) {
+        if (dueDate != null && dueDate.isBefore(OffsetDateTime.now())) {
             throw new BadRequestException("Due dates can only be in the future");
         }
     }

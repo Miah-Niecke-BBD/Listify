@@ -1,6 +1,7 @@
 package org.listify.service;
 
-import org.listify.dto.*;
+import org.listify.dto.DueTasksDTO;
+import org.listify.dto.ProjectSectionsDTO;
 import org.listify.exception.ForbiddenException;
 import org.listify.exception.NotFoundException;
 import org.listify.model.Projects;
@@ -9,7 +10,7 @@ import org.listify.model.Tasks;
 import org.listify.repo.ProjectsRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
