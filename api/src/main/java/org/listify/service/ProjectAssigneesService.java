@@ -63,7 +63,7 @@ public class ProjectAssigneesService {
             throw new ForbiddenException("Only a team leader can assign users to a project");
         }
         repository.assignUserToProject(teamLeaderID, userID, projectID);
-        return userID; // Return the assigned userID as confirmation
+        return userID;
     }
 
     public void deleteUserFromProject(Long userID, Long projectID, Long teamLeaderID) {
