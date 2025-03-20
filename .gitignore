@@ -6,3 +6,5 @@ API/target/
 
 ### VS Code ###
 .vscode/
+
+/node_modules
