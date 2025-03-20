@@ -1,0 +1,6 @@
+* text=auto eol=lf
+
+# For API
+/api/mvnw text eol=lf
+/api/.mvn/** text eol=lf
+*.cmd text eol=crlf
