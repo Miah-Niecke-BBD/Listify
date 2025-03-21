@@ -47,12 +47,15 @@ public class UserController {
 
         String googleID = (String) request.getAttribute("sub");
         String name = (String) request.getAttribute("name");
-        UserDTO user = null;
+        UserDTO userDto = null;
+        Users user = userService.getUserByGitHubID(googleID);
+
         if (userService.userExistsByGitHubID(googleID)) {
-            user = new UserDTO();
-            user.setUsername(name);
+            userDto = new UserDTO();
+            userDto.setUsername(name);
+            userDto.setUserID(user.getUserID());
         }
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(userDto);
 
     }
 
