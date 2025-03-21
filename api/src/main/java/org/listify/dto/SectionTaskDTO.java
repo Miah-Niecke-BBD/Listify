@@ -2,7 +2,7 @@ package org.listify.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SectionTaskDTO {
@@ -11,11 +11,11 @@ public class SectionTaskDTO {
     private String taskName;
     private Long parentTaskID;
     private Integer taskPosition;
-    private LocalDateTime createdAt;
-    private LocalDateTime dueDate;
+    private OffsetDateTime createdAt;
+    private OffsetDateTime dueDate;
 
-    public SectionTaskDTO(Long taskID, String taskName, Long parentTaskID, Integer taskPosition, LocalDateTime createdAt,
-                          LocalDateTime dueDate) {
+    public SectionTaskDTO(Long taskID, String taskName, Long parentTaskID, Integer taskPosition, OffsetDateTime createdAt,
+                          OffsetDateTime dueDate) {
         this.taskID = taskID;
         this.taskName = taskName;
         this.parentTaskID = parentTaskID;
@@ -48,19 +48,19 @@ public class SectionTaskDTO {
         this.parentTaskID = parentTaskID;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public OffsetDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getDueDate() {
+    public OffsetDateTime getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(LocalDateTime dueDate) {
+    public void setDueDate(OffsetDateTime dueDate) {
         this.dueDate = dueDate;
     }
 

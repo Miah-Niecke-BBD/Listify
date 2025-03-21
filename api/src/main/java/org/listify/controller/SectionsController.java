@@ -2,6 +2,8 @@ package org.listify.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.listify.dto.SectionTaskDTO;
+import org.listify.dto.UpdateSectionDTO;
+import org.listify.dto.UpdateSectionPositionDTO;
 import org.listify.model.Sections;
 import org.listify.service.SectionsService;
 import org.listify.service.UserService;
@@ -25,6 +27,7 @@ public class SectionsController {
         this.userService = userService;
     }
 
+
     @GetMapping("/{sectionID}/tasks")
     public ResponseEntity<List<SectionTaskDTO>> getTasksBySectionID(@PathVariable("sectionID") Long sectionID , HttpServletRequest request) {
         Long userID = userService.getUserIDFromAuthentication(request);
@@ -45,27 +48,30 @@ public class SectionsController {
         return ResponseEntity.status(HttpStatus.CREATED).body(section);
     }
 
+
     @PutMapping("/{sectionID}")
     @Transactional
     public ResponseEntity<Sections> updateSection(@PathVariable("sectionID") Long sectionID,
                                                   HttpServletRequest request,
-                                           @RequestParam("newSectionName") String newSectionName) {
+                                                  @RequestBody UpdateSectionDTO updateSectionDTO) {
         Long loggedInUserID = userService.getUserIDFromAuthentication(request);
-        sectionsService.updateSection(sectionID, loggedInUserID, newSectionName);
+        sectionsService.updateSection(sectionID, loggedInUserID, updateSectionDTO);
         Sections updatedSection = sectionsService.getSectionById(sectionID);
         return ResponseEntity.status(HttpStatus.CREATED).body(updatedSection);
     }
+
 
     @PutMapping("/{sectionID}/position")
     @Transactional
     public ResponseEntity<Sections> updateSectionPosition(@PathVariable("sectionID") Long sectionID,
                                                           HttpServletRequest request,
-                                                        @RequestParam("newSectionPosition") Integer newSectionPosition) {
+                                                          @RequestBody UpdateSectionPositionDTO updatedPosition) {
         Long loggedInUserID = userService.getUserIDFromAuthentication(request);
-        sectionsService.updateSectionPosition(sectionID, loggedInUserID, newSectionPosition);
+        sectionsService.updateSectionPosition(sectionID, loggedInUserID, updatedPosition);
         Sections updatedSection = sectionsService.getSectionById(sectionID);
         return ResponseEntity.status(HttpStatus.CREATED).body(updatedSection);
     }
+
 
     @DeleteMapping("/{sectionID}")
     @Transactional

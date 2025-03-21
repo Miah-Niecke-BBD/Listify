@@ -3,13 +3,14 @@ package org.listify.repo;
 import org.listify.dto.SimpleTaskDTO;
 import org.listify.dto.SimpleUserDTO;
 import org.listify.dto.ViewTaskDTO;
+import org.listify.model.PriorityLabels;
 import org.listify.model.Tasks;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 public interface TasksRepository extends JpaRepository<Tasks, Long> {
@@ -21,7 +22,7 @@ public interface TasksRepository extends JpaRepository<Tasks, Long> {
             @Param("taskName") String taskName,
             @Param("taskDescription") String taskDescription,
             @Param("taskPriority") Byte taskPriority,
-            @Param("taskPosition") Byte taskPosition
+            @Param("dueDate") OffsetDateTime dueDate
     );
 
     @Procedure("listify.uspCreateSubTask")
@@ -31,7 +32,7 @@ public interface TasksRepository extends JpaRepository<Tasks, Long> {
             @Param("taskName") String taskName,
             @Param("taskDescription") String taskDescription,
             @Param("sectionID") Long sectionID,
-            @Param("dueDate") LocalDateTime dueDate
+            @Param("dueDate") OffsetDateTime dueDate
     );
 
     @Procedure("listify.uspUpdateTaskDetails")
@@ -40,8 +41,9 @@ public interface TasksRepository extends JpaRepository<Tasks, Long> {
             @Param("teamLeaderID") Long teamLeaderID,
             @Param("newTaskName") String newTaskName,
             @Param("newTaskDescription") String newTaskDescription,
-            @Param("newTaskPriority") Byte newTaskPriority,
-            @Param("newDueDate") LocalDateTime newDueDate
+            @Param("newTaskPriority") Long newTaskPriority,
+            @Param("newDueDate") OffsetDateTime newDueDate,
+            @Param("dateCompleted") OffsetDateTime dateCompleted
     );
 
     @Procedure("listify.uspUpdateTaskPosition")
@@ -77,15 +79,6 @@ public interface TasksRepository extends JpaRepository<Tasks, Long> {
     List<Tasks> findTasksByUserID(Long userID);
 
 
-    @Query("SELECT new org.listify.dto.ViewTaskDTO(" +
-            "t.taskID, t.taskName, t.taskDescription, pl.priorityLabelName, t.createdAt, " +
-            "t.updatedAt, t.dueDate, null, null) " +
-            "FROM Tasks t " +
-            "JOIN PriorityLabels pl ON t.taskPriority = pl.priorityLabelID " +
-            "WHERE t.taskID = :taskID")
-    ViewTaskDTO getTaskInformation(@Param("taskID") Long taskID);
-
-
     @Query("SELECT new org.listify.dto.SimpleUserDTO(u.userID, u.gitHubID) " +
             "FROM Users u " +
             "JOIN TaskAssignees ta ON u.userID = ta.userID " +
@@ -112,6 +105,9 @@ public interface TasksRepository extends JpaRepository<Tasks, Long> {
             "JOIN Tasks t ON t.taskPriority = pl.priorityLabelID " +
             "WHERE t.taskID = :taskID")
     String getPriorityLabelNameByTaskID(@Param("taskID") Long taskID);
+
+    @Query("SELECT p FROM PriorityLabels p")
+    List<PriorityLabels> getAllPriorityLabels();
 
     @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END "+
                     "FROM listify.Tasks t "+
