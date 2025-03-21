@@ -10,7 +10,6 @@ import org.listify.model.Projects;
 import org.listify.service.ProjectsService;
 import org.listify.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +17,7 @@ import java.util.List;
 
 
 @RestController
+@CrossOrigin
 @RequestMapping("/projects")
 public class ProjectsController {
 

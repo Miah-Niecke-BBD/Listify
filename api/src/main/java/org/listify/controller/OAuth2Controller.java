@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@CrossOrigin
 public class OAuth2Controller {
 
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
@@ -70,7 +72,7 @@ public class OAuth2Controller {
         String authorizationUrl = "https://accounts.google.com/o/oauth2/v2/auth?"
                 + "scope=openid%20profile%20email"
                 + "&client_id=" + clientId
-                + "&redirect_uri=http://localhost:8080/oauth2/callback/google"
+                + "&redirect_uri="+redirectUri
                 + "&response_type=code";
 
         Map<String, String> responseMap = new HashMap<>();
