@@ -17,6 +17,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/tasks")
 public class TasksController {
 
