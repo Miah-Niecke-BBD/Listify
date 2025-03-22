@@ -19,7 +19,7 @@ public class CorsConfig {
 
         config.setAllowedOrigins(Arrays.asList("http://localhost:8080", "http://localhost:8050"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization"));
+        config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization","X-XSRF-TOKEN"));
         config.setAllowCredentials(true);
 
         source.registerCorsConfiguration("/**", config);
