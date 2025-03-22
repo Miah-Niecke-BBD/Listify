@@ -1,12 +1,11 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
+
 </script>
 
 <template>
-  <h1>Hello Vue!</h1>
+  <router-view />
 </template>
-
-<style scoped>
-h1 {
-  color: blue;
-}
+<style>
 </style>
+
