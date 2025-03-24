@@ -7,7 +7,9 @@ import ReassignLeaderModal from "./ReassignLeaderModal.vue";
 defineProps<{ teamName: string }>();
 
 const showOptions = ref(false);
-const isModalVisible = ref(false);
+
+const isAddTeamMemberModalVisible = ref(false);
+const isReassignLeaderModalVisible = ref(false);
 
 const emit = defineEmits(["changeTeamName"]);
 
@@ -18,17 +20,21 @@ const teamMembers = ref([
   { id: 4, name: "Jane Smith", isLeader: false },
 ]);
 
-const openModal = () => {
-  isModalVisible.value = true;
+// Open Add Team Member Modal
+const openAddTeamMemberModal = () => {
+  isAddTeamMemberModalVisible.value = true;
+};
+
+const openReassignLeaderModal = () => {
+  isReassignLeaderModalVisible.value = true;
 };
 
 const closeModal = () => {
-  isModalVisible.value = false;
+  isAddTeamMemberModalVisible.value = false;
+  isReassignLeaderModalVisible.value = false;
 };
 
-const changeTeamName = () => {
-
-};
+const changeTeamName = () => {};
 </script>
 
 <template>
@@ -55,18 +61,18 @@ const changeTeamName = () => {
     <section @mouseenter="showOptions = true" @mouseleave="showOptions = false" class="more-btn">
       <i class="more-btn-icon" role="button" aria-label="More options">...</i>
       <section v-if="showOptions" class="more-options">
-        <button @click="openModal">Edit Team</button>
-        <button @click="openModal">Edit Roles</button>
+        <button @click="openAddTeamMemberModal">Edit Team</button>
+        <button @click="openReassignLeaderModal">Edit Roles</button>
       </section>
     </section>
     <AddTeamMemberModal
       mode="updateTeamName"
-      :isVisible="isModalVisible"
+      :isVisible="isAddTeamMemberModalVisible"
       :onClose="closeModal"
       :onUpdateTeamName="changeTeamName"
     />
     <ReassignLeaderModal
-      :isVisible="isModalVisible"
+      :isVisible="isReassignLeaderModalVisible"
       :onClose="closeModal"
       :teamName="teamName"
       :teamMembers="teamMembers"
