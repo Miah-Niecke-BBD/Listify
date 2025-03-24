@@ -24,7 +24,7 @@ public class ProjectAssigneesController {
         this.userService = userService;
     }
 
-    @GetMapping("/{assignees}")
+    @GetMapping("/{projectID}")
     public ResponseEntity<List<ProjectAssigneeDTO>> getProjectsAssignedUsers(@PathVariable("projectID") Long projectID,
                                                                              HttpServletRequest request) {
         Long teamLeaderID = userService.getUserIDFromAuthentication(request);
