@@ -2,6 +2,7 @@
 import "@/assets/base.css";
 import AddTeamMemberModal from "@/components/EditTeamModal.vue";
 import { defineProps, ref } from "vue";
+import ReassignLeaderModal from "./ReassignLeaderModal.vue";
 
 defineProps<{ teamName: string }>();
 
@@ -9,6 +10,13 @@ const showOptions = ref(false);
 const isModalVisible = ref(false);
 
 const emit = defineEmits(["changeTeamName"]);
+
+const teamMembers = ref([
+  { id: 1, name: "John Doe", isLeader: true },
+  { id: 2, name: "Jane Smith", isLeader: false },
+  { id: 3, name: "Jane Smith", isLeader: false },
+  { id: 4, name: "Jane Smith", isLeader: false },
+]);
 
 const openModal = () => {
   isModalVisible.value = true;
@@ -18,8 +26,8 @@ const closeModal = () => {
   isModalVisible.value = false;
 };
 
-const changeTeamName = (id: number) => {
-  console.log(`Adding member with ID: ${id}`);
+const changeTeamName = () => {
+
 };
 </script>
 
@@ -47,8 +55,8 @@ const changeTeamName = (id: number) => {
     <section @mouseenter="showOptions = true" @mouseleave="showOptions = false" class="more-btn">
       <i class="more-btn-icon" role="button" aria-label="More options">...</i>
       <section v-if="showOptions" class="more-options">
-        <button @click="openModal">Edit Team Name</button>
-        <button>Edit Roles</button>
+        <button @click="openModal">Edit Team</button>
+        <button @click="openModal">Edit Roles</button>
       </section>
     </section>
     <AddTeamMemberModal
@@ -56,6 +64,12 @@ const changeTeamName = (id: number) => {
       :isVisible="isModalVisible"
       :onClose="closeModal"
       :onUpdateTeamName="changeTeamName"
+    />
+    <ReassignLeaderModal
+      :isVisible="isModalVisible"
+      :onClose="closeModal"
+      :teamName="teamName"
+      :teamMembers="teamMembers"
     />
   </section>
 </template>
