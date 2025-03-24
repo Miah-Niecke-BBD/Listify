@@ -1,20 +1,42 @@
-// import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router'
+import LoginView from '../views/LoginView.vue'
+import HomeView from '../views/HomeView.vue'
+import LoadingView from '../views/LoadingView.vue'
+import TeamView from '@/views/TeamView.vue'
+const router = createRouter({
 
-// const routes = [
-//   {
-//     path: '/',
-//     name: 'Login',
-//   },
-//   {
-//     path: '/home',
-//     name: 'home-project',
-//   },
-// ];
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    {
+      path: '/',
+      name: 'login',
+      component: LoginView,
+    },
+    {
+      path: '/loading',
+      name: 'loading',
+      component: LoadingView,
+    },
+    {
+      path: '/home',
+      name: 'home',
+      component: HomeView,
+      beforeEnter: (to, from, next) => {
+        const jwtToken = localStorage.getItem('jwtToken');
+        if (jwtToken) {
+          next();
+        } else {
+          next('/');
+        }
+      }
+    },
 
-// const router = createRouter({
-//   history: createWebHistory(),
-//   routes,
-// });
+    {
+      path: '/team',
+      name: 'team',
+      component: TeamView
+    },
+  ],
+})
 
-// export default router;
-
+export default router
