@@ -4,11 +4,7 @@ import TeamHeader from "@/components/TeamHeader.vue";
 import { onMounted, ref, computed } from "vue";
 import TeamMember from "@/components/TeamMembers.vue";
 import TeamProjects from "@/components/TeamProjects.vue";
-
-interface Team {
-  id: string;
-  name: string;
-}
+import type { Team } from "@/models/Team";
 
 const team = ref<Team | null>(null);
 

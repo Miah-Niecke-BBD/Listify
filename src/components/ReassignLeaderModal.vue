@@ -2,17 +2,12 @@
 import "@/assets/base.css";
 import { defineProps, ref } from "vue";
 import type { PropType } from "vue";
-
-interface Member {
-  id: number;
-  name: string;
-  isLeader: boolean;
-}
+import type { TeamMember } from "@/models/TeamMember";
 
 const props = defineProps({
   teamName: String,
   teamMembers: {
-    type: Array as PropType<Member[]>,
+    type: Array as PropType<TeamMember[]>,
     required: true,
   },
   isVisible: {

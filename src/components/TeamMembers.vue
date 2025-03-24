@@ -3,17 +3,12 @@ import { ref } from "vue";
 import "@/assets/base.css";
 import AddTeamMemberModal from "@/components/EditTeamModal.vue";
 import AddButton from "@/components/AddButton.vue";
+import type { TeamMember } from "@/models/TeamMember";
 
 const isModalVisible = ref(false);
 
-interface Member {
-  id: number;
-  name: string;
-  isLeader: boolean;
-}
-
 defineProps<{
-  members: Member[];
+  members: TeamMember[];
   loggedInMemberId: number;
 }>();
 
@@ -61,7 +56,7 @@ const addMember = (id: number) => {
           v-if="loggedInMemberId === members.find((m) => m.isLeader)?.id && !member.isLeader"
           class="delete-btn"
           @click="emit('deleteMember', member.id)"
-          aria-label="Delete Member"
+          aria-label="Delete TeamMember"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

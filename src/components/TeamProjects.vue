@@ -4,28 +4,17 @@ import AddButton from "@/components/AddButton.vue";
 import AddProjectModal from "@/components/AddProjectModal.vue";
 import ProjectMembersModal from "@/components/ProjectMembersModal.vue";
 import { defineProps, ref } from "vue";
+import type { TeamMember } from "@/models/TeamMember";
+import type { Project } from "@/models/Project";
 
 const isModalVisible = ref(false);
 const isMembersModalVisible = ref(false);
 const selectedProject = ref<number | null>(null);
 
-interface Member {
-  id: number;
-  name: string;
-  isLeader: boolean;
-}
-
-interface Project {
-  id: number;
-  name: string;
-  description: string;
-  projectAssignees: Member[];
-}
-
 defineProps<{
   projects: Project[];
   loggedInMemberId: number;
-  teamMembers: Member[];
+  teamMembers: TeamMember[];
 }>();
 
 const hoveredAssigneeKey = ref<string | null>(null);
