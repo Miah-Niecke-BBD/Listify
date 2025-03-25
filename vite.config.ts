@@ -15,4 +15,7 @@ export default defineConfig({
     },
     extensions: ['.ts', '.js', '.vue']
   },
+  server: {
+    port: 8050,
+  },
 })

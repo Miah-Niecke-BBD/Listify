@@ -2,8 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import HomeView from '../views/HomeView.vue'
 import LoadingView from '../views/LoadingView.vue'
-
+import TeamView from '@/views/TeamView.vue'
 const router = createRouter({
+
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
@@ -14,7 +15,7 @@ const router = createRouter({
     {
       path: '/loading',
       name: 'loading',
-      component: LoadingView, 
+      component: LoadingView,
     },
     {
       path: '/home',
@@ -23,11 +24,17 @@ const router = createRouter({
       beforeEnter: (to, from, next) => {
         const jwtToken = localStorage.getItem('jwtToken');
         if (jwtToken) {
-          next(); 
+          next();
         } else {
-          next('/'); 
+          next('/');
         }
       }
+    },
+
+    {
+      path: '/team',
+      name: 'team',
+      component: TeamView
     },
   ],
 })
