@@ -31,10 +31,11 @@ BEGIN
 		WHERE teamID IN (SELECT teamID FROM [listify].TeamMembers
 		WHERE userID = @userID AND teamID = @teamID)));
 
-		DELETE FROM [listify].ProjectAssignees
-		WHERE ProjectID IN(SELECT projectID FROM [listify].Projects
-		WHERE teamID IN(SELECT teamID FROM [listify].TeamMembers
-		WHERE teamID = @teamID AND userID = @userID) );
+		DELETE PA
+        FROM [listify].ProjectAssignees AS PA
+        INNER JOIN [listify].Projects AS P ON PA.ProjectID = P.projectID
+        INNER JOIN [listify].TeamMembers AS TM ON P.teamID = TM.teamID
+        WHERE TM.teamID = @teamID AND TM.userID = @userID AND PA.userID = @userID;
 
 		DELETE FROM [listify].TeamMembers
 		WHERE userID = @userID AND teamID = @teamID;
