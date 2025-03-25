@@ -8,3 +8,5 @@ API/target/
 .vscode/
 
 /node_modules
+
+.vite

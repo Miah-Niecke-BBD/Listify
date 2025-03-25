@@ -1,10 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
-// import HomeView from '../views/HomeView.vue'
+import HomeView from '../views/HomeView.vue'
 import LoadingView from '../views/LoadingView.vue'
 import ProjectView from '@/views/ProjectView.vue'
-import HomeView from "@/views/HomeView.vue";
 
+import TeamView from '@/views/TeamView.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -30,6 +30,12 @@ const router = createRouter({
           next('/');
         }
       }
+    },
+
+    {
+      path: '/team',
+      name: 'team',
+      component: TeamView
     },
     {
       path: '/project/:id',
