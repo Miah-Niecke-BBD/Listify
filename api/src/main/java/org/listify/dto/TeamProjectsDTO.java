@@ -7,10 +7,12 @@ public class TeamProjectsDTO {
 
     private Long projectID;
     private String projectName;
+    private String projectDescription;
 
-    public TeamProjectsDTO(Long projectID, String projectName) {
+    public TeamProjectsDTO(Long projectID, String projectName, String projectDescription) {
         this.projectID = projectID;
         this.projectName = projectName;
+        this.projectDescription = projectDescription;
     }
 
     public Long getProjectID() {
@@ -27,5 +29,13 @@ public class TeamProjectsDTO {
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    public String getProjectDescription() {
+        return projectDescription;
+    }
+
+    public void setProjectDescription(String projectDescription) {
+        this.projectDescription = projectDescription;
     }
 }
