@@ -34,7 +34,7 @@ public class ProjectAssigneesService {
 
         String githubID = "user" + projectAssignee.getUserID() + "_github";
 
-        return new ProjectAssigneeDTO(project.getProjectName(), githubID);
+        return new ProjectAssigneeDTO(githubID);
     }
 
     public List<ProjectAssigneeDTO> getAllProjectsAssignees(Long projectID) {
@@ -52,7 +52,7 @@ public class ProjectAssigneesService {
                             .map(user -> user.getGitHubID())
                             .orElse("Unknown");
 
-                    return new ProjectAssigneeDTO(assignee.getUserID().toString(), githubID);
+                    return new ProjectAssigneeDTO( githubID);
                 })
                 .collect(Collectors.toList());
     }
