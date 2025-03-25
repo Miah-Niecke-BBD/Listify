@@ -3,6 +3,8 @@ import { ref } from "vue";
 import type {Task} from "@/models/Task.ts";
 import { updateTask, deleteTask } from "@/api/TasksHandler.ts"
 import { jwtToken } from "@/models/JWTToken.ts";
+import TaskDependencyManager from "@/components/TaskDependencyManager.vue";
+import TaskAssignmentManager from "@/components/TaskAssignmentManager.vue";
 
 const emit = defineEmits(["close", "task-updated", "task-deleted"])
 
@@ -38,6 +40,8 @@ const customFormatDate = (date: Date | string | null): string => {
 
 const isEditing = ref(false);
 const editableTask = ref({ ...props.task });
+const showDependencies = ref(false);
+const showAssignments = ref(false);
 
 const startEdit = () => {
   isEditing.value = true;
@@ -68,6 +72,39 @@ const handleDelete = async (): Promise<void> => {
     emit("task-deleted", props.task.taskID);
   } catch (error) {
     console.error("Error deleting task:", error);
+  }
+};
+
+const toggleDependencies = () => (showDependencies.value = !showDependencies.value);
+const toggleAssignments = () => (showAssignments.value = !showAssignments.value);
+
+const taskDependencies = ref(props.task?.dependantTask ? [props.task.dependantTask] : []);
+
+const onDependencyAdded = (newDependency: any) => {
+  taskDependencies.value.push(newDependency);
+};
+
+const onDependencyDeleted = (dependencyID: number) => {
+  taskDependencies.value = taskDependencies.value.filter(
+    (dep) => dep.taskID !== dependencyID
+  );
+}
+
+const taskState = ref({ ...props.task });
+
+const onAssigneeAdded = (newAssignee: { userID: number; githubID: string }) => {
+  if (taskState.value?.taskAssignees) {
+    taskState.value.taskAssignees.push(newAssignee);
+  } else if (taskState.value) {
+    taskState.value.taskAssignees = [newAssignee];
+  }
+};
+
+const onAssigneeRemoved = (userID: number) => {
+  if (taskState.value?.taskAssignees) {
+    taskState.value.taskAssignees = taskState.value.taskAssignees.filter(
+      (assignee) => assignee.userID !== userID
+    );
   }
 };
 </script>
@@ -133,6 +170,28 @@ const handleDelete = async (): Promise<void> => {
             <input id="due-date" v-model="editableTask.dueDate" type="date" />
           </section>
         </form>
+      </section>
+
+      <section class="task-dependency-toggle">
+        <button @click="toggleDependencies">{{ showDependencies ? 'Hide' : 'Manage' }} Dependencies</button>
+        <TaskDependencyManager
+          v-if="showDependencies"
+          :taskID="task.taskID"
+          :dependencies="taskDependencies"
+          @dependency-added="onDependencyAdded"
+          @dependency-deleted="onDependencyDeleted"
+        />
+      </section>
+
+      <section class="task-assignment-toggle">
+        <button @click="toggleAssignments">{{ showAssignments ? 'Hide' : 'Manage' }} Assignments</button>
+        <TaskAssignmentManager
+          v-if="showAssignments"
+          :taskID="task.taskID"
+          :assignees="task.taskAssignees"
+          @assignee-added="onAssigneeAdded"
+          @assignee-removed="onAssigneeRemoved"
+        />
       </section>
 
       <footer class="popup-footer">
@@ -416,5 +475,31 @@ const handleDelete = async (): Promise<void> => {
   border: none;
   border-radius: var(--radius);
   cursor: pointer;
+}
+
+.task-dependency-toggle button {
+  margin-top: 0.5rem;
+  color: #fff;
+  background-color: #ca6de8;
+  border: none;
+  border-radius: 5px;
+  padding: 0.2rem 0.5rem;
+  cursor: pointer;
+}
+.task-dependency-toggle button:hover {
+  background-color: #a150c7;
+}
+
+.task-assignment-toggle button {
+  margin-top: 0.5rem;
+  color: #fff;
+  background-color: #ca6de8;
+  border: none;
+  border-radius: 5px;
+  padding: 0.2rem 0.5rem;
+  cursor: pointer;
+}
+.task-assignment-toggle button:hover {
+  background-color: #a150c7;
 }
 </style>
