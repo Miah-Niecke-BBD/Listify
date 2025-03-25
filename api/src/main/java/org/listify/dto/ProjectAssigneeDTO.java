@@ -6,22 +6,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class ProjectAssigneeDTO {
 
-
-    private String projectName;
     private String githubID;
 
-    public ProjectAssigneeDTO(String projectName, String githubID) {
-        this.projectName = projectName;
+    public ProjectAssigneeDTO(String githubID) {
         this.githubID = githubID;
-    }
-
-
-    public String getProjectName() {
-        return projectName;
-    }
-
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
     }
 
     public String getGithubID() {

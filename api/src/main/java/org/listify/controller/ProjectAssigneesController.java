@@ -24,7 +24,7 @@ public class ProjectAssigneesController {
         this.userService = userService;
     }
 
-    @GetMapping("/{assignees}")
+    @GetMapping("/{projectID}")
     public ResponseEntity<List<ProjectAssigneeDTO>> getProjectsAssignedUsers(@PathVariable("projectID") Long projectID,
                                                                              HttpServletRequest request) {
         Long teamLeaderID = userService.getUserIDFromAuthentication(request);
@@ -40,8 +40,7 @@ public class ProjectAssigneesController {
         Long teamLeaderID = userService.getUserIDFromAuthentication(request);
         projectAssigneesService.assignUserToProject(teamLeaderID, userID, projectID);
         String githubID = "user" + userID + "_github";
-        String projectName = projectAssigneesService.getAllProjectsAssignees(projectID).get(0).getProjectName();
-        ProjectAssigneeDTO newProjectAssignee = new ProjectAssigneeDTO(projectName, githubID);
+        ProjectAssigneeDTO newProjectAssignee = new ProjectAssigneeDTO( githubID);
         return ResponseEntity.status(HttpStatus.CREATED).body(newProjectAssignee);
     }
 

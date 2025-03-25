@@ -34,7 +34,7 @@ public class ProjectAssigneesService {
 
         String githubID = "user" + projectAssignee.getUserID() + "_github";
 
-        return new ProjectAssigneeDTO(project.getProjectName(), githubID);
+        return new ProjectAssigneeDTO(githubID);
     }
 
     public List<ProjectAssigneeDTO> getAllProjectsAssignees(Long projectID) {
@@ -46,9 +46,14 @@ public class ProjectAssigneesService {
         if (projectAssigneesList.isEmpty()) {
             throw new NotFoundException("No users assigned to project with ID: " + projectID);
         }
-
         return projectAssigneesList.stream()
-                .map(this::convertToDTO)
+                .map(assignee -> {
+                    String githubID = usersRepository.findById(assignee.getUserID().toString())
+                            .map(user -> user.getGitHubID())
+                            .orElse("Unknown");
+
+                    return new ProjectAssigneeDTO( githubID);
+                })
                 .collect(Collectors.toList());
     }
 
