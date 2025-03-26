@@ -24,6 +24,7 @@ import {
 
 const route = useRoute();
 const teamID = route.params.id as string;
+const loggedInMemberId: string = localStorage.getItem("loggedInUser") ?? "";
 
 const team = ref<Team | null>(null);
 const teamMembers = ref<TeamMember[]>([]);
@@ -161,7 +162,7 @@ const activeTab = ref("members");
     <TeamHeader
       :teamName="teamName"
       :teamID="teamID"
-      loggedInMemberId="102994491153243422001"
+      :loggedInMemberId="loggedInMemberId"
       :updateTeamName="updateTeamName"
       :teamMembers="teamMembers"
       :changeTeamLeader="changeTeamLeader"
@@ -204,14 +205,14 @@ const activeTab = ref("members");
     <TeamMemberList
       v-if="activeTab === 'members'"
       :members="teamMembers"
-      loggedInMemberId="102994491153243422001"
+      :loggedInMemberId="loggedInMemberId"
       :addAMember="addMemberToTeam"
       :deleteAMember="removeMember"
     />
     <TeamProjects
       v-if="activeTab === 'projects'"
       :projects="teamProjects"
-      loggedInMemberId="102994491153243422001"
+      :loggedInMemberId="loggedInMemberId"
       :teamMembers="teamMembers"
       :addProject="addProject"
       :deleteProject="removeProject"
