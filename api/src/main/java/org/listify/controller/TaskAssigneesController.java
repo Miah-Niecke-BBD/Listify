@@ -52,10 +52,10 @@ public class TaskAssigneesController {
     @DeleteMapping("/{taskID}")
     @Transactional
     public ResponseEntity<?> deleteTaskAssignment(@PathVariable("taskID") Long taskID,
-                                                  @RequestParam(name = "userID") Long userID,
+                                                  @RequestParam(name = "githubID") String githubID,
                                                   HttpServletRequest request) {
         Long teamLeaderID = userService.getUserIDFromAuthentication(request);
-        taskAssigneesService.deleteUserFromTask(userID, taskID, teamLeaderID);
+        taskAssigneesService.deleteUserFromTask(githubID, taskID, teamLeaderID);
         return ResponseEntity.noContent().build();
     }
 

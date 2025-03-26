@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import TaskCard from "@/components/TaskCard.vue";
 import TaskDetailsPopup from "@/components/TaskDetailsPopup.vue";
 import SectionDetailsPopup from "@/components/SectionDetailsPopup.vue";
-import { useTasks } from "@/api/TasksHandler.ts";
+import {updateTaskPosition, useTasks} from "@/api/TasksHandler.ts";
 import {jwtToken} from "@/models/JWTToken.ts";
 
 const props = defineProps<{
@@ -39,6 +39,10 @@ onMounted(() => {
   getTasksForSection();
 });
 
+const sortedTasks = computed(() => {
+  return [...sectionTask.value].sort((a, b) => a.taskPosition - b.taskPosition);
+});
+
 const toggleSectionPopup = () => {
   isSectionPopupVisible.value = !isSectionPopupVisible.value;
 };
@@ -62,6 +66,34 @@ const handleAddTask = async () => {
     console.log("Failed to add task:", error);
   }
 };
+
+const handleDragEnd = async (event: DragEvent, targetTaskID: number) => {
+  const draggedTaskID = Number(event.dataTransfer?.getData("taskID"));
+  if (draggedTaskID === targetTaskID) return;
+
+  const draggedTask = sectionTask.value.find(task => task.taskID === draggedTaskID);
+  const targetTask = sectionTask.value.find(task => task.taskID === targetTaskID);
+
+  if (draggedTask && targetTask) {
+    const oldPosition = draggedTask.taskPosition;
+    const newPosition = targetTask.taskPosition;
+
+    sectionTask.value.forEach(task => {
+      if (oldPosition < newPosition && task.taskPosition > oldPosition && task.taskPosition <= newPosition) {
+        task.taskPosition -= 1;
+      } else if (oldPosition > newPosition && task.taskPosition < oldPosition && task.taskPosition >= newPosition) {
+        task.taskPosition += 1;
+      }
+    });
+
+    draggedTask.taskPosition = newPosition;
+
+    await updateTaskPosition(draggedTaskID, newPosition, props.sectionID, jwtToken);
+    getTasksForSection();
+  }
+};
+
+
 </script>
 
 <template>
@@ -92,10 +124,9 @@ const handleAddTask = async () => {
       </div>
     </form>
 
-    <!-- Render tasks -->
     <section class="tasks-container">
       <TaskCard
-        v-for="task in sectionTask"
+        v-for="task in sortedTasks"
         :key="task.taskID"
         :taskID="task.taskID"
         :taskName="task.taskName"
@@ -103,6 +134,10 @@ const handleAddTask = async () => {
         :taskPosition="task.taskPosition"
         :dueDate="task.dueDate"
         :createdAt="task.createdAt"
+        draggable="true"
+        @dragstart="(e: DragEvent) => e.dataTransfer?.setData('taskID', task.taskID.toString())"
+        @dragover.prevent
+        @drop="(e: DragEvent) => handleDragEnd(e, task.taskID)"
         @task-clicked="openTaskPopup"
       />
 

@@ -82,6 +82,27 @@ export default class SectionsHandler {
     }
   }
 
+  static async updateSectionPosition(sectionID:number, newSectionPosition: number): Promise<boolean> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/sections/${sectionID}/position`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwtToken}`,
+        },
+        body: JSON.stringify({ sectionPosition: newSectionPosition })
+      })
+
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(`Failed to update section position: ${errorMessage}`);
+      }
+      return true
+    } catch (error) {
+      console.error("Error updating section position", error)
+      return false
+    }
+  }
 
   static async deleteSection(sectionID: number): Promise<boolean> {
     try {
