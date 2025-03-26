@@ -3,7 +3,6 @@ import { ref, onMounted, computed } from "vue";
 import SectionCard from "@/components/SectionCard.vue";
 import type { Section } from "@/models/Section.ts";
 import SectionsHandler from "@/api/SectionsHandler.ts";
-import Sidebar from "@/components/Sidebar.vue";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
@@ -42,6 +41,10 @@ const addSection = async () => {
     newSection.value.sectionPosition = 0;
     showForm.value = false;
   }
+};
+
+const removeSection = (sectionID: number) => {
+  sections.value = sections.value.filter(section => section.sectionID !== sectionID);
 };
 
 onMounted(() => {
@@ -99,7 +102,6 @@ const handleDrop = async (event: DragEvent, targetPosition: number) => {
 
 <template>
 <main>
-  <Sidebar />
   <div class="project-container">
     <div class="project-container">
       <h1 class="project-title">Project Name</h1>
@@ -124,9 +126,10 @@ const handleDrop = async (event: DragEvent, targetPosition: number) => {
           :createdAt="section.createdAt"
           :updatedAt="section.updatedAt"
           draggable="true"
-          @dragstart="(e) => handleDragStart(e, section.sectionID)"
-          @drop="(e) => handleDrop(e, section.sectionPosition)"
+          @dragstart="(e: DragEvent) => handleDragStart(e, section.sectionID)"
+          @drop="(e: DragEvent) => handleDrop(e, section.sectionPosition)"
           @section-updated="updateSection"
+          @section-deleted="removeSection"
         />
       </div>
     </div>

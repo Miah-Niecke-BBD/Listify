@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import type {Task} from "@/models/Task.ts";
-import { updateTask, deleteTask } from "@/api/TasksHandler.ts"
+import { ref, watch } from "vue";
 import { jwtToken } from "@/models/JWTToken.ts";
 import TaskDependencyManager from "@/components/TaskDependencyManager.vue";
 import TaskAssignmentManager from "@/components/TaskAssignmentManager.vue";
+import TasksHandler from "@/api/TasksHandler.ts";
 
 const emit = defineEmits(["close", "task-updated", "task-deleted"])
 
@@ -16,12 +15,12 @@ const props = defineProps<{
   task: {
     taskID: number;
     taskName: string;
-    taskDescription: string;
+    taskDescription: string | null;
     taskPriority: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-    dueDate: Date;
-    dateCompleted: Date | null;
+    createdAt: string | Date;
+    updatedAt: string | Date | null;
+    dueDate: string | Date | null;
+    dateCompleted: string | Date | null;
     taskAssignees: { userID: number; githubID: string }[] | null;
     dependantTask: { taskID: number; taskName: string } | null;
   } | null;
@@ -43,6 +42,10 @@ const editableTask = ref({ ...props.task });
 const showDependencies = ref(false);
 const showAssignments = ref(false);
 
+watch(() => props.task, (newTask) => {
+  editableTask.value = { ...newTask };
+}, { deep: true });
+
 const startEdit = () => {
   isEditing.value = true;
   editableTask.value = { ...props.task };
@@ -56,8 +59,10 @@ const handleSave = async (): Promise<void> => {
   if (!editableTask.value) return;
 
   try {
-    const updatedTask: Task = await updateTask(editableTask.value, jwtToken);
-    emit("task-updated", updatedTask);
+    await TasksHandler.updateTask(editableTask.value, jwtToken);
+
+    const fullUpdatedTask = await TasksHandler.openTaskPopup(editableTask.value.taskID);
+    emit("task-updated", fullUpdatedTask);
     isEditing.value = false;
   } catch (error) {
     console.error("Error updating task:", error);
@@ -68,8 +73,9 @@ const handleDelete = async (): Promise<void> => {
   if (!props.task) return;
 
   try {
-    await deleteTask(props.task.taskID, jwtToken);
+    await TasksHandler.deleteTask(props.task.taskID, jwtToken);
     emit("task-deleted", props.task.taskID);
+    closePopup()
   } catch (error) {
     console.error("Error deleting task:", error);
   }

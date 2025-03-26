@@ -3,8 +3,11 @@ import { onMounted, ref, computed } from "vue";
 import TaskCard from "@/components/TaskCard.vue";
 import TaskDetailsPopup from "@/components/TaskDetailsPopup.vue";
 import SectionDetailsPopup from "@/components/SectionDetailsPopup.vue";
-import {updateTaskPosition, useTasks} from "@/api/TasksHandler.ts";
 import {jwtToken} from "@/models/JWTToken.ts";
+import {useRoute} from "vue-router";
+import type {SectionTask} from "@/models/SectionTask.ts";
+import TasksHandler from "@/api/TasksHandler.ts";
+import type {Task} from "@/models/Task.ts";
 
 const props = defineProps<{
   sectionID: number;
@@ -14,7 +17,7 @@ const props = defineProps<{
   updatedAt: Date | null;
 }>();
 
-const emits = defineEmits(["section-updated"]);
+const emits = defineEmits(["section-updated", "section-deleted"]);
 
 const isSectionPopupVisible = ref(false);
 const section = ref({
@@ -23,20 +26,31 @@ const section = ref({
   sectionPosition: props.sectionPosition,
 });
 
-const {
-  sectionTask,
-  selectedTask,
-  showForm,
-  newTask,
-  addTask,
-  projectID,
-  getTasksForSection,
-  cancelTask,
-  openTaskPopup,
-} = useTasks(props.sectionID);
+const route = useRoute();
+const projectID = route.params.id as string;
+
+const sectionTask = ref<SectionTask[]>([]);
+const selectedTask = ref<Task | null>(null);
+const showForm = ref(false);
+
+const newTask = ref({
+  taskName: "",
+  taskDescription: null as string | null,
+  taskPriority: null as number | null,
+  dueDate: null as string | null,
+});
+
+const loadTasks = async () => {
+  sectionTask.value = await TasksHandler.getTasksForSection(section.value.sectionID)
+}
+
+const cancelTask = () => {
+  showForm.value = false;
+  newTask.value = { taskName: "", taskDescription: "", taskPriority: 1, dueDate: "" };
+};
 
 onMounted(() => {
-  getTasksForSection();
+  loadTasks();
 });
 
 const sortedTasks = computed(() => {
@@ -52,19 +66,39 @@ const updateSectionHandler = (updatedSection: any) => {
   emits("section-updated", updatedSection);
 };
 
+const updateTask = (updatedTask: Task) => {
+  selectedTask.value = updatedTask;
+
+  const taskToUpdate = sectionTask.value.find(task => task.taskID === updatedTask.taskID);
+  if (taskToUpdate) {
+    Object.assign(taskToUpdate, updatedTask);
+  }
+};
+
+const removeTask = (taskID: number) => {
+  sectionTask.value = sectionTask.value.filter(task => task.taskID !== taskID);
+};
+
 const handleAddTask = async () => {
   if (!newTask.value.taskName) return;
-  try {
-    await addTask({
-      ...newTask.value,
-      sectionID: props.sectionID,
-      projectID: projectID.value,
-    });
-    getTasksForSection();
-    showForm.value = false;
-  } catch (error) {
-    console.log("Failed to add task:", error);
+  const createdTask = await TasksHandler.addTask(projectID, section.value.sectionID, {
+    taskName: newTask.value.taskName,
+    taskDescription: newTask.value.taskDescription,
+    taskPriority: newTask.value.taskPriority,
+    dueDate: newTask.value.dueDate,
+  })
+
+  if (createdTask) {
+    sectionTask.value.push(createdTask);
+    newTask.value.taskName = ""
+    newTask.value.taskDescription = null
+    newTask.value.taskPriority = null
+    newTask.value.dueDate = null
   }
+};
+
+const handlePopup = async (taskID: number) => {
+  selectedTask.value = await TasksHandler.openTaskPopup(taskID);
 };
 
 const handleDragEnd = async (event: DragEvent, targetTaskID: number) => {
@@ -88,8 +122,8 @@ const handleDragEnd = async (event: DragEvent, targetTaskID: number) => {
 
     draggedTask.taskPosition = newPosition;
 
-    await updateTaskPosition(draggedTaskID, newPosition, props.sectionID, jwtToken);
-    getTasksForSection();
+    await TasksHandler.updateTaskPosition(draggedTaskID, newPosition, props.sectionID, jwtToken);
+    await loadTasks();
   }
 };
 
@@ -138,10 +172,15 @@ const handleDragEnd = async (event: DragEvent, targetTaskID: number) => {
         @dragstart="(e: DragEvent) => e.dataTransfer?.setData('taskID', task.taskID.toString())"
         @dragover.prevent
         @drop="(e: DragEvent) => handleDragEnd(e, task.taskID)"
-        @task-clicked="openTaskPopup"
+        @task-clicked="handlePopup(task.taskID)"
       />
 
-      <TaskDetailsPopup v-if="selectedTask" :task="selectedTask" @close="selectedTask = null" />
+      <TaskDetailsPopup
+          v-if="selectedTask"
+          :task="selectedTask"
+          @task-updated="updateTask"
+          @task-deleted="removeTask"
+          @close="selectedTask = null" />
     </section>
 
     <SectionDetailsPopup
@@ -149,6 +188,7 @@ const handleDragEnd = async (event: DragEvent, targetTaskID: number) => {
       :section="props"
       @close="toggleSectionPopup"
       @update="updateSectionHandler"
+      @section-deleted="() => emits('section-deleted', section.sectionID)"
     />
   </section>
 </template>

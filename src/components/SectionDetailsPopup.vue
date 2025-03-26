@@ -10,7 +10,7 @@ const props = defineProps<{
   };
 }>();
 
-const emit = defineEmits(["close", "update"]);
+const emit = defineEmits(["close", "update", "section-deleted"]);
 const sectionName = ref(props.section.sectionName);
 
 const updateSection = async () => {
@@ -26,6 +26,7 @@ const updateSection = async () => {
 const deleteSection = async () => {
   const success = await SectionsHandler.deleteSection(props.section.sectionID);
   if (success) {
+    emit("section-deleted", props.section.sectionID);
     emit("close");
   }
 };
