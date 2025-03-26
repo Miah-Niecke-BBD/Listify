@@ -35,11 +35,10 @@ public class ProjectAssigneesController {
     @PostMapping("/{projectID}")
     @Transactional
     public ResponseEntity<ProjectAssigneeDTO> assignUserToProject(@PathVariable("projectID") Long projectID,
-                                                                  @RequestParam(name = "userID") Long userID,
+                                                                  @RequestParam(name = "githubID")String githubID,
                                                                   HttpServletRequest request) {
         Long teamLeaderID = userService.getUserIDFromAuthentication(request);
-        projectAssigneesService.assignUserToProject(teamLeaderID, userID, projectID);
-        String githubID = "user" + userID + "_github";
+        projectAssigneesService.assignUserToProject(teamLeaderID, githubID, projectID);
         ProjectAssigneeDTO newProjectAssignee = new ProjectAssigneeDTO( githubID);
         return ResponseEntity.status(HttpStatus.CREATED).body(newProjectAssignee);
     }
@@ -47,10 +46,10 @@ public class ProjectAssigneesController {
     @DeleteMapping("/{projectID}")
     @Transactional
     public ResponseEntity<?> deleteUserFromProject(@PathVariable("projectID") Long projectID,
-                                                   @RequestParam(name = "userID") Long userID,
+                                                   @RequestParam(name = "githubID") String githubID,
                                                    HttpServletRequest request) {
         Long teamLeaderID = userService.getUserIDFromAuthentication(request);
-        projectAssigneesService.deleteUserFromProject(userID, projectID, teamLeaderID);
+        projectAssigneesService.deleteUserFromProject(githubID, projectID, teamLeaderID);
         return ResponseEntity.noContent().build();
     }
 }

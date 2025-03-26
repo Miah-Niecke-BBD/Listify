@@ -19,13 +19,17 @@ public class ProjectAssigneesService {
     private final ProjectAssigneesRepository repository;
     private final ProjectsRepository projectRepository;
     private final UsersRepository usersRepository;
+    private final UserService userService;
 
     public ProjectAssigneesService(ProjectAssigneesRepository repository,
                                    ProjectsRepository projectRepository,
-                                   UsersRepository usersRepository) {
+                                   UsersRepository usersRepository,
+                                   UserService userService
+    ) {
         this.repository = repository;
         this.projectRepository = projectRepository;
         this.usersRepository = usersRepository;
+        this.userService = userService;
     }
 
     private ProjectAssigneeDTO convertToDTO(ProjectAssignees projectAssignee) {
@@ -57,7 +61,9 @@ public class ProjectAssigneesService {
                 .collect(Collectors.toList());
     }
 
-    public Long assignUserToProject(Long teamLeaderID, Long userID, Long projectID) {
+    public Long assignUserToProject(Long teamLeaderID, String githubID, Long projectID) {
+        Long userID = userService.getUserIDFromGithubID(githubID);
+
         if (!usersRepository.existsById(String.valueOf(userID))) {
             throw new NotFoundException("User with ID " + userID + " does not exist");
         }
@@ -71,7 +77,8 @@ public class ProjectAssigneesService {
         return userID;
     }
 
-    public void deleteUserFromProject(Long userID, Long projectID, Long teamLeaderID) {
+    public void deleteUserFromProject(String githubID, Long projectID, Long teamLeaderID) {
+        Long userID = userService.getUserIDFromGithubID(githubID);
         if (!projectRepository.existsById(projectID)) {
             throw new NotFoundException("Project with ID " + projectID + " not found");
         }
