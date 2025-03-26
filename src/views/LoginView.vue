@@ -23,7 +23,7 @@ async function handleLogin(): Promise<void> {
 <template>
   <section id="body">
     <header>
-      <img src="../assets/logo.png" alt="Logo" />
+      <img id="logo" src="../assets/logo.png" alt="Logo" />
     </header>
     <main>
       <section>
@@ -53,40 +53,44 @@ header {
 }
 
 main {
-  border: 1px solid rgb(240, 239, 239);
+  border: 1px solid var(--light-purple);
+  border-radius: 0.5em;
   padding: 1em 2em;
   margin-top: 6rem;
+
 }
 
+
 h1 {
-  color: black;
+  color: var(--heading-purple);
   font-size: 32pt;
   font-weight: 700;
-  margin: 0;
+  margin-bottom: 0.1em;
 }
 
 main p {
-  color: grey;
+  color: var(--light-text-color);
   font-weight: 500;
   font-size: 8pt;
+  margin-bottom: 1em;
 }
 
 button {
-  background-color: white;
-  border: 1px solid lightgrey;
+  border: 1px solid var(--light-purple);
   border-radius: 0.5em;
   padding: 0.4em;
-  width: 80%;
-  color: black;
+  width: 100%;
+  color: var(--light-text-color);
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 0.8em;
   cursor: pointer;
+  margin-bottom: 1em;
 }
 
 button:hover {
-  background-color: rgb(237, 238, 239);
+  background-color: var(--button-hover-bg);
 }
 
 footer {
@@ -99,8 +103,16 @@ footer {
 }
 
 @media (max-width: 480px) {
-  h1 {
-    font-size: 24pt;
+  #body{
+    margin: 0.5rem;
+  }
+  
+  h1{
+    font-size: 23pt;
+  }
+
+  #logo{
+    width: 100%;
   }
 }
 </style>
