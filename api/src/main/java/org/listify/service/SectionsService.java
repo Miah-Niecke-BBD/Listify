@@ -63,7 +63,8 @@ public class SectionsService {
             throw new BadRequestException("Section name has a maximum of 100 characters");
         }
 
-        if (!repository.isSectionAndUserInSameProject(sectionID, userID)) {
+        Integer userAccessToTask = repository.userHasAccessToSection(userID, sectionID);
+        if (userAccessToTask == null || userAccessToTask == 0) {
             throw new ForbiddenException("Only sections within your project can be updated.");
         }
         repository.updateSection(sectionID, userID, updatedSection.getSectionName());
@@ -78,7 +79,8 @@ public class SectionsService {
     }
 
     public void updateSectionPosition(Long sectionID, Long loggedInUserID, UpdateSectionPositionDTO updatedPosition) {
-        if (!repository.isSectionAndUserInSameProject(sectionID, loggedInUserID)) {
+        Integer userAccessToTask = repository.userHasAccessToSection(loggedInUserID, sectionID);
+        if (userAccessToTask == null || userAccessToTask == 0) {
             throw new ForbiddenException("Only sections within your project can be updated.");
         }
         repository.updateSectionPosition(loggedInUserID, sectionID, updatedPosition.getSectionPosition());

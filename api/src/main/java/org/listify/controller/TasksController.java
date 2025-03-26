@@ -73,12 +73,12 @@ public class TasksController {
     @PostMapping
     @Transactional
     public ResponseEntity<ViewTaskDTO> newTask(HttpServletRequest request,
-                                     @RequestParam(name = "projectID") Long projectID,
-                                     @RequestParam(name = "sectionID") Long sectionID,
-                                     @RequestParam(name = "taskName") String taskName,
-                                     @RequestParam(name = "taskDescription", required = false) String taskDescription,
-                                     @RequestParam(name = "taskPriority") Byte taskPriority,
-                                     @RequestParam(name = "dueDate", required = false) OffsetDateTime dueDate) {
+                                               @RequestParam(name = "projectID") Long projectID,
+                                               @RequestParam(name = "sectionID") Long sectionID,
+                                               @RequestParam(name = "taskName") String taskName,
+                                               @RequestParam(name = "taskDescription", required = false) String taskDescription,
+                                               @RequestParam(name = "taskPriority", required = false) Byte taskPriority,
+                                               @RequestParam(name = "dueDate", required = false) OffsetDateTime dueDate) {
 
         Long userID = userService.getUserIDFromAuthentication(request);
         Long newTaskID = tasksService.createTask(userID, projectID, sectionID, taskName, taskDescription, taskPriority, dueDate);
