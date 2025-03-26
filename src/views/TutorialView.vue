@@ -1,11 +1,9 @@
 <script setup>
-import Sidebar from '@/components/Sidebar.vue';
 
 </script>
 
 <template>
   <section id="body">
-  <Sidebar />
   <section class="tutorial-container">
     
     <header class="tutorial-header">

@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import type { AuthCodeResponse } from '@/models/AuthCodeResponse.ts';
-import { GetAuthCode } from '../api/OAuth2Api.ts';
-import IconGoogle from '@/components/icons/IconGoogle.vue';
+import type { AuthCodeResponse } from "@/models/AuthCodeResponse.ts";
+import { GetAuthCode } from "../api/OAuth2Api.ts";
+import IconGoogle from "@/components/icons/IconGoogle.vue";
 
 async function handleLogin(): Promise<void> {
   try {
-    const result:any = await GetAuthCode();
+    const result: any = await GetAuthCode();
 
-   
     if (result && result.authorization_url) {
-      const data: AuthCodeResponse = result; 
-      window.location.href = data.authorization_url; 
+      const data: AuthCodeResponse = result;
+      window.location.href = data.authorization_url;
     } else {
       console.log("No authorization URL received.");
     }
@@ -29,7 +28,7 @@ async function handleLogin(): Promise<void> {
       <section>
         <h1>Welcome to Listify</h1>
         <p>Sign in to access your lists</p>
-        <button @click="handleLogin"><IconGoogle/>Continue with Google</button>
+        <button @click="handleLogin"><IconGoogle />Continue with Google</button>
         <p>By continuing, you agree to Listify's Terms and Privacy Policy</p>
       </section>
     </main>
@@ -46,6 +45,7 @@ async function handleLogin(): Promise<void> {
   align-items: center;
   justify-content: center;
   text-align: center;
+  min-width: 100vw;
 }
 
 header {
@@ -57,9 +57,7 @@ main {
   border-radius: 0.5em;
   padding: 1em 2em;
   margin-top: 6rem;
-
 }
-
 
 h1 {
   color: var(--heading-purple);
@@ -103,15 +101,15 @@ footer {
 }
 
 @media (max-width: 480px) {
-  #body{
+  #body {
     margin: 0.5rem;
   }
-  
-  h1{
+
+  h1 {
     font-size: 23pt;
   }
 
-  #logo{
+  #logo {
     width: 100%;
   }
 }

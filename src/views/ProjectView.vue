@@ -4,7 +4,6 @@ import SectionCard from "@/components/SectionCard.vue";
 import type { Section } from "@/models/Section.ts";
 import SectionsHandler from "@/api/SectionsHandler.ts";
 import {useRoute} from "vue-router";
-import Sidebar from "@/components/Sidebar.vue";
 
 const route = useRoute()
 const sections = ref<Section[]>([])
@@ -51,7 +50,6 @@ onMounted(() => {
 
 <template>
   <main>
-    <Sidebar />
 <div class="project-container">
     <h1 class="project-title">Project Name</h1>
 
