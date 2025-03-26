@@ -6,6 +6,7 @@ import type { TeamMember } from "@/models/TeamMember";
 
 const props = defineProps({
   projectName: String,
+  projectID: Number,
   projectMembers: {
     type: Array as PropType<TeamMember[]>,
     required: true,
@@ -22,19 +23,19 @@ const props = defineProps({
     type: Function as PropType<() => void>,
     required: true,
   },
+  addProjectAssignee: { type: Function, required: true },
+  removeProjectAssignee: { type: Function, required: true },
 });
 
-const emit = defineEmits(["assignMember", "unassignMember"]);
-
-const isMemberInProject = (memberId: number): boolean => {
-  return props.projectMembers.some((member) => member.id === memberId);
+const isMemberInProject = (memberId: string): boolean => {
+  return props.projectMembers.some((member) => member.githubID === memberId);
 };
 
-const onMemberToggle = (memberId: number, isChecked: boolean) => {
+const onMemberToggle = (memberId: string, isChecked: boolean) => {
   if (isChecked) {
-    emit("assignMember", memberId);
+    props.addProjectAssignee(props.projectID, memberId);
   } else {
-    emit("unassignMember", memberId);
+    props.removeProjectAssignee(props.projectID, memberId);
   }
 };
 
@@ -49,26 +50,27 @@ const closeModal = () => {
       <h3 class="modal-header">Manage Project Members</h3>
       <p>Select team members to assign to the "{{ projectName }}" project</p>
       <ul class="project-members-list">
-        <ol v-for="member in teamMembers" :key="member.id" class="member-item">
+        <ol v-for="member in teamMembers" :key="member.githubID" class="member-item">
           <input
-            v-if="!member.isLeader"
+            v-if="!member.teamLeader"
             type="checkbox"
-            :checked="isMemberInProject(member.id)"
+            :checked="isMemberInProject(member.githubID)"
             @change="
-              ($event) => onMemberToggle(member.id, ($event.target as HTMLInputElement).checked)
+              ($event) =>
+                onMemberToggle(member.githubID, ($event.target as HTMLInputElement).checked)
             "
-            :id="'member-' + member.id"
+            :id="'member-' + member.githubID"
           />
 
           <section class="member-details">
             <p class="member-name">{{ member.name }}</p>
-            <p class="member-id">ID: {{ member.id }}</p>
+            <p class="member-id">ID: {{ member.githubID }}</p>
           </section>
         </ol>
       </ul>
       <footer class="modal-footer">
-        <button @click="closeModal" class="modal-btn">Cancel</button>
-        <button class="modal-btn">OK</button>
+        <button @click="closeModal" class="modal-btn">Done</button>
+        <!-- <button class="modal-btn">OK</button> -->
       </footer>
     </article>
   </section>
@@ -95,6 +97,7 @@ const closeModal = () => {
   display: flex;
   flex-direction: column;
   min-width: 30em;
+  margin: 1em;
 }
 
 .project-members-list {
@@ -131,5 +134,12 @@ const closeModal = () => {
 }
 .project-members-modal input[type="checkbox"] {
   accent-color: var(--primary-color);
+}
+
+@media (max-width: 700px) {
+  .modal-content {
+    min-width: unset;
+    margin: 1em;
+  }
 }
 </style>

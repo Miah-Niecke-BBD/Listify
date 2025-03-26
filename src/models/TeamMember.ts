@@ -1,5 +1,6 @@
 export interface TeamMember {
-    id: number;
-    name: string;
-    isLeader: boolean;
+    userID: number
+    githubID: string;
+    name?: string | undefined;
+    teamLeader: boolean;
 }

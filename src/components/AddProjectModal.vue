@@ -10,7 +10,12 @@ const props = defineProps({
     type: Function,
     required: true,
   },
+  addProject: {
+    type: Function,
+    required: true,
+  }
 });
+
 const newProjectName = ref<string>("");
 const description = ref<string>("");
 
@@ -19,7 +24,11 @@ const closeModal = () => {
   description.value = "";
   props.onClose();
 };
-const handleAction = () => {};
+
+const createProject = () => {
+  props.addProject(newProjectName.value, description.value);
+  closeModal();
+};
 </script>
 
 <template>
@@ -43,7 +52,7 @@ const handleAction = () => {};
         placeholder="Enter description"
       ></textarea>
       <footer class="modal-footer">
-        <button @click="handleAction" class="modal-btn">Add Project</button>
+        <button @click="createProject" class="modal-btn">Add Project</button>
         <button @click="closeModal" class="modal-btn">Cancel</button>
       </footer>
     </article>

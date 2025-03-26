@@ -33,7 +33,15 @@ const closeModal = () => {
   props.onClose();
 };
 
-const handleAction = () => {};
+const handleAction = () => {
+  if (props.mode === "updateTeamName" && props.onUpdateTeamName) {
+    props.onUpdateTeamName(newTeamName.value);
+    closeModal();
+  } else if (props.mode === "addMember" && props.onAddMember) {
+    props.onAddMember(newMemberId.value);
+    closeModal();
+  }
+};
 </script>
 
 <template>
@@ -62,7 +70,7 @@ const handleAction = () => {};
       />
 
       <footer class="modal-footer">
-        <button @click="handleAction" class="modal-btn">
+        <button @click="handleAction" class="modal-btn" type="submit">
           {{ mode === "addMember" ? "Add Member" : "Update Name" }}
         </button>
         <button @click="closeModal" class="modal-btn">Cancel</button>

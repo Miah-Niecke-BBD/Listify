@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
-import TutorialView from '../views/TutorialView.vue'
+import TutorialView from '@/views/TutorialView.vue'
 import LoadingView from '../views/LoadingView.vue'
 import ProjectView from '@/views/ProjectView.vue'
 import TaskList from '../views/Tasklist.vue'
@@ -10,11 +10,12 @@ import TeamView from '@/views/TeamView.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    
+
     {
       path: '/',
       name: 'login',
       component: LoginView,
+      meta: { requiresSidebar: false },
     },
     {
       path: '/loading',
@@ -28,9 +29,9 @@ const router = createRouter({
       beforeEnter: (to, from, next) => {
         const jwtToken = localStorage.getItem('jwtToken');
         if (jwtToken) {
-          next(); 
+          next();
         } else {
-          next('/'); 
+          next('/');
         }
       }
     },
@@ -41,9 +42,9 @@ const router = createRouter({
       beforeEnter: (to, from, next) => {
         const jwtToken = localStorage.getItem('jwtToken');
         if (jwtToken) {
-          next(); 
+          next();
         } else {
-          next('/'); 
+          next('/');
         }
       }
     },
@@ -54,9 +55,9 @@ const router = createRouter({
       beforeEnter: (to, from, next) => {
         const jwtToken = localStorage.getItem('jwtToken');
         if (jwtToken) {
-          next(); 
+          next();
         } else {
-          next('/'); 
+          next('/');
         }
       }
     },
@@ -67,9 +68,9 @@ const router = createRouter({
       beforeEnter: (to, from, next) => {
         const jwtToken = localStorage.getItem('jwtToken');
         if (jwtToken) {
-          next(); 
+          next();
         } else {
-          next('/'); 
+          next('/');
         }
       }
     },
@@ -85,5 +86,12 @@ const router = createRouter({
     }
   ],
 })
+
+router.afterEach((to, from) => {
+  if (to.name === 'team' && from.name === 'team' || to.name === 'project' && from.name === 'project'&& to.params.id !== from.params.id) {
+    location.reload();
+  }
+});
+
 
 export default router

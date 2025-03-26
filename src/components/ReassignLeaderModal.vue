@@ -18,13 +18,22 @@ const props = defineProps({
     type: Function as PropType<() => void>,
     required: true,
   },
+  changeTeamLeader: {
+    type: Function,
+    required: true,
+  },
 });
 
-const selectedLeader = ref<number | null>(null);
+const selectedLeader = ref<string | null>(null);
 
 const closeModal = () => {
   props.onClose();
   selectedLeader.value = null;
+};
+
+const updateTeamLeader = () => {
+  props.changeTeamLeader(selectedLeader.value?.trim());
+  window.location.reload();
 };
 </script>
 
@@ -34,16 +43,16 @@ const closeModal = () => {
       <h3 class="modal-header">Reassign Team Leader</h3>
       <p>Select a new team leader for the "{{ teamName }}" project</p>
       <ul class="team-members-list">
-        <li v-for="member in teamMembers" :key="member.id" class="team-member-item">
+        <li v-for="member in teamMembers" :key="member.githubID" class="team-member-item">
           <input
-            v-if="!member.isLeader"
+            v-if="!member.teamLeader"
             type="radio"
-            :value="member.id"
+            :value="member.githubID"
             v-model="selectedLeader"
-            :id="'member-' + member.id"
+            :id="'member-' + member.githubID"
           />
           <svg
-            v-if="member.isLeader"
+            v-if="member.teamLeader"
             xmlns="http://www.w3.org/2000/svg"
             width="24"
             height="24"
@@ -60,13 +69,13 @@ const closeModal = () => {
 
           <section class="member-details">
             <p class="member-name">{{ member.name }}</p>
-            <p class="member-id">ID: {{ member.id }}</p>
+            <p class="member-id">ID: {{ member.githubID }}</p>
           </section>
         </li>
       </ul>
       <footer class="modal-footer">
         <button @click="closeModal" class="modal-btn">Cancel</button>
-        <button class="modal-btn">OK</button>
+        <button class="modal-btn" @click="updateTeamLeader">OK</button>
       </footer>
     </article>
   </section>
@@ -131,5 +140,11 @@ const closeModal = () => {
 
 .reassign-leader-modal input[type="radio"] {
   accent-color: var(--primary-color);
+}
+@media (max-width: 700px) {
+  .modal-content {
+    min-width: unset;
+    margin: 1em;
+  }
 }
 </style>
