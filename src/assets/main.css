@@ -4,7 +4,6 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  background-color: var(--background-color);
   font-family:
     ui-sans-serif,
     system-ui,
@@ -19,5 +18,9 @@
 
 h1, h2, h3, h4 {
   color: var(--heading-purple);
+}
+
+body{
+  background-color: var(--background-color);
 }
 

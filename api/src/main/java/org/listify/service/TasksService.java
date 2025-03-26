@@ -74,6 +74,7 @@ public class TasksService {
         return labels;
     }
 
+
     public Long createTask(Long teamLeaderID, Long projectID, Long sectionID,
                            String taskName, String taskDescription,
                            Byte taskPriority, OffsetDateTime dueDate) {
@@ -87,8 +88,10 @@ public class TasksService {
             throw new BadRequestException("Task description has a maximum of 500 characters");
         }
 
-        if (taskPriority > 3 || taskPriority < 1) {
-            throw new BadRequestException("Task Priority should be between 1 & 3");
+        if (taskPriority != null) {
+            if (taskPriority > 3 || taskPriority < 1) {
+                throw new BadRequestException("Task Priority should be between 1 & 3");
+            }
         }
 
         repository.createTask(teamLeaderID, projectID,
@@ -116,7 +119,7 @@ public class TasksService {
 
         String newTaskName = task.getTaskName();
         String newTaskDescription = task.getTaskDescription();
-        Long newTaskPriority = task.getTaskPriority();
+        Long newTaskPriority;
         OffsetDateTime newDueDate = task.getDueDate();
         OffsetDateTime dateCompleted = task.getDateCompleted();
 
@@ -139,6 +142,8 @@ public class TasksService {
                 throw new BadRequestException("Task Priority should be between 1 & 3");
             }
             newTaskPriority = Long.valueOf(updatedTask.getTaskPriority());
+        } else {
+            newTaskPriority = null;
         }
 
         if (updatedTask.getDueDate() != null) {
@@ -200,8 +205,8 @@ public class TasksService {
         }
     }
 
-    private void validateTeamLeader(Long userID, Long taskID) {
-        Integer isTeamLeader = repository.userIsTeamLeader(userID, taskID);
+    private void validateTeamLeader(Long userID, Long projectID) {
+        Integer isTeamLeader = repository.userIsTeamLeader(userID, projectID);
         if (isTeamLeader == null || isTeamLeader == 0) {
             throw new ForbiddenException("User: "+userID+" is not a team leader");
         }

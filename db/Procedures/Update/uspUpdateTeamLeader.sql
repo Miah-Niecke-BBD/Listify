@@ -24,6 +24,36 @@ BEGIN
 	 SET isTeamLeader = 0
 	 WHERE UserID = @teamLeaderID
 
+DECLARE @projectID INT;
+
+	DECLARE project_cursor CURSOR FOR
+		SELECT p.ProjectID
+		FROM listify.Projects p
+		WHERE p.TeamID = @teamID;
+
+	OPEN project_cursor;
+
+	FETCH NEXT FROM project_cursor INTO @projectID;
+
+	WHILE @@FETCH_STATUS = 0
+	BEGIN
+		IF NOT EXISTS (
+			SELECT 1
+			FROM listify.ProjectAssignees pa
+			WHERE pa.ProjectID = @projectID
+			AND pa.UserID = @newTeamLeaderID
+		)
+		BEGIN
+			INSERT INTO listify.ProjectAssignees (UserID, ProjectID)
+			VALUES (@newTeamLeaderID, @projectID);
+		END
+
+		FETCH NEXT FROM project_cursor INTO @projectID;
+	END
+
+	CLOSE project_cursor;
+	DEALLOCATE project_cursor;
+
 	 COMMIT;
 	 END TRY
 	 BEGIN CATCH
