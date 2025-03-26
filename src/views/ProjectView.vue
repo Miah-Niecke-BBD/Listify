@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from "vue";
 import SectionCard from "@/components/SectionCard.vue";
 import type { Section } from "@/models/Section.ts";
 import SectionsHandler from "@/api/SectionsHandler.ts";
+import Sidebar from "@/components/Sidebar.vue";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
@@ -97,6 +98,9 @@ const handleDrop = async (event: DragEvent, targetPosition: number) => {
 </script>
 
 <template>
+  <main>
+    <Sidebar />
+<div class="project-container">
   <div class="project-container">
     <h1 class="project-title">Project Name</h1>
 
@@ -126,11 +130,17 @@ const handleDrop = async (event: DragEvent, targetPosition: number) => {
       />
     </div>
   </div>
+</main>
 </template>
 
 <style scoped>
 * {
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+main{
+  display: flex;
+  flex-direction: row;
 }
 
 .project-container {
