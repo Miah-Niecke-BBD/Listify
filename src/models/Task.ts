@@ -1,4 +1,4 @@
-export type Task = {
+export interface Task {
   taskID: number;
   taskName: string;
   taskDescription: string;
@@ -9,4 +9,4 @@ export type Task = {
   dateCompleted: string | Date | null;
   taskAssignees: { userID: number; githubID: string }[] | null;
   dependantTask: { taskID: number; taskName: string } | null;
-};
+}
