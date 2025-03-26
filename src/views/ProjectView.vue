@@ -98,36 +98,37 @@ const handleDrop = async (event: DragEvent, targetPosition: number) => {
 </script>
 
 <template>
-  <main>
-    <Sidebar />
-<div class="project-container">
+<main>
+  <Sidebar />
   <div class="project-container">
-    <h1 class="project-title">Project Name</h1>
+    <div class="project-container">
+      <h1 class="project-title">Project Name</h1>
 
-    <button v-if="!showForm" @click="showForm = true">Add Section</button>
+      <button v-if="!showForm" @click="showForm = true">Add Section</button>
 
-    <form v-if="showForm" @submit.prevent="addSection">
-      <input v-model="newSection.sectionName" placeholder="Section Name" required />
-      <section>
-        <button type="submit">Create</button>
-        <button type="button" @click="showForm = false">Cancel</button>
-      </section>
-    </form>
+      <form v-if="showForm" @submit.prevent="addSection">
+        <input v-model="newSection.sectionName" placeholder="Section Name" required />
+        <section>
+          <button type="submit">Create</button>
+          <button type="button" @click="showForm = false">Cancel</button>
+        </section>
+      </form>
 
-    <div class="sections-container" @dragover="handleDragOver">
-      <SectionCard
-        v-for="section in sortedSections"
-        :key="section.sectionID"
-        :sectionID="section.sectionID"
-        :sectionName="section.sectionName"
-        :sectionPosition="section.sectionPosition"
-        :createdAt="section.createdAt"
-        :updatedAt="section.updatedAt"
-        draggable="true"
-        @dragstart="(e) => handleDragStart(e, section.sectionID)"
-        @drop="(e) => handleDrop(e, section.sectionPosition)"
-        @section-updated="updateSection"
-      />
+      <div class="sections-container" @dragover="handleDragOver">
+        <SectionCard
+          v-for="section in sortedSections"
+          :key="section.sectionID"
+          :sectionID="section.sectionID"
+          :sectionName="section.sectionName"
+          :sectionPosition="section.sectionPosition"
+          :createdAt="section.createdAt"
+          :updatedAt="section.updatedAt"
+          draggable="true"
+          @dragstart="(e) => handleDragStart(e, section.sectionID)"
+          @drop="(e) => handleDrop(e, section.sectionPosition)"
+          @section-updated="updateSection"
+        />
+      </div>
     </div>
   </div>
 </main>
