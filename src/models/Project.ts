@@ -1,8 +1,8 @@
 import type { TeamMember } from "./TeamMember";
 
 export interface Project {
-    id: number;
-    name: string;
-    description: string;
+    projectID: number;
+    projectName: string;
+    projectDescription: string;
     projectAssignees: TeamMember[];
 }

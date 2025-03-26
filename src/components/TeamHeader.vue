@@ -1,26 +1,25 @@
 <script setup lang="ts">
 import "@/assets/base.css";
 import AddTeamMemberModal from "@/components/EditTeamModal.vue";
-import { defineProps, ref } from "vue";
+import { defineProps, ref, onMounted } from "vue";
 import ReassignLeaderModal from "./ReassignLeaderModal.vue";
+import type { TeamMember } from "@/models/TeamMember";
 
-defineProps<{ teamName: string }>();
+defineProps<{
+  teamName: string;
+  teamID: string;
+  loggedInMemberId: string;
+  updateTeamName: Function;
+  teamMembers: TeamMember[];
+  changeTeamLeader: Function;
+}>();
 
 const showOptions = ref(false);
-
 const isAddTeamMemberModalVisible = ref(false);
 const isReassignLeaderModalVisible = ref(false);
 
-const emit = defineEmits(["changeTeamName"]);
+const emit = defineEmits(["handleUpdateTeam"]);
 
-const teamMembers = ref([
-  { id: 1, name: "John Doe", isLeader: true },
-  { id: 2, name: "Jane Smith", isLeader: false },
-  { id: 3, name: "Jane Smith", isLeader: false },
-  { id: 4, name: "Jane Smith", isLeader: false },
-]);
-
-// Open Add Team Member Modal
 const openAddTeamMemberModal = () => {
   isAddTeamMemberModalVisible.value = true;
 };
@@ -34,13 +33,12 @@ const closeModal = () => {
   isReassignLeaderModalVisible.value = false;
 };
 
-const changeTeamName = () => {};
 </script>
 
 <template>
   <section class="team-heading">
     <h1>{{ teamName }}</h1>
-    <RouterLink to="/calendar" class="calendar-btn">
+    <RouterLink to="/team/1/calendar" class="calendar-btn">
       <svg
         width="20"
         height="20"
@@ -58,7 +56,12 @@ const changeTeamName = () => {};
       </svg>
       Team Calendar
     </RouterLink>
-    <section @mouseenter="showOptions = true" @mouseleave="showOptions = false" class="more-btn">
+    <section
+      v-if="loggedInMemberId.trim() === teamMembers.find((m) => m.teamLeader)?.githubID.trim()"
+      @mouseenter="showOptions = true"
+      @mouseleave="showOptions = false"
+      class="more-btn"
+    >
       <i class="more-btn-icon" role="button" aria-label="More options">...</i>
       <section v-if="showOptions" class="more-options">
         <button @click="openAddTeamMemberModal">Edit Team</button>
@@ -69,13 +72,14 @@ const changeTeamName = () => {};
       mode="updateTeamName"
       :isVisible="isAddTeamMemberModalVisible"
       :onClose="closeModal"
-      :onUpdateTeamName="changeTeamName"
+      :onUpdateTeamName="updateTeamName"
     />
     <ReassignLeaderModal
       :isVisible="isReassignLeaderModalVisible"
       :onClose="closeModal"
       :teamName="teamName"
       :teamMembers="teamMembers"
+      :changeTeamLeader="changeTeamLeader"
     />
   </section>
 </template>
@@ -140,7 +144,7 @@ const changeTeamName = () => {};
   left: -2.3em;
   width: 6em;
   background: rgb(228, 227, 227);
-  border: 1px solid #ccc;
+  border: 0.1em solid #ccc;
   border-radius: 0.5em;
   box-shadow: 0 0.3em 0.6em rgba(0, 0, 0, 0.1);
   padding: 0.5em;

@@ -9,10 +9,10 @@ const isModalVisible = ref(false);
 
 defineProps<{
   members: TeamMember[];
-  loggedInMemberId: number;
+  loggedInMemberId: string;
+  addAMember: Function;
+  deleteAMember: Function;
 }>();
-
-const emit = defineEmits(["addMember", "deleteMember"]);
 
 const openModal = () => {
   isModalVisible.value = true;
@@ -21,20 +21,16 @@ const openModal = () => {
 const closeModal = () => {
   isModalVisible.value = false;
 };
-
-const addMember = (id: number) => {
-  console.log(`Adding member with ID: ${id}`);
-};
 </script>
 
 <template>
   <section class="team-members">
     <h2>Team Members ({{ members.length }})</h2>
     <ul>
-      <li v-for="member in members" :key="member.id" class="member-item">
+      <li v-for="member in members" :key="member.githubID" class="member-item">
         <span class="member-name">{{ member.name }}</span>
-        <span class="member-id">ID: {{ member.id }}</span>
-        <span v-if="member.isLeader" class="leader-label">
+        <span class="member-id">ID: {{ member.githubID }}</span>
+        <span v-if="member.teamLeader" class="leader-label">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -53,9 +49,11 @@ const addMember = (id: number) => {
           Team Leader
         </span>
         <button
-          v-if="loggedInMemberId === members.find((m) => m.isLeader)?.id && !member.isLeader"
+          v-if="
+            loggedInMemberId === members.find((m) => m.teamLeader)?.githubID && !member.teamLeader
+          "
           class="delete-btn"
-          @click="emit('deleteMember', member.id)"
+          @click="deleteAMember(member.githubID)"
           aria-label="Delete TeamMember"
         >
           <svg
@@ -76,12 +74,15 @@ const addMember = (id: number) => {
         </button>
       </li>
     </ul>
-    <AddButton v-if="loggedInMemberId === members.find((m) => m.isLeader)?.id" @click="openModal" />
+    <AddButton
+      v-if="loggedInMemberId === members.find((m) => m.teamLeader)?.githubID"
+      @click="openModal"
+    />
     <AddTeamMemberModal
       mode="addMember"
       :isVisible="isModalVisible"
       :onClose="closeModal"
-      :onAddMember="addMember"
+      :onAddMember="addAMember"
     />
   </section>
 </template>
