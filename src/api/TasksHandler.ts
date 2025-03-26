@@ -155,6 +155,34 @@ export async function updateTask(task: Partial<Task>, jwtToken: string | null): 
   return response.json();
 }
 
+export async function updateTaskPosition(taskID: number, newTaskPosition: number, sectionID: number, jwtToken: string | null): Promise<boolean> {
+  if (!jwtToken) throw new Error("JWT token is missing");
+  try {
+    const response = await fetch(`http://localhost:8080/tasks/${taskID}/position`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwtToken}`
+      },
+      body: JSON.stringify({
+        taskPosition: newTaskPosition,
+        sectionID: sectionID
+      })
+    })
+
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      throw new Error(`Failed to update task position: ${errorMessage}`);
+    }
+    return true
+  } catch (error) {
+    console.error("Error updating task position:", error);
+    return false
+  }
+
+}
+
+
 export async function deleteTask(taskID: number, jwtToken: string | null): Promise<void> {
   if (!jwtToken) throw new Error("JWT token is missing");
 
@@ -168,52 +196,3 @@ export async function deleteTask(taskID: number, jwtToken: string | null): Promi
     throw new Error(`Failed to delete task: ${errorMessage}`);
   }
 }
-
-// export async function addTask(
-//   projectID: number,
-//   sectionID: number,
-//   taskData: {
-//     taskName: string;
-//     taskDescription?: string | null;
-//     taskPriority?: number | null;
-//     dueDate?: string | null;
-//   },
-//   jwtToken: string | null,
-// ): Promise<SectionTask | null> {
-//   if (!jwtToken) throw new Error("JWT token is missing");
-//
-//   try {
-//     const params = new URLSearchParams({
-//       projectID: projectID.toString(),
-//       sectionID: sectionID.toString(),
-//       taskName: taskData.taskName,
-//     });
-//
-//     // Only add optional params if they have a value
-//     if (taskData.taskDescription) params.append("taskDescription", taskData.taskDescription);
-//     if (taskData.taskPriority !== undefined && taskData.taskPriority !== null)
-//       params.append("taskPriority", taskData.taskPriority.toString());
-//     if (taskData.dueDate) params.append("dueDate", taskData.dueDate);
-//
-//     const response = await fetch(
-//       `http://localhost:8080/tasks?${params.toString()}`,
-//       {
-//         method: "POST",
-//         headers: {
-//           Accept: "*/*",
-//           Authorization: `Bearer ${jwtToken}`,
-//         },
-//       },
-//     );
-//
-//     if (!response.ok) {
-//       const errorMessage = await response.text();
-//       throw new Error(`Failed to create task: ${errorMessage}`);
-//     }
-//
-//     return await response.json();
-//   } catch (error) {
-//     console.error("Error adding task:", error);
-//     return null;
-//   }
-// }
