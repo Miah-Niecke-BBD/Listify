@@ -75,6 +75,7 @@ const router = createRouter({
     },
     {
       path: '/team/:id',
+      path: '/team/:id',
       name: 'team',
       component: TeamView
     },

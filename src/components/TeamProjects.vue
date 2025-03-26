@@ -11,15 +11,20 @@ const isModalVisible = ref(false);
 const isMembersModalVisible = ref(false);
 const selectedProject = ref<number | null>(null);
 
-defineProps<{
+const props = defineProps<{
   projects: Project[];
-  loggedInMemberId: number;
+  loggedInMemberId: string;
   teamMembers: TeamMember[];
+  addProject: Function;
+  deleteProject: Function;
+  addProjectAssignee: Function;
+  removeProjectAssignee: Function;
 }>();
 
 const hoveredAssigneeKey = ref<string | null>(null);
 
-const getInitials = (name: string): string => {
+const getInitials = (name: string | undefined): string | undefined => {
+  if (!name) return undefined;
   const nameParts = name.split(" ");
   return nameParts.map((part) => part.charAt(0).toUpperCase()).join("");
 };
@@ -48,15 +53,16 @@ const closeMembersModal = () => {
   <section class="team-projects">
     <h2>Team Projects ({{ projects.length }})</h2>
     <ul>
-      <li v-for="project in projects" :key="project.id" class="project-item">
-        <RouterLink class="project-name" :to="'/projects/' + project.id">
-          {{ project.name }}
+      <li v-for="project in projects" :key="project.projectID" class="project-item">
+        <RouterLink class="project-name" :to="'/projects/' + project.projectID">
+          {{ project.projectName }}
         </RouterLink>
-        <p class="project-description">{{ project.description }}</p>
+        <p class="project-description">{{ project.projectDescription }}</p>
         <button
-          v-if="loggedInMemberId === teamMembers.find((m) => m.isLeader)?.id"
+          v-if="loggedInMemberId === teamMembers.find((m) => m.teamLeader)?.githubID"
           class="delete-btn"
           aria-label="Delete Project"
+          @click="deleteProject(project.projectID)"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -77,41 +83,53 @@ const closeMembersModal = () => {
 
         <h3>Project Members</h3>
         <ul class="project-assignees">
-          <li v-for="assignee in project.projectAssignees" :key="assignee.id">
+          <li v-for="assignee in project.projectAssignees" :key="assignee.githubID">
             <section
               class="assignee"
-              @mouseenter="hoveredAssigneeKey = assignee.id + '-' + project.id"
+              @mouseenter="hoveredAssigneeKey = assignee.githubID + '-' + project.projectID"
               @mouseleave="hoveredAssigneeKey = null"
             >
               <p class="initials">{{ getInitials(assignee.name) }}</p>
-              <p class="full-name" v-if="hoveredAssigneeKey === assignee.id + '-' + project.id">
+              <p
+                class="full-name"
+                v-if="hoveredAssigneeKey === assignee.githubID + '-' + project.projectID"
+              >
                 {{ assignee.name }}
               </p>
             </section>
           </li>
         </ul>
         <button
-          v-if="loggedInMemberId === teamMembers.find((m) => m.isLeader)?.id"
+          v-if="loggedInMemberId === teamMembers.find((m) => m.teamLeader)?.githubID"
           class="manage-btn"
           aria-label="Manage Project Members"
-          @click="openMembersModal(project.id)"
+          @click="openMembersModal(project.projectID)"
         >
           Manage Members
         </button>
       </li>
     </ul>
     <AddButton
-      v-if="loggedInMemberId === teamMembers.find((m) => m.isLeader)?.id"
+      v-if="loggedInMemberId === teamMembers.find((m) => m.teamLeader)?.githubID"
       @click="openModal"
     />
-    <AddProjectModal :isVisible="isModalVisible" :onClose="closeModal" />
+    <AddProjectModal
+      :isVisible="isModalVisible"
+      :onClose="closeModal"
+      :addProject="props.addProject"
+    />
     <ProjectMembersModal
       v-if="selectedProject !== null"
       :isVisible="isMembersModalVisible"
       :onClose="closeMembersModal"
-      :projectName="projects.find((p) => p.id === selectedProject)?.name || ''"
-      :projectMembers="projects.find((p) => p.id === selectedProject)?.projectAssignees || []"
+      :projectID="selectedProject"
+      :projectName="projects.find((p) => p.projectID === selectedProject)?.projectName || ''"
+      :projectMembers="
+        projects.find((p) => p.projectID === selectedProject)?.projectAssignees || []
+      "
       :teamMembers="teamMembers"
+      :addProjectAssignee="addProjectAssignee"
+      :removeProjectAssignee="removeProjectAssignee"
     />
   </section>
 </template>
@@ -220,6 +238,7 @@ const closeMembersModal = () => {
   bottom: 1.5em;
   right: 2em;
   cursor: pointer;
+  background-color: transparent;
 }
 
 .manage-btn:hover {

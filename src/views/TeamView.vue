@@ -1,54 +1,171 @@
 <script setup lang="ts">
 import "@/assets/base.css";
+import { useRoute } from "vue-router";
 import TeamHeader from "@/components/TeamHeader.vue";
-import { onMounted, ref, computed } from "vue";
-import TeamMember from "@/components/TeamMembers.vue";
+import { onMounted, ref } from "vue";
+import TeamMemberList from "@/components/TeamMembersList.vue";
 import TeamProjects from "@/components/TeamProjects.vue";
 import type { Team } from "@/models/Team";
+import type { TeamMember } from "@/models/TeamMember";
+import type { Project } from "@/models/Project";
+import {
+  fetchTeamByID,
+  fetchTeamMembers,
+  fetchTeamProject,
+  updateTeam,
+  addTeamMember,
+  removeMemberFromTeam,
+  updateTeamLeader,
+  createProject,
+  deleteProject,
+  addProjectAssignee,
+  deleteProjectAssignee,
+} from "@/api/TeamApiCalls";
+
+const route = useRoute();
+const teamID = route.params.id as string;
 
 const team = ref<Team | null>(null);
+const teamMembers = ref<TeamMember[]>([]);
+const teamProjects = ref<Project[]>([]);
+const teamName = ref("Loading...");
 
 onMounted(async () => {
-  const teamId = "1";
-
-  team.value = { id: teamId, name: "Dream Team" };
+  try {
+    team.value = await fetchTeamByID(teamID);
+    teamMembers.value = await fetchTeamMembers(teamID);
+    teamProjects.value = await fetchTeamProject(teamID, teamMembers.value);
+    if (team.value?.teamName) {
+      teamName.value = team.value.teamName;
+    }
+  } catch (error) {
+    console.error("Error fetching:", error);
+  }
 });
 
-const teamName = computed(() => team.value?.name ?? "Loading...");
+const updateTeamName = async (newTeamName: string) => {
+  if (!newTeamName.trim()) {
+    return;
+  }
+
+  try {
+    await updateTeam(teamID, newTeamName);
+    teamName.value = newTeamName;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const addMemberToTeam = async (googleID: string) => {
+  try {
+    const updatedMembers: TeamMember[] = await addTeamMember(teamID, googleID);
+    teamMembers.value = updatedMembers;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const removeMember = async (googleID: string) => {
+  try {
+    await removeMemberFromTeam(teamID, googleID);
+    teamMembers.value = teamMembers.value.filter((member) => member.githubID != googleID);
+  } catch (error) {
+    throw error;
+  }
+};
+
+const changeTeamLeader = async (googleID: string) => {
+  try {
+    await updateTeamLeader(teamID, googleID);
+  } catch (error) {
+    throw error;
+  }
+};
+
+const addProject = async (projectName: string, projectDescription: string) => {
+  const loggedInUser: TeamMember = teamMembers.value.filter((m) => m.teamLeader)[0];
+
+  try {
+    const newProject: Project = await createProject(
+      teamID,
+      projectName,
+      projectDescription,
+      loggedInUser,
+    );
+
+    teamProjects.value.push(newProject);
+  } catch (error) {
+    throw error;
+  }
+};
+
+const removeProject = async (projectID: number) => {
+  try {
+    await deleteProject(projectID);
+
+    teamProjects.value = teamProjects.value.filter((p) => p.projectID !== projectID);
+  } catch (error) {
+    throw error;
+  }
+};
+
+const addAProjectAssignee = async (projectID: number, googleID: string) => {
+  const updatedProject: Project | undefined = teamProjects?.value.find(
+    (project) => project.projectID === projectID,
+  );
+
+  if (updatedProject?.projectAssignees.filter((assignee) => assignee.githubID == googleID)[0])
+    return;
+
+  try {
+    await addProjectAssignee(projectID, googleID);
+    const member: TeamMember | undefined = teamMembers?.value.filter(
+      (m) => m.githubID == googleID,
+    )[0];
+    updatedProject?.projectAssignees.push(member);
+  } catch (error) {
+    throw error;
+  }
+};
+
+const removeAProjectAssignee = async (projectID: number, googleID: string) => {
+  const updatedProject: Project | undefined = teamProjects?.value.find(
+    (project) => project.projectID === projectID,
+  );
+
+  if (!updatedProject?.projectAssignees.filter((assignee) => assignee.githubID == googleID)[0])
+    return;
+
+  try {
+    await deleteProjectAssignee(projectID, googleID);
+    teamProjects.value = teamProjects.value.map((p) =>
+      p.projectID === projectID
+        ? {
+            ...p,
+            projectAssignees: p.projectAssignees.filter(
+              (assignee) => assignee.githubID !== googleID,
+            ),
+          }
+        : p,
+    );
+  } catch (error) {
+    throw error;
+  }
+};
 
 const activeTab = ref("members");
-const teamMembers = ref([
-  { id: 1, name: "John Doe", isLeader: true },
-  { id: 2, name: "Jane Smith", isLeader: false },
-  { id: 3, name: "Jane Smith", isLeader: false },
-  { id: 4, name: "Jane Smith", isLeader: false },
-]);
-const teamProjects = ref([
-  {
-    id: 1,
-    name: "Project A",
-    description: "testing",
-    projectAssignees: [
-      { id: 1, name: "John Doe", isLeader: true },
-      { id: 2, name: "Jane Smith", isLeader: false },
-    ],
-  },
-  {
-    id: 2,
-    name: "Project B",
-    description: "developing",
-    projectAssignees: [
-      { id: 1, name: "John Doe", isLeader: true },
-      { id: 3, name: "Jane Smith", isLeader: false },
-      { id: 4, name: "Jane Smith", isLeader: false },
-    ],
-  },
-]);
 </script>
 
 <template>
   <section class="team-view">
-    <TeamHeader :teamName="teamName" />
+    <TeamHeader
+      :teamName="teamName"
+      :teamID="teamID"
+      loggedInMemberId="102994491153243422001"
+      :updateTeamName="updateTeamName"
+      :teamMembers="teamMembers"
+      :changeTeamLeader="changeTeamLeader"
+    />
 
     <nav class="tabs">
       <button :class="{ active: activeTab === 'members' }" @click="activeTab = 'members'">
@@ -84,12 +201,22 @@ const teamProjects = ref([
       </button>
     </nav>
     <hr />
-    <TeamMember v-if="activeTab === 'members'" :members="teamMembers" :loggedInMemberId="1" />
+    <TeamMemberList
+      v-if="activeTab === 'members'"
+      :members="teamMembers"
+      loggedInMemberId="102994491153243422001"
+      :addAMember="addMemberToTeam"
+      :deleteAMember="removeMember"
+    />
     <TeamProjects
       v-if="activeTab === 'projects'"
       :projects="teamProjects"
-      :loggedInMemberId="1"
+      loggedInMemberId="102994491153243422001"
       :teamMembers="teamMembers"
+      :addProject="addProject"
+      :deleteProject="removeProject"
+      :addProjectAssignee="addAProjectAssignee"
+      :removeProjectAssignee="removeAProjectAssignee"
     />
   </section>
 </template>
