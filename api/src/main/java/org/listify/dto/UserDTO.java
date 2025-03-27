@@ -1,12 +1,12 @@
-package org.listify.dto;
-
 public class UserDTO {
     private Long userID;
     private String username;
+    private String githubID;
 
-    public UserDTO(String username , Long userID) {
+    public UserDTO(String username , Long userID, String githubID) {
         this.username = username;
         this.userID = userID;
+        this.githubID = githubID;
     }
 
     public UserDTO() {
@@ -25,5 +25,12 @@ public class UserDTO {
     }
     public void setUserID(Long userID) {
         this.userID = userID;
+    }
+
+    public String getGithubID() {
+        return githubID;
+    }
+    public void setGithubID(String githubID) {
+        this.githubID = githubID;
     }
 }
