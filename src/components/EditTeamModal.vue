@@ -26,20 +26,35 @@ const props = defineProps({
 
 const newMemberId = ref<number | null>(null);
 const newTeamName = ref<string>("");
+const errorMessage = ref<string | null>(null);
 
 const closeModal = () => {
   newMemberId.value = null;
   newTeamName.value = "";
+  errorMessage.value = null;
   props.onClose();
 };
 
-const handleAction = () => {
+const handleAction = async () => {
   if (props.mode === "updateTeamName" && props.onUpdateTeamName) {
     props.onUpdateTeamName(newTeamName.value);
     closeModal();
   } else if (props.mode === "addMember" && props.onAddMember) {
-    props.onAddMember(newMemberId.value);
-    closeModal();
+    try {
+      await props.onAddMember(newMemberId.value);
+      closeModal();
+    } catch (error: any) {
+      if (error.message.includes("404")) {
+        errorMessage.value = `User id: ${newMemberId.value} does not exist`;
+      } else if (
+        error.message.includes("403") &&
+        error.message.includes("already a member of team")
+      ) {
+        errorMessage.value = `User id: ${newMemberId.value} is already added to the team`;
+      } else {
+        errorMessage.value = error.message;
+      }
+    }
   }
 };
 </script>
@@ -69,7 +84,7 @@ const handleAction = () => {
         class="modal-input"
         required
       />
-
+      <p class="error-message">{{ errorMessage }}</p>
       <footer class="modal-footer">
         <button @click="handleAction" class="modal-btn" type="submit">
           {{ mode === "addMember" ? "Add Member" : "Update Name" }}
@@ -129,6 +144,11 @@ const handleAction = () => {
 
 .modal-btn:hover {
   opacity: 0.8;
+}
+
+.error-message {
+  color: red;
+  margin-bottom: 0.5em;
 }
 
 @media (max-width: 700px) {

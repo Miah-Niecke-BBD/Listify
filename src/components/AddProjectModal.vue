@@ -13,7 +13,7 @@ const props = defineProps({
   addProject: {
     type: Function,
     required: true,
-  }
+  },
 });
 
 const newProjectName = ref<string>("");

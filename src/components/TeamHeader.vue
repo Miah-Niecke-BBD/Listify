@@ -19,8 +19,6 @@ const showOptions = ref(false);
 const isAddTeamMemberModalVisible = ref(false);
 const isReassignLeaderModalVisible = ref(false);
 
-const emit = defineEmits(["handleUpdateTeam"]);
-
 const openAddTeamMemberModal = () => {
   isAddTeamMemberModalVisible.value = true;
 };
@@ -144,7 +142,7 @@ const deleteATeam = async () => {
 .more-options {
   position: absolute;
   top: 100%;
-  left: -2.3em;
+  left: -3.3em;
   width: 6em;
   background: rgb(228, 227, 227);
   border: 0.1em solid #ccc;

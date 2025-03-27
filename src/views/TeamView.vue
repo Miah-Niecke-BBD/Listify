@@ -43,7 +43,7 @@ onMounted(async () => {
       teamName.value = team.value.teamName;
     }
   } catch (error) {
-    console.error("Error fetching:", error);
+    throw error;
   }
 });
 
@@ -65,6 +65,7 @@ const addMemberToTeam = async (googleID: string) => {
     const updatedMembers: TeamMember[] = await addTeamMember(teamID, googleID);
     teamMembers.value = updatedMembers;
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };
