@@ -331,3 +331,26 @@ export const deleteProjectAssignee = async (projectID: number, googleID: string)
         throw error
     }
 }
+
+export const deleteTeam = async (teamID: string) => {
+    if (!jwtToken) {
+        throw new Error("JWT token is missing.");
+    }
+
+    try {
+        const response = await fetch(`http://localhost:8080/teams/${teamID}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${jwtToken}`,
+            },
+        })
+
+        if (response.status !== 204) {
+            const errorMessage = await response.text();
+            throw new Error(`Request failed with status ${response.status}: ${errorMessage}`);
+        }
+    } catch (error) {
+        throw error
+    }
+}

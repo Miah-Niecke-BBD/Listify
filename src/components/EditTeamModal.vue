@@ -65,6 +65,7 @@ const handleAction = () => {
         v-model="newTeamName"
         type="text"
         placeholder="New Team Name"
+        maxlength="100"
         class="modal-input"
         required
       />

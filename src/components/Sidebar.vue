@@ -1,17 +1,20 @@
 <script setup lang="ts">
-import { GetTeams, GetProjects } from '@/api/SidebarApi'
-import { onMounted, ref, defineEmits  } from 'vue';
-import type { TeamInterface, ProjectInterface } from '@/models/TeamInterface';
-import NavItem from '@/components/NavItem.vue';
-import IconCollapse from './icons/IconCollapse.vue';
+import { GetTeams, GetProjects } from "@/api/SidebarApi";
+import { onMounted, ref, defineEmits } from "vue";
+import type { TeamInterface, ProjectInterface } from "@/models/TeamInterface";
+import NavItem from "@/components/NavItem.vue";
+import IconCollapse from "./icons/IconCollapse.vue";
+import AddTeam from "@/components/AddTeam.vue";
+import { addNewTeam } from "@/api/SidebarApi";
 
 const teams = ref<TeamInterface[]>([]);
 const myList = ref<ProjectInterface | null>(null);
-const emit = defineEmits(['select'])
+const emit = defineEmits(["select"]);
 const collapsed = ref(false);
+const modalOpen = ref(false);
 
 onMounted(async () => {
-  const jwtToken: string | null = localStorage.getItem('jwtToken');
+  const jwtToken: string | null = localStorage.getItem("jwtToken");
 
   if (jwtToken) {
     try {
@@ -20,16 +23,19 @@ onMounted(async () => {
       if (response) {
         teams.value = response;
 
-        
         for (const team of teams.value) {
           try {
-            const projectResponse: ProjectInterface[] | null = await GetProjects(jwtToken, team.teamID.toString());
-            
-            if (projectResponse) {
-              team.projects = projectResponse;  
+            const projectResponse: ProjectInterface[] | null = await GetProjects(
+              jwtToken,
+              team.teamID.toString(),
+            );
 
-           
-              const myListProjectIndex = team.projects.findIndex(project => project.projectName === "MyList");
+            if (projectResponse) {
+              team.projects = projectResponse;
+
+              const myListProjectIndex = team.projects.findIndex(
+                (project) => project.projectName === "MyList",
+              );
               if (myListProjectIndex !== -1) {
                 if (!myList.value) {
                   myList.value = team.projects.splice(myListProjectIndex, 1)[0];
@@ -43,20 +49,22 @@ onMounted(async () => {
         }
       }
     } catch (error) {
-      console.error('Error fetching teams:', error);
+      console.error("Error fetching teams:", error);
     }
   }
 });
 
 const GetAllTeams = () => {
-  emit('select', teams.value)
-}
-
+  emit("select", teams.value);
+};
 
 const toggleSidebar = () => {
   collapsed.value = !collapsed.value;
 };
 
+const toggleModal = () => {
+  modalOpen.value = !modalOpen.value;
+};
 </script>
 
 <template>
@@ -64,7 +72,7 @@ const toggleSidebar = () => {
     <header class="sidebar-header">
       <img src="@/assets/logo.png" alt="Listify Logo" class="logo-image" v-if="!collapsed" />
       <button class="collapse-toggle" @click="toggleSidebar">
-      <IconCollapse />
+        <IconCollapse />
       </button>
     </header>
 
@@ -94,30 +102,31 @@ const toggleSidebar = () => {
       <section class="nav-section" v-if="!collapsed">
         <section class="nav-section-title">
           <h2 id="teamTitle">Teams</h2>
-          <button class="add-button"> + </button>
+          <button class="add-button" @click="toggleModal">+</button>
         </section>
-        <NavItem :teams="teams" />    
+        <NavItem :teams="teams" />
       </section>
+      <AddTeam :isOpen="modalOpen" :toggleModal="toggleModal" :addTeam="addNewTeam" />
     </nav>
   </aside>
 </template>
 
-
 <style scoped>
 .sidebar {
-  width: 18em;
-  background-color: var( --nav-bg-color);
+  min-width: 14em;
+  background-color: var(--nav-bg-color);
   border-right: 1pt solid var(--card-bg);
   box-shadow: 1pt 1pt 1pt var(--card-bg);
-  margin-right: 1em;
   display: flex;
   flex-direction: column;
-  height: 50em;
+  max-height: 100;
+  min-height: 100vh;
   transition: width 0.3s ease;
-  overflow-y: hidden;
+  overflow-y: auto;
 }
+
 .sidebar.collapsed {
-  width: 4em; 
+  min-width: 2em;
 }
 
 .sidebar-header {
@@ -135,7 +144,7 @@ const toggleSidebar = () => {
 }
 
 .collapse-toggle {
-  background-color: var( --nav-bg-color);
+  background-color: var(--nav-bg-color);
   border: none;
   width: 20%;
 }
@@ -176,7 +185,7 @@ const toggleSidebar = () => {
 .nav-item {
   margin-bottom: 2px;
 }
-.nav-item span{
+.nav-item span {
   margin-left: 5pt;
 }
 
@@ -200,7 +209,7 @@ const toggleSidebar = () => {
   transition: background-color 0.2s ease;
   white-space: nowrap;
   text-decoration: none;
-  margin-left:1em;
+  margin-left: 1em;
 }
 
 .nav-link:hover {
@@ -261,12 +270,12 @@ const toggleSidebar = () => {
   justify-content: center;
 }
 
-.inline{
+.inline {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 }
-.inline button{
+.inline button {
   display: flex;
   justify-content: right;
   border: none;
@@ -284,5 +293,4 @@ const toggleSidebar = () => {
   color: var(--primary-color);
   font-weight: 500;
 }
-
-</style>  
+</style>

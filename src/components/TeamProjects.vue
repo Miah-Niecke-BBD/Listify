@@ -58,28 +58,6 @@ const closeMembersModal = () => {
           {{ project.projectName }}
         </RouterLink>
         <p class="project-description">{{ project.projectDescription }}</p>
-        <button
-          v-if="loggedInMemberId === teamMembers.find((m) => m.teamLeader)?.githubID"
-          class="delete-btn"
-          aria-label="Delete Project"
-          @click="deleteProject(project.projectID)"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="red"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path
-              d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m4 5v6m6-6v6"
-            />
-          </svg>
-        </button>
 
         <h3>Project Members</h3>
         <ul class="project-assignees">
@@ -106,6 +84,28 @@ const closeMembersModal = () => {
           @click="openMembersModal(project.projectID)"
         >
           Manage Members
+        </button>
+        <button
+          v-if="loggedInMemberId === teamMembers.find((m) => m.teamLeader)?.githubID"
+          class="delete-btn"
+          aria-label="Delete Project"
+          @click="deleteProject(project.projectID)"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="red"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m4 5v6m6-6v6"
+            />
+          </svg>
         </button>
       </li>
     </ul>
@@ -150,7 +150,6 @@ const closeMembersModal = () => {
   flex-direction: column;
   max-height: calc(100vh - 18em);
   overflow-y: auto;
-  height: 100%;
 }
 
 .project-item {
@@ -188,11 +187,13 @@ const closeMembersModal = () => {
   list-style: none;
   display: flex;
   flex-direction: row;
-  gap: 1em;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  margin: 1em 0;
 }
 
 .team-projects ul.project-assignees li {
-  margin: 1em 0;
+  margin-right: 0.1em;
 }
 
 .assignee .initials {
@@ -243,5 +244,13 @@ const closeMembersModal = () => {
 
 .manage-btn:hover {
   opacity: 0.75;
+}
+
+@container (max-width: 600px) {
+  .team-projects h2,
+  h3,
+  .project-item {
+    word-wrap: break-word;
+  }
 }
 </style>
