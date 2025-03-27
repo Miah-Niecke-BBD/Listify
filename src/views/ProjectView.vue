@@ -43,6 +43,10 @@ const addSection = async () => {
   }
 };
 
+const removeSection = (sectionID: number) => {
+  sections.value = sections.value.filter(section => section.sectionID !== sectionID);
+};
+
 onMounted(() => {
   loadSections();
 });
@@ -111,9 +115,10 @@ const handleDrop = async (event: DragEvent, targetPosition: number) => {
           :createdAt="section.createdAt"
           :updatedAt="section.updatedAt"
           draggable="true"
-          @dragstart="(e) => handleDragStart(e, section.sectionID)"
-          @drop="(e) => handleDrop(e, section.sectionPosition)"
+          @dragstart="(e: DragEvent) => handleDragStart(e, section.sectionID)"
+          @drop="(e: DragEvent) => handleDrop(e, section.sectionPosition)"
           @section-updated="updateSection"
+          @section-deleted="removeSection"
         />
         <button id="addSectionBtn" v-if="!showForm" @click="showForm = true">
         <pre>+ </pre>Add Section

@@ -1,37 +1,10 @@
-import { ref } from "vue";
 import type { SectionTask } from "@/models/SectionTask.ts";
 import type { Task } from "@/models/Task.ts";
-import { useRoute } from "vue-router";
 import { jwtToken } from "@/models/JWTToken.ts";
 import { removeJwt } from "./Main";
 
-export function useTasks(sectionID: number) {
-  const route = useRoute();
-  const projectID = route.params.id as string;
-
-  const sectionTask = ref<SectionTask[]>([]);
-  const selectedTask = ref(null);
-  const showForm = ref(false);
-
-  const newTask = ref({
-    taskName: "",
-    taskDescription: null as string | null,
-    taskPriority: null as number | null,
-    dueDate: null as string | null,
-  });
-
-  function mapTaskData(task: any): SectionTask {
-    return {
-      taskID: task.taskID,
-      taskName: task.taskName,
-      parentTaskID: task.parentTaskID ?? null,
-      taskPosition: task.taskPosition ?? 0,
-      createdAt: new Date(task.createdAt),
-      dueDate: task.dueDate ? new Date(task.dueDate) : null,
-    };
-  }
-
-  const getTasksForSection = async () => {
+export default class TasksHandler {
+  static async getTasksForSection(sectionID: number): Promise<SectionTask[]> {
     try {
       const response = await fetch(`http://localhost:8080/sections/${sectionID}/tasks`, {
         method: "GET",
@@ -48,25 +21,33 @@ export function useTasks(sectionID: number) {
         const errorMessage = await response.text();
         throw new Error(`Failed to fetch tasks: ${errorMessage}`);
       }
-      const data = await response.json();
-      sectionTask.value = data.map(mapTaskData);
-    } catch (error:any) {
+      const task = await response.json();
+      return task.map((task: any) => ({
+        taskID: task.taskID,
+        taskName: task.taskName,
+        parentTaskID: task.parentTaskID ?? null,
+        taskPosition: task.taskPosition ?? 0,
+        createdAt: new Date(task.createdAt),
+        dueDate: task.dueDate ? new Date(task.dueDate) : null,
+      }))
+    } catch (error) {
       console.error(`Error loading tasks for section ${sectionID}:`, error);
+      return []
     }
   };
 
-  const addTask = async () => {
+  static async addTask(projectID: string, sectionID: number, taskData: {taskName: string, taskDescription: string | null, taskPriority: number | null, dueDate: string | null}): Promise<SectionTask | null> {
     try {
       const params = new URLSearchParams();
 
-      params.append("projectID", String(projectID));
+      params.append("projectID", projectID);
       params.append("sectionID", String(sectionID));
-      if (newTask.value.taskName) params.append("taskName", newTask.value.taskName);
-      if (newTask.value.taskDescription) params.append("taskDescription", newTask.value.taskDescription);
-      if (newTask.value.taskPriority !== null && newTask.value.taskPriority !== undefined) {
-        params.append("taskPriority", String(newTask.value.taskPriority));
+      if (taskData.taskName) params.append("taskName", taskData.taskName);
+      if (taskData.taskDescription) params.append("taskDescription", taskData.taskDescription);
+      if (taskData.taskPriority !== null && taskData.taskPriority !== undefined) {
+        params.append("taskPriority", String(taskData.taskPriority));
       }
-      if (newTask.value.dueDate) params.append("dueDate", new Date(newTask.value.dueDate).toISOString());
+      if (taskData.dueDate) params.append("dueDate", new Date(taskData.dueDate).toISOString());
 
 
       const response = await fetch(`http://localhost:8080/tasks?${params.toString()}`, {
@@ -87,128 +68,120 @@ export function useTasks(sectionID: number) {
       }
 
       const createdTask = await response.json();
-      sectionTask.value.push(createdTask);
-      newTask.value.taskName = "";
-      newTask.value.taskDescription = null;
-      newTask.value.taskPriority = null;
-      newTask.value.dueDate = null;
-      showForm.value = false;
+      return {
+        taskID: createdTask.taskID,
+        taskName: createdTask.taskName,
+        parentTaskID: createdTask.parentTaskID ? createdTask.parentTaskID: null,
+        taskPosition: createdTask.taskPosition,
+        dueDate: createdTask.dueDate? new Date(createdTask.dueDate) : null,
+        createdAt: new Date(createdTask.createdAt),
+      }
     } catch (error) {
       console.error("Error adding task:", error);
+      return null
     }
   };
 
-
-
-  const cancelTask = () => {
-    showForm.value = false;
-    newTask.value = { taskName: "", taskDescription: "", taskPriority: 1, dueDate: "" };
-  };
-
-  const openTaskPopup = async (taskID: number) => {
-    try {
-      const response = await fetch(`http://localhost:8080/tasks/${taskID}`, {
-        method: "GET",
-        headers: {
-          Accept: "*/*",
-          Authorization: `Bearer ${jwtToken}`,
-        },
-      });
-
-      if(response.status === 401) {
-        removeJwt();
-      }
-
-      if (!response.ok) {
-        const errorMessage = await response.text();
-        throw new Error(`Failed to fetch task: ${errorMessage}`);
-      }
-      selectedTask.value = await response.json();
-    } catch (error) {
-      console.error("Error loading task details:", error);
-    }
-  };
-
-  return {
-    sectionTask,
-    selectedTask,
-    showForm,
-    newTask,
-    addTask,
-    projectID,
-    getTasksForSection,
-    cancelTask,
-    openTaskPopup,
-  };
-}
-
-export async function updateTask(task: Partial<Task>, jwtToken: string | null): Promise<Task> {
-  if (!jwtToken) throw new Error("JWT token is missing");
-
-  const response = await fetch(`http://localhost:8080/tasks/${task.taskID}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${jwtToken}`,
-    },
-    body: JSON.stringify({
-      taskName: task.taskName || null,
-      taskDescription: task.taskDescription || null,
-      taskPriority: task.taskPriority || null,
-      dueDate: task.dueDate ? new Date(task.dueDate).toISOString() : null,
-      dateCompleted: task.dateCompleted ? new Date(task.dateCompleted).toISOString() : null,
-    }),
-  });
-
-  if(response.status === 401) {
-    removeJwt();
-  }
-
-  if (!response.ok) {
-    const errorMessage = await response.text();
-    throw new Error(`Failed to update task: ${errorMessage}`);
-  }
-  return response.json();
-}
-
-export async function updateTaskPosition(taskID: number, newTaskPosition: number, sectionID: number, jwtToken: string | null): Promise<boolean> {
-  if (!jwtToken) throw new Error("JWT token is missing");
-  try {
-    const response = await fetch(`http://localhost:8080/tasks/${taskID}/position`, {
-      method: "PUT",
+  static async openTaskPopup(taskID: number | undefined): Promise<Task> {
+    const response = await fetch(`http://localhost:8080/tasks/${taskID}`, {
+      method: "GET",
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${jwtToken}`
+        Accept: "*/*",
+        Authorization: `Bearer ${jwtToken}`,
       },
-      body: JSON.stringify({
-        taskPosition: newTaskPosition,
-        sectionID: sectionID
-      })
-    })
+    });
 
     if (!response.ok) {
       const errorMessage = await response.text();
-      throw new Error(`Failed to update task position: ${errorMessage}`);
+      throw new Error(`Failed to fetch task: ${errorMessage}`);
     }
-    return true
-  } catch (error) {
-    console.error("Error updating task position:", error);
-    return false
+
+    if (response.status === 401) {
+      removeJwt();
+    }
+    const task = await response.json();
+    return {
+      taskID: task.taskID,
+      taskName: task.taskName,
+      taskDescription: task.taskDescription,
+      taskPriority: task.taskPriority,
+      createdAt: new Date(task.createdAt),
+      updatedAt: task.updatedAt ? new Date(task.updatedAt) : null,
+      dueDate: task.dueDate ? new Date(task.dueDate) : null,
+      dateCompleted: task.dateCompleted ? new Date(task.dateCompleted) : null,
+      taskAssignees: task.taskAssignees,
+      dependantTask: task.dependantTask,
+      }
+  };
+
+  static async updateTask(task: Partial<Task>, jwtToken: string | null): Promise<Task> {
+    if (!jwtToken) throw new Error("JWT token is missing");
+
+    const response = await fetch(`http://localhost:8080/tasks/${task.taskID}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwtToken}`,
+      },
+      body: JSON.stringify({
+        taskName: task.taskName || null,
+        taskDescription: task.taskDescription || null,
+        taskPriority: task.taskPriority || null,
+        dueDate: task.dueDate ? new Date(task.dueDate).toISOString() : null,
+        dateCompleted: task.dateCompleted ? new Date(task.dateCompleted).toISOString() : null,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      throw new Error(`Failed to update task: ${errorMessage}`);
+    }
+
+    if(response.status === 401) {
+      removeJwt();
+    }
+    return response.json();
   }
 
-}
+  static async updateTaskPosition(taskID: number, newTaskPosition: number, sectionID: number, jwtToken: string | null): Promise<boolean> {
+    if (!jwtToken) throw new Error("JWT token is missing");
+    try {
+      const response = await fetch(`http://localhost:8080/tasks/${taskID}/position`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwtToken}`
+        },
+        body: JSON.stringify({
+          taskPosition: newTaskPosition,
+          sectionID: sectionID
+        })
+      })
+
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(`Failed to update task position: ${errorMessage}`);
+      }
+      return true
+    } catch (error) {
+      console.error("Error updating task position:", error);
+      return false
+    }
+
+  }
 
 
-export async function deleteTask(taskID: number, jwtToken: string | null): Promise<void> {
-  if (!jwtToken) throw new Error("JWT token is missing");
+  static async deleteTask(taskID: number, jwtToken: string | null): Promise<void> {
+    if (!jwtToken) throw new Error("JWT token is missing");
 
-  const response = await fetch(`http://localhost:8080/tasks/${taskID}`, {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${jwtToken}` },
-  });
+    const response = await fetch(`http://localhost:8080/tasks/${taskID}`, {
+      method: "DELETE",
+      headers: {Authorization: `Bearer ${jwtToken}`},
+    });
 
-  if (!response.ok) {
-    const errorMessage = await response.text();
-    throw new Error(`Failed to delete task: ${errorMessage}`);
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      throw new Error(`Failed to delete task: ${errorMessage}`);
+    }
   }
 }

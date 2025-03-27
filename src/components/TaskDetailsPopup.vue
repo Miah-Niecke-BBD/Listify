@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import type { Task } from "@/models/Task.ts";
-import { updateTask, deleteTask } from "@/api/TasksHandler";
+import { ref, watch } from "vue";
 import { jwtToken } from "@/models/JWTToken.ts";
 import TaskDependencyManager from "@/components/TaskDependencyManager.vue";
 import TaskAssignmentManager from "@/components/TaskAssignmentManager.vue";
+import TasksHandler from "@/api/TasksHandler.ts";
 
 const emit = defineEmits(["close", "task-updated", "task-deleted"]);
 
@@ -16,12 +15,12 @@ const props = defineProps<{
   task: {
     taskID: number;
     taskName: string;
-    taskDescription: string;
+    taskDescription: string | null;
     taskPriority: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-    dueDate: Date;
-    dateCompleted: Date | null;
+    createdAt: string | Date;
+    updatedAt: string | Date | null;
+    dueDate: string | Date | null;
+    dateCompleted: string | Date | null;
     taskAssignees: { userID: number; githubID: string }[] | null;
     dependantTask: { taskID: number; taskName: string } | null;
   } | null;
@@ -41,10 +40,12 @@ const editableTask = ref({ ...props.task });
 const showDependencies = ref(false);
 const showAssignments = ref(false);
 
+watch(() => props.task, (newTask) => {
+  editableTask.value = { ...newTask };
+}, { deep: true });
+
 const startEdit = () => {
   isEditing.value = true;
-  showDependencies.value = false;
-  showAssignments.value = false;
   editableTask.value = { ...props.task };
 };
 
@@ -56,8 +57,10 @@ const handleSave = async (): Promise<void> => {
   if (!editableTask.value) return;
 
   try {
-    const updatedTask: Task = await updateTask(editableTask.value, jwtToken);
-    emit("task-updated", updatedTask);
+    await TasksHandler.updateTask(editableTask.value, jwtToken);
+
+    const fullUpdatedTask = await TasksHandler.openTaskPopup(editableTask.value.taskID);
+    emit("task-updated", fullUpdatedTask);
     isEditing.value = false;
   } catch (error) {
     console.error("Error updating task:", error);
@@ -68,28 +71,16 @@ const handleDelete = async (): Promise<void> => {
   if (!props.task) return;
 
   try {
-    await deleteTask(props.task.taskID, jwtToken);
+    await TasksHandler.deleteTask(props.task.taskID, jwtToken);
     emit("task-deleted", props.task.taskID);
+    closePopup()
   } catch (error) {
     console.error("Error deleting task:", error);
   }
 };
 
-const toggleDependencies = () => {
-  showDependencies.value = !showDependencies.value;
-  if (showDependencies.value) {
-    isEditing.value = false;
-    showAssignments.value = false;
-  }
-};
-
-const toggleAssignments = () => {
-  showAssignments.value = !showAssignments.value;
-  if (showAssignments.value) {
-    isEditing.value = false;
-    showDependencies.value = false;
-  }
-};
+const toggleDependencies = () => (showDependencies.value = !showDependencies.value);
+const toggleAssignments = () => (showAssignments.value = !showAssignments.value);
 
 const taskDependencies = ref(props.task?.dependantTask ? [props.task.dependantTask] : []);
 
@@ -126,11 +117,12 @@ const onAssigneeRemoved = (userID: number) => {
   <dialog class="task-popup" v-if="task" open>
     <article class="popup-content">
       <header class="popup-header">
+        <h2 v-if="!isEditing">{{ task.taskName }}</h2>
+        <input v-else v-model="editableTask.taskName" type="text" />
         <button @click="closePopup" aria-label="Close popup">&times;</button>
       </header>
 
-      <section v-if="!isEditing && !showDependencies && !showAssignments" class="popup-details">
-        <p><strong>Name:</strong> {{ task.taskName }}</p>
+      <section class="popup-details" v-if="!isEditing && !showDependencies && !showAssignments">
         <p><strong>Description:</strong> {{ task.taskDescription }}</p>
         <p :data-priority="task.taskPriority"><strong>Priority:</strong> {{ task.taskPriority }}</p>
         <p><strong>Due Date:</strong> <time>{{ customFormatDate(task.dueDate) }}</time></p>
@@ -154,7 +146,7 @@ const onAssigneeRemoved = (userID: number) => {
         </section>
       </section>
 
-      <section v-if="isEditing && !showDependencies && !showAssignments">
+      <section v-else>
         <form>
           <section class="form-group">
             <label for="task-name">Task Name</label>
@@ -184,11 +176,10 @@ const onAssigneeRemoved = (userID: number) => {
       </section>
 
       <section class="task-dependency-toggle">
-        <button @click="toggleDependencies" :disabled="isEditing || showAssignments">
-          {{ showDependencies ? 'Hide' : 'Manage' }} Dependencies
-        </button>
+        <button @click="toggleDependencies">
+          {{ showDependencies ? 'Hide' : 'Manage' }} Dependencies</button>
         <TaskDependencyManager
-          v-if="showDependencies && !isEditing && !showAssignments"
+          v-if="showDependencies"
           :taskID="task.taskID"
           :dependencies="taskDependencies"
           @dependency-added="onDependencyAdded"
@@ -197,11 +188,9 @@ const onAssigneeRemoved = (userID: number) => {
       </section>
 
       <section class="task-assignment-toggle">
-        <button @click="toggleAssignments" :disabled="isEditing || showDependencies">
-          {{ showAssignments ? 'Hide' : 'Manage' }} Assignments
-        </button>
+        <button @click="toggleAssignments">{{ showAssignments ? 'Hide' : 'Manage' }} Assignments</button>
         <TaskAssignmentManager
-          v-if="showAssignments && !isEditing && !showDependencies"
+          v-if="showAssignments"
           :taskID="task.taskID"
           :assignees="task.taskAssignees"
           @assignee-added="onAssigneeAdded"
@@ -210,7 +199,7 @@ const onAssigneeRemoved = (userID: number) => {
       </section>
 
       <footer class="popup-footer">
-        <button v-if="!isEditing" @click="startEdit" class="edit-button" :disabled="showDependencies || showAssignments">Edit</button>
+        <button v-if="!isEditing" @click="startEdit" class="edit-button">Edit</button>
         <button v-if="isEditing" @click="handleSave" class="save-button">Save</button>
         <button v-if="isEditing" @click="cancelEdit" class="cancel-button">Cancel</button>
         <button @click="handleDelete" class="delete-button">Delete</button>
