@@ -20,6 +20,7 @@ onMounted(async () => {
 
         const { user, error } = await GetUser(response.jwtToken);
         if (user) {
+          console.log(user)
           localStorage.setItem("loggedInUser", (user as User).githubID);
         }
 

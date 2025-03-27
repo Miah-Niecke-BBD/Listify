@@ -1,3 +1,5 @@
+package org.listify.dto;
+
 public class UserDTO {
     private Long userID;
     private String username;

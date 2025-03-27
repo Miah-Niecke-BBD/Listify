@@ -161,7 +161,7 @@ const removeAProjectAssignee = async (projectID: number, googleID: string) => {
 const deleteATeam = async () => {
   try {
     await deleteTeam(teamID);
-    router.push(`/tasklist`);
+    router.push(`/calendar`);
   } catch (error) {
     throw error;
   }
