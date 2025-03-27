@@ -205,7 +205,7 @@ public class TeamsService {
         List<Projects> projects = teamsRepository.findTeamProjects(userID, teamID);
 
         List<TeamProjectsDTO> teamProjectsDTOs = projects.stream().map((project) ->
-                new TeamProjectsDTO(project.getProjectID(), project.getProjectName())
+                new TeamProjectsDTO(project.getProjectID(), project.getProjectName(), project.getProjectDescription())
         ).collect(Collectors.toList());
 
         return teamProjectsDTOs;

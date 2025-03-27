@@ -38,7 +38,9 @@ public class TaskAssigneesService {
         return newlyAssignedTask != null ? newlyAssignedTask.getTaskAssigneeID() : null;
     }
 
-    public void deleteUserFromTask(Long userID, Long taskID, Long teamLeaderID) {
+    public void deleteUserFromTask(String githubID, Long taskID, Long teamLeaderID) {
+        Long userID = userService.getUserIDFromGithubID(githubID);
+
         if (!repository.findUserAndTaskInProject(userID, taskID)) {
             throw new ForbiddenException("Tasks and Users should both exist in the project");
         }

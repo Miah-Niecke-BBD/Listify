@@ -1,6 +1,7 @@
 :root {
   /* Colors */
   --primary-color: #8b53ff;
+  --nav-bg-color:rgb(247, 245, 245);
   --dark-purple: #422cb3;
   --light-purple: #ca6de8;
   --heading-purple: #1e1466;
