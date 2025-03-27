@@ -38,21 +38,68 @@ const removeDependency = async (dependencyID: number) => {
 
 <style scoped>
 .task-dependency-manager {
-  margin-top: 1rem;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: var(--background-color);
+  border: 0.1rem solid black;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
 }
+
+h3 {
+  color: var(--heading-purple);
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+
+li {
+  background-color: var(--faq-bg);
+  border-radius: 0.3rem;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
 button {
-  margin-left: 0.5rem;
-  color: #fff;
-  background-color: #ca6de8;
-  border: none;
-  border-radius: 5px;
-  padding: 0.2rem 0.5rem;
+  background-color: var(--background-color);
+  color: black;
+  border: 1pt solid black;
+  border-radius: 0.3rem;
+  padding: 0.4rem 0.8rem;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
+
 button:hover {
-  background-color: #a150c7;
+  background-color: var(--primary-color);
+}
+
+input {
+  padding: 0.6rem 1rem;
+  border-radius: 0.3rem;
+  border: 0.1rem solid #ccc;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+p {
+  color: var(--light-text-color);
+  font-size: 1.2rem;
 }
 </style>
+
+

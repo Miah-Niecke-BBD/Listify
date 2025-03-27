@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { GetJwtToken } from "@/api/OAuth2Api";
+import { GetJwtToken } from "@/api/OAuth2";
 import type { LoginResponse } from "@/models/LoginResponse";
-import { GetUser, CreateUser } from "@/api/UserApi";
+import { GetUser, CreateUser } from "@/api/User";
 import type { User } from "@/models/User";
 const loading = ref(false);
 const router = useRouter();

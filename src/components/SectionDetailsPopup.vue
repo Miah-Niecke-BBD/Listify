@@ -32,20 +32,26 @@ const deleteSection = async () => {
 </script>
 
 <template>
-  <div class="popup-overlay" @click.self="emit('close')">
-    <div class="popup-content">
-      <h2>Edit Section</h2>
-      <label for="section-name">Section Name:</label>
-      <input v-model="sectionName" id="section-name" type="text" />
+  <section class="popup-overlay" @click.self="emit('close')">
+    <article class="popup-content" role="dialog" aria-modal="true" aria-labelledby="edit-section-title">
+      <header>
+        <h2 id="edit-section-title">Edit Section</h2>
+      </header>
 
-      <div class="form-actions">
-        <button @click="updateSection">Save Changes</button>
-        <button @click="deleteSection" class="delete-button">Delete Section</button>
-        <button @click="emit('close')">Close</button>
-      </div>
-    </div>
-  </div>
+      <form @submit.prevent="updateSection">
+        <label for="section-name">Section Name:</label>
+        <input v-model="sectionName" id="section-name" type="text" />
+
+        <footer class="form-actions">
+          <button type="submit">Save Changes</button>
+          <button type="button" @click="deleteSection" id="delete-button">Delete Section</button>
+          <button type="button" @click="emit('close')" id="close-button">Close</button>
+        </footer>
+      </form>
+    </article>
+  </section>
 </template>
+
 
 <style scoped>
 
@@ -66,9 +72,9 @@ const deleteSection = async () => {
 .popup-content {
   background: #fff;
   padding: 1.5rem;
-  border-radius: 8px;
-  width: 300px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  border-radius: 8pt;
+  width: 30rem;
+  box-shadow: 0 4pt 15pt rgba(0, 0, 0, 0.3);
   text-align: center;
 }
 
@@ -82,8 +88,8 @@ input {
   width: 100%;
   padding: 0.5rem;
   margin-bottom: 1rem;
-  border-radius: 5px;
-  border: 1px solid #ddd;
+  border-radius: 5pt;
+  border: 1pt solid #ddd;
 }
 
 .form-actions {
@@ -91,6 +97,11 @@ input {
   gap: 1rem;
   justify-content: center;
 }
+
+.form-actions button{
+  width: 10em;
+}
+
 
 button {
   padding: 0.5rem 1rem;
@@ -104,10 +115,15 @@ button:hover {
 }
 
 
-.delete-button {
+#delete-button {
   background-color: red;
   color: white;
 }
+#close-button {
+  background-color: rgb(163, 163, 163);
+  color: white;
+}
+
 
 button:not(.delete-button) {
   background-color: #ca6de8;

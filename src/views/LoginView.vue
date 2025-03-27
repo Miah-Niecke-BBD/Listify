@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { AuthCodeResponse } from "@/models/AuthCodeResponse.ts";
-import { GetAuthCode } from "../api/OAuth2Api.ts";
+import { GetAuthCode } from "../api/OAuth2.ts";
 import IconGoogle from "@/components/icons/IconGoogle.vue";
 
 async function handleLogin(): Promise<void> {
