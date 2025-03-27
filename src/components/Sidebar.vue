@@ -10,7 +10,7 @@ import { addNewTeam } from "@/api/SidebarApi";
 const teams = ref<TeamInterface[]>([]);
 const myList = ref<ProjectInterface | null>(null);
 const emit = defineEmits(["select"]);
-const collapsed = ref(false);
+const collapsed = ref(window.innerWidth <= 700);
 const modalOpen = ref(false);
 
 onMounted(async () => {
@@ -295,5 +295,11 @@ const toggleModal = () => {
 .inline button.active {
   color: var(--primary-color);
   font-weight: 500;
+}
+@media (max-width: 700px) {
+  .sidebar {
+    position: fixed;
+    z-index: 1000;
+  }
 }
 </style>

@@ -22,4 +22,10 @@ const isLoading = computed(() => route.name === "loading");
 .main-content {
   overflow-x: auto;
 }
+
+@media (max-width: 700px) {
+  .main-content {
+    padding-left: 2em;
+  }
+}
 </style>
