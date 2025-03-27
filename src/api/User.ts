@@ -12,10 +12,10 @@ export async function GetUser<UserInterface>(jwtToken: string|null): Promise<{ u
     if(response.status === 401) {
       removeJwt();
     }
- 
+  console.log(data)
     return { user: data };
   } catch (error:any) {
- 
+
     console.log((`Failed to get User Details (status ${error.status}): ${error.message}`))
     throw error;
   }
@@ -33,13 +33,13 @@ export async function CreateUser<UserInterface>(jwtToken: string|null): Promise<
     if(response.status === 401) {
       removeJwt();
     }
-    
+
     return { user: data };
   } catch (error:any) {
- 
+
     console.log((`Failed to create User (status ${error.status}): ${error.message}`))
     throw error;
   }
 }
-  
+
 
