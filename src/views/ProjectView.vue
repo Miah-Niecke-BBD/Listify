@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from "vue";
 import SectionCard from "@/components/SectionCard.vue";
 import type { Section } from "@/models/Section.ts";
-import SectionsHandler from "@/api/SectionsHandler.ts";
+import SectionsHandler from "@/api/SectionsHandler";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
@@ -101,22 +101,11 @@ const handleDrop = async (event: DragEvent, targetPosition: number) => {
 </script>
 
 <template>
-<main>
-  <div class="project-container">
-    <div class="project-container">
-      <h1 class="project-title">Project Name</h1>
+  <main>
+    <section class="project-container">
+      <h1 id="project-title">Project</h1>
+      <section class="sections-container" @dragover="handleDragOver">
 
-      <button v-if="!showForm" @click="showForm = true">Add Section</button>
-
-      <form v-if="showForm" @submit.prevent="addSection">
-        <input v-model="newSection.sectionName" placeholder="Section Name" required />
-        <section>
-          <button type="submit">Create</button>
-          <button type="button" @click="showForm = false">Cancel</button>
-        </section>
-      </form>
-
-      <div class="sections-container" @dragover="handleDragOver">
         <SectionCard
           v-for="section in sortedSections"
           :key="section.sectionID"
@@ -131,59 +120,125 @@ const handleDrop = async (event: DragEvent, targetPosition: number) => {
           @section-updated="updateSection"
           @section-deleted="removeSection"
         />
-      </div>
-    </div>
-  </div>
-</main>
+        <button id="addSectionBtn" v-if="!showForm" @click="showForm = true">
+        <pre>+ </pre>Add Section
+        </button>
+
+        <form v-if="showForm" @submit.prevent="addSection">
+        <input v-model="newSection.sectionName" placeholder="Section Name" required />
+        <fieldset>
+          <section>
+            <button type="submit">Add Section</button>
+            <button type="button" @click="showForm = false">Cancel</button>
+          </section>
+        </fieldset>
+      </form>
+
+      </section>
+
+    </section>
+ 
+  </main>
 </template>
 
 <style scoped>
-* {
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-}
 
 main{
   display: flex;
-  flex-direction: row;
+  flex-flow:row;
+}
+
+#project-title{
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  margin-bottom: 1em;
 }
 
 .project-container {
   padding: 1rem;
 }
 
+
 .sections-container {
   display: flex;
   flex-direction: row;
   gap: 1rem;
+  overflow-x: auto;
+  width: max-content;
+  height: 90vh;
+}
+
+#addSectionBtn {
+  display: flex;
+  cursor: pointer;
+  width: 15rem;
+  color: var(--light-text-color);
+  background: #f9f9f9;
+  border: 1pt solid #ddd;
+  border-radius: 8pt;
+  padding: 1rem;
+  font-size: 13pt;
+  align-items: start;
+  text-align: center;
+  flex: 0 0 auto;
+  justify-content: left;
+}
+
+#addSectionBtn pre{
+  align-items: start;
+  font-size: 13pt;
 }
 
 form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: #f9f9f9;
-  max-width: 300px;
-}
-
-button {
   padding: 0.5rem;
   cursor: pointer;
+  border-radius: 5pt;
+  color: var(--light-text-color);
+  background: #f9f9f9;
+  border: 1pt solid #ddd;
+  border-radius: 8pt;
+  padding: 1rem;
+  font-size: 13pt;
+  width: 15rem;
+}
+form input{
+  margin-bottom: 1em;
+  padding: 3pt;
+  font-size: small;
+  border-radius: 3pt;
+}
+form section,fieldset{
+  display: flex;
+  flex-direction: row;
   border: none;
-  border-radius: 5px;
-  font-weight: bold;
-  color: #fff;
-  background-color: #ca6de8;
+}
+
+form button{
+  font-size: 9pt;
+  border-radius: 4pt;
+  align-items: center;
+  padding: 4pt;
+  border: none;
 }
 
 button[type="submit"] {
-  background-color: #4caf50;
+margin-right: 1em;
+color: white;
+background-color: lightgrey;
+}
+
+button[type="submit"]:hover {
+  background-color: #969696;
 }
 
 button[type="button"] {
-  background-color: #ca6de8;
+  background-color: #f9f9f9;
+}
+
+button[type="button"]:hover {
+  background-color: #f3f3f3;
 }
 </style>
+
+

@@ -8,6 +8,7 @@ import {useRoute} from "vue-router";
 import type {SectionTask} from "@/models/SectionTask.ts";
 import TasksHandler from "@/api/TasksHandler.ts";
 import type {Task} from "@/models/Task.ts";
+import IconEllipse from "./icons/IconEllipse.vue";
 
 const props = defineProps<{
   sectionID: number;
@@ -131,57 +132,62 @@ const handleDragEnd = async (event: DragEvent, targetTaskID: number) => {
 </script>
 
 <template>
-  <section class="section-card">
-    <h2 class="section-title">{{ section.sectionName }}</h2>
+  <article class="section-card">
+    <header>
+      <h2 class="section-title">{{ section.sectionName }}</h2>
+      <button class="expand-button" @click="toggleSectionPopup" aria-label="More options">
+        <IconEllipse /><IconEllipse /><IconEllipse />
+      </button>
+    </header>
 
-    <button class="expand-button" aria-label="Expand Section details" @click="toggleSectionPopup">
-      ▼
-    </button>
 
-    <button v-if="!showForm" @click="showForm = true">Add Task</button>
-    <form v-if="showForm" @submit.prevent="handleAddTask" class="add-task-form">
-      <input v-model="newTask.taskName" placeholder="Task Name" required />
-      <textarea v-model="newTask.taskDescription" placeholder="Task Description"></textarea>
+    <ul class="tasks-container" aria-label="Sorted Tasks List">
+      <li>
+        <TaskCard
+          v-for="task in sortedTasks"
+          :key="task.taskID"
+          :taskID="task.taskID"
+          :taskName="task.taskName"
+          :parentTaskID="task.parentTaskID"
+          :taskPosition="task.taskPosition"
+          :dueDate="task.dueDate"
+          :createdAt="task.createdAt"
+          draggable="true"
+          @dragstart="(e: DragEvent) => e.dataTransfer?.setData('taskID', task.taskID.toString())"
+          @dragover.prevent
+          @drop="(e: DragEvent) => handleDragEnd(e, task.taskID)"
+          @task-clicked="handlePopup"
+        />
+      </li>
 
-      <select v-model="newTask.taskPriority">
-        <option :value="null">None</option>
-        <option value="1">Low</option>
-        <option value="2">Medium</option>
-        <option value="3">High</option>
-      </select>
+      <form v-if="showForm" @submit.prevent="handleAddTask" class="add-task-form" aria-label="Add Task Form">
+        <input v-model="newTask.taskName" placeholder="Task Name" required />
+        <textarea v-model="newTask.taskDescription" placeholder="Task Description"></textarea>
+        <label>
+          Priority:
+          <select v-model="newTask.taskPriority">
+            <option :value="null">None</option>
+            <option value="1">Low</option>
+            <option value="2">Medium</option>
+            <option value="3">High</option>
+          </select>
+        </label>
 
-      <input type="date" v-model="newTask.dueDate" />
+        <label>
+          Due Date:
+          <input type="date" v-model="newTask.dueDate" />
+        </label>
 
-      <div class="form-actions">
-        <button type="submit">Create</button>
-        <button type="button" @click="cancelTask">Cancel</button>
-      </div>
-    </form>
+        <footer class="form-actions">
+          <button type="submit">Create</button>
+          <button type="button" @click="cancelTask">Cancel</button>
+        </footer>
+      </form>
 
-    <section class="tasks-container">
-      <TaskCard
-        v-for="task in sortedTasks"
-        :key="task.taskID"
-        :taskID="task.taskID"
-        :taskName="task.taskName"
-        :parentTaskID="task.parentTaskID"
-        :taskPosition="task.taskPosition"
-        :dueDate="task.dueDate"
-        :createdAt="task.createdAt"
-        draggable="true"
-        @dragstart="(e: DragEvent) => e.dataTransfer?.setData('taskID', task.taskID.toString())"
-        @dragover.prevent
-        @drop="(e: DragEvent) => handleDragEnd(e, task.taskID)"
-        @task-clicked="handlePopup(task.taskID)"
-      />
-
-      <TaskDetailsPopup
-          v-if="selectedTask"
-          :task="selectedTask"
-          @task-updated="updateTask"
-          @task-deleted="removeTask"
-          @close="selectedTask = null" />
-    </section>
+      <li>
+        <button  v-if="!showForm" @click="showForm = true" id="AddBtn" aria-label="Add Task" > <pre>+ </pre> Add Task </button>
+      </li>
+    </ul>
 
     <SectionDetailsPopup
       v-if="isSectionPopupVisible"
@@ -190,8 +196,16 @@ const handleDragEnd = async (event: DragEvent, targetTaskID: number) => {
       @update="updateSectionHandler"
       @section-deleted="() => emits('section-deleted', section.sectionID)"
     />
-  </section>
+
+    <TaskDetailsPopup
+      v-if="selectedTask"
+      :task="selectedTask"
+      @task-updated="updateTask"
+      @task-deleted="removeTask"
+      @close="selectedTask = null" />
+  </article>
 </template>
+
 
 <style scoped>
 * {
@@ -205,53 +219,107 @@ const handleDragEnd = async (event: DragEvent, targetTaskID: number) => {
   flex-direction: column;
   gap: 0.5rem;
   margin-top: 0.5rem;
+  margin: .8em;
 }
 
 .add-task-form textarea,
 .add-task-form input,
 .add-task-form select {
   padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  border: 1pt solid #ddd;
+  border-radius: 5pt;
 }
 
-/* Button row styling */
+
 .form-actions {
   display: flex;
   gap: 0.5rem;
-  justify-content: flex-end;
+  justify-content: space-evenly;
+}
+.form-actions button{
+  border: solid 1pt var(--light-text-color);
+  padding: 2pt 10pt;
+  border-radius: 2pt;
+
 }
 
-/* Section card styling */
-.section-card {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 1rem;
-  background: #f9f9f9;
-  width: 300px;
+.form-actions button:hover{
+ background-color: #ddd;
 }
 
-.section-title {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-}
 
 .tasks-container {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1pt;
   margin-top: 1rem;
+  width: 15rem;
+  flex-grow: 1;
+  overflow-y: auto;
 }
 
-/* Expand button */
-.expand-button {
-  background-color: #ca6de8;
+.section-card {
+  border: 1pt solid #ddd;
+  border-radius: 8pt;
+  padding: 8pt;
+  background: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  height: 90vh;
+}
+
+#taskCard{
+  margin: .2em;
+}
+
+.section-title {
+  width: 100%;
+  font-size: 12pt;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+header{
+  display: flex;
+  flex-flow: row;
+  justify-content: space-between;
+  text-align: center;
+  width: 100%;
+}
+
+ header section{
+  display: flex;
+  flex-flow: row;
+  justify-content: space-between;
+  text-align: flex-start;
+}
+
+#AddBtn {
+  align-self: flex-start;
+  margin-top: auto;
+  display: flex;
+  font-size: 12pt;
+  color: var(--light-text-color);
+  flex-direction: row;
   border: none;
-  color: #fff;
-  padding: 0.4rem;
+  justify-content: start;
+  align-items: center;
+  background-color: #f9f9f9;
+}
+
+#AddBtn pre {
+  align-items: start;
+  font-size: 20pt;
+}
+
+.expand-button {
+  display: flex;
   cursor: pointer;
-  border-radius: 5px;
-  font-size: 0.9rem;
+  border: none;
+  background-color: #f9f9f9;
+  text-align: start;
 }
 </style>

@@ -1,6 +1,7 @@
 import type { SectionTask } from "@/models/SectionTask.ts";
 import type { Task } from "@/models/Task.ts";
 import { jwtToken } from "@/models/JWTToken.ts";
+import { removeJwt } from "./Main";
 
 export default class TasksHandler {
   static async getTasksForSection(sectionID: number): Promise<SectionTask[]> {
@@ -12,6 +13,9 @@ export default class TasksHandler {
           Authorization: `Bearer ${jwtToken}`,
         },
       });
+      if(response.status === 401) {
+        removeJwt();
+      }
 
       if (!response.ok) {
         const errorMessage = await response.text();
@@ -54,6 +58,10 @@ export default class TasksHandler {
         },
       });
 
+      if(response.status === 401) {
+        removeJwt();
+      }
+
       if (!response.ok) {
         const errorMessage = await response.text();
         throw new Error(`Failed to create task: ${errorMessage}`);
@@ -86,6 +94,10 @@ export default class TasksHandler {
     if (!response.ok) {
       const errorMessage = await response.text();
       throw new Error(`Failed to fetch task: ${errorMessage}`);
+    }
+
+    if (response.status === 401) {
+      removeJwt();
     }
     const task = await response.json();
     return {
@@ -123,6 +135,10 @@ export default class TasksHandler {
     if (!response.ok) {
       const errorMessage = await response.text();
       throw new Error(`Failed to update task: ${errorMessage}`);
+    }
+
+    if(response.status === 401) {
+      removeJwt();
     }
     return response.json();
   }

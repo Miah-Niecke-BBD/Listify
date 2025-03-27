@@ -115,6 +115,8 @@ const toggleModal = () => {
 .sidebar {
   min-width: 14em;
   background-color: var(--nav-bg-color);
+  min-width: 14em;
+  background-color: var(--nav-bg-color);
   border-right: 1pt solid var(--card-bg);
   box-shadow: 1pt 1pt 1pt var(--card-bg);
   display: flex;
@@ -126,6 +128,7 @@ const toggleModal = () => {
 }
 
 .sidebar.collapsed {
+  min-width: 2em;
   min-width: 2em;
 }
 

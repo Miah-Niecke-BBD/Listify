@@ -9,15 +9,13 @@
     }
 
     const data: LoginResponse = await response.json();
+    
     return data;
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error(error.message);
-    } else {
-      console.error("An unknown error occurred.");
-    }
-    return null;
+  } catch(error:any){
+    console.log((`Failed to get Jwt Token (status ${error.status}): ${error.message}`))
+    throw error;
   }
+  
 }
 
 export async function GetAuthCode<AuthCodeResponse> ():Promise<AuthCodeResponse | null> {
@@ -30,13 +28,9 @@ export async function GetAuthCode<AuthCodeResponse> ():Promise<AuthCodeResponse 
 
     const data: AuthCodeResponse = await response.json();
     return data;
-  }catch(error: unknown){
-      if (error instanceof Error) {
-        console.error(error.message);
-      } else {
-        console.error("An unknown error occurred.");
-      }
-      return null;
+  }catch(error:any){
+    console.log((`Failed to get auth code (status ${error.status}): ${error.message}`))
+    throw error;
   }
 }
 

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import IconEllipse from './icons/IconEllipse.vue';
+
 const props = defineProps<{
   taskID: number
   taskName: string;
@@ -11,7 +13,7 @@ const props = defineProps<{
 const customFormatDate = (date: Date | null): string => {
   if (!date) return 'No date';
   const day = String(date.getDate()).padStart(2, '0');
-  const month = date.toLocaleString('default', { month: 'long' });
+  const month = new Intl.DateTimeFormat('default', { month: 'short' }).format(date);
   const year = date.getFullYear();
   return `${day} ${month} ${year}`;
 };
@@ -31,63 +33,48 @@ const openTaskDetails = () => {
       <section class="task-content">
         <header class="task-header">
           <h2 class="task-title">{{ taskName }}</h2>
-          <time class="due-date due-date-red" datetime="2025-03-22"> Due Date: {{ customFormatDate(dueDate) }} </time>
-          <time datetime="2025-03-20"> Created: {{ customFormatDate(createdAt) }} </time>
+          <time class="due-date due-date-red" datetime="2025-03-22">{{ customFormatDate(dueDate) }} </time>
         </header>
       </section>
-      <button class="expand-button" @click="openTaskDetails" aria-label="Expand task details">▼</button>
+      <button class="expand-button" @click="openTaskDetails" ><IconEllipse/><IconEllipse/><IconEllipse/></button>
     </section>
   </article>
 </template>
 
 <style scoped>
-* {
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-seri;
-}
 
 .task-item {
   background: #fff;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 24px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1pt solid #d1d5db;
+  border-radius: 8pt;
+  padding: 12pt;
+  margin: 1em 1em .5em .5em;
+  box-shadow: 0 2pt 4pt rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  transition:
-    box-shadow 0.2s ease-in-out,
-    transform 0.2s ease-in-out;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 8pt;
 }
-
-
-.task-item:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
-}
-
 
 .task-row {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 8px;
+  gap: 12pt;
+  margin-bottom: 8pt;
 }
 
 
 .checkbox {
   appearance: none;
-  height: 20px;
-  width: 20px;
-  border-radius: 4px;
-  border: 1px solid #d1d5db;
+  height: 1.5em;
+  width: 1.5em;
+  border-radius: 4pt;
+  border: 1pt solid #d1d5db;
   cursor: pointer;
   background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s ease-in-out;
 }
 
 
@@ -100,8 +87,8 @@ const openTaskDetails = () => {
 .checkbox:checked::after {
   content: "✔";
   color: #fff;
-  font-size: 14px;
-  line-height: 20px;
+  font-size: 8pt;
+  line-height: 12pt;
 }
 
 .task-content {
@@ -114,14 +101,14 @@ const openTaskDetails = () => {
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6pt;
 }
 
 .task-title {
   font-size: 1.1rem;
   font-weight: 500;
   overflow: hidden;
-  color: #333;
+  color: var(--heading-purple);
   margin: 0;
 }
 
@@ -131,7 +118,7 @@ const openTaskDetails = () => {
 }
 
 .due-date {
-  font-size: 0.9rem;
+  font-size: 10pt;
   color: #555;
   flex-shrink: 0;
   font-weight: 500;
@@ -147,22 +134,16 @@ time {
   display: block;
 }
 
-time:hover {
-  color: #333;
-  font-weight: 500;
-}
-
 .expand-button {
-  background: #ddd;
+  background: none;
   border: none;
-  padding: 4px 8px;
-  border-radius: 4px;
   cursor: pointer;
-  font-size: 1rem;
-  transition: background 0.2s ease-in-out;
+  display: flex;
+  opacity: 0;
 }
 
 .expand-button:hover {
-  background: #bbb;
+  background: var(--button-hover-bg);
+  opacity: 1;
 }
 </style>
