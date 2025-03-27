@@ -37,6 +37,7 @@ const createProject = () => {
       <h3 class="modal-header">Please enter project name to add a new project</h3>
       <input
         v-model="newProjectName"
+        maxlength="100"
         type="text"
         placeholder="Project Name"
         class="modal-input"

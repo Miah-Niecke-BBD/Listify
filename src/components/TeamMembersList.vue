@@ -28,9 +28,9 @@ const closeModal = () => {
     <h2>Team Members ({{ members.length }})</h2>
     <ul>
       <li v-for="member in members" :key="member.githubID" class="member-item">
-        <span class="member-name">{{ member.name }}</span>
-        <span class="member-id">ID: {{ member.githubID }}</span>
-        <span v-if="member.teamLeader" class="leader-label">
+        <h3 class="member-name">{{ member.name }}</h3>
+        <p class="member-id">ID: {{ member.githubID }}</p>
+        <p v-if="member.teamLeader" class="leader-label">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -47,7 +47,7 @@ const closeModal = () => {
           </svg>
 
           Team Leader
-        </span>
+        </p>
         <button
           v-if="
             loggedInMemberId === members.find((m) => m.teamLeader)?.githubID && !member.teamLeader
@@ -96,14 +96,16 @@ const closeModal = () => {
   margin-bottom: 1em;
 }
 
+.team-members h3 {
+  color: black;
+}
+
 .team-members ul {
-  list-style-type: none;
   padding: 0.5em;
   display: flex;
   flex-direction: column;
   max-height: calc(100vh - 18em);
   overflow-y: auto;
-  height: 100%;
 }
 
 .member-item {
@@ -158,5 +160,24 @@ const closeModal = () => {
 
 .delete-btn:hover svg {
   stroke: darkred;
+}
+
+@container (max-width: 500px) {
+  .team-members {
+    word-wrap: break-word;
+  }
+  .leader-label {
+    position: relative;
+    top: 0em;
+    right: 0em;
+  }
+
+  .delete-btn {
+    position: relative;
+    bottom: 0em;
+    right: 0em;
+    margin-left: auto;
+    bottom: 1.1em;
+  }
 }
 </style>

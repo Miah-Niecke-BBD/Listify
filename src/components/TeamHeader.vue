@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import "@/assets/base.css";
 import AddTeamMemberModal from "@/components/EditTeamModal.vue";
-import { defineProps, ref, onMounted } from "vue";
+import { ref } from "vue";
 import ReassignLeaderModal from "./ReassignLeaderModal.vue";
 import type { TeamMember } from "@/models/TeamMember";
 
-defineProps<{
+const props = defineProps<{
   teamName: string;
   teamID: string;
   loggedInMemberId: string;
   updateTeamName: Function;
   teamMembers: TeamMember[];
   changeTeamLeader: Function;
+  deleteTeam: Function;
 }>();
 
 const showOptions = ref(false);
@@ -33,6 +34,9 @@ const closeModal = () => {
   isReassignLeaderModalVisible.value = false;
 };
 
+const deleteATeam = async () => {
+  await props.deleteTeam();
+};
 </script>
 
 <template>
@@ -66,6 +70,7 @@ const closeModal = () => {
       <section v-if="showOptions" class="more-options">
         <button @click="openAddTeamMemberModal">Edit Team</button>
         <button @click="openReassignLeaderModal">Edit Roles</button>
+        <button @click="deleteATeam">Delete Team</button>
       </section>
     </section>
     <AddTeamMemberModal
@@ -90,9 +95,9 @@ const closeModal = () => {
   flex-direction: row;
   margin-bottom: 2em;
   align-items: center;
-  border: 0.1rem solid black;
+  border: 0.1em solid var(--dark-purple);
   border-radius: 1em;
-  padding: 1.5em;
+  padding: 1em;
   justify-content: center;
 }
 
@@ -112,17 +117,15 @@ const closeModal = () => {
   gap: 0.2em;
   margin-left: auto;
   margin-right: 1.5em;
-  padding: 0.2em 0.8em;
-  height: 2.5em;
+  padding: 0.5em 0.8em;
 }
 
 .team-heading .calendar-btn:hover {
-  background-color: rgb(228, 227, 227);
+  background-color: var(--button-hover-bg);
 }
 
 .team-heading .calendar-btn svg {
   background-color: transparent;
-  vertical-align: middle;
 }
 
 .more-btn {
@@ -151,6 +154,7 @@ const closeModal = () => {
   display: flex;
   flex-direction: column;
   gap: 0.2em;
+  z-index: 1000;
 }
 
 .more-options button {
@@ -169,30 +173,42 @@ svg {
   color: var(--primary-color);
 }
 
-@media (max-width: 700px) {
+@container (max-width: 580px) {
   .team-heading {
-    padding: 1em;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5em;
   }
   .team-heading h1 {
     font-size: 20pt;
+    text-align: center;
   }
 
   .team-heading .calendar-btn {
     font-size: 10pt;
+    padding: 0.2em 0.8em;
+    margin: 1em 0;
   }
 
   .team-heading .more-btn {
     font-size: 20pt;
   }
 
+  .more-btn-icon {
+    text-align: center;
+    line-height: 0.6em;
+  }
+
   .more-options {
-    width: 4.5em;
     left: -1.5em;
+    width: 4em;
     padding: 0.3em;
+    gap: 0.1em;
   }
 
   .more-options button {
-    padding: 0.1em;
+    padding: 0em;
   }
 }
 </style>
