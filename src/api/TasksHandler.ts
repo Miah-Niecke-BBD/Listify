@@ -3,6 +3,7 @@ import type { SectionTask } from "@/models/SectionTask.ts";
 import type { Task } from "@/models/Task.ts";
 import { useRoute } from "vue-router";
 import { jwtToken } from "@/models/JWTToken.ts";
+import { removeJwt } from "./Main";
 
 export function useTasks(sectionID: number) {
   const route = useRoute();
@@ -39,6 +40,9 @@ export function useTasks(sectionID: number) {
           Authorization: `Bearer ${jwtToken}`,
         },
       });
+      if(response.status === 401) {
+        removeJwt();
+      }
 
       if (!response.ok) {
         const errorMessage = await response.text();
@@ -46,7 +50,7 @@ export function useTasks(sectionID: number) {
       }
       const data = await response.json();
       sectionTask.value = data.map(mapTaskData);
-    } catch (error) {
+    } catch (error:any) {
       console.error(`Error loading tasks for section ${sectionID}:`, error);
     }
   };
@@ -72,6 +76,10 @@ export function useTasks(sectionID: number) {
           Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
         },
       });
+
+      if(response.status === 401) {
+        removeJwt();
+      }
 
       if (!response.ok) {
         const errorMessage = await response.text();
@@ -106,6 +114,10 @@ export function useTasks(sectionID: number) {
           Authorization: `Bearer ${jwtToken}`,
         },
       });
+
+      if(response.status === 401) {
+        removeJwt();
+      }
 
       if (!response.ok) {
         const errorMessage = await response.text();
@@ -147,6 +159,10 @@ export async function updateTask(task: Partial<Task>, jwtToken: string | null): 
       dateCompleted: task.dateCompleted ? new Date(task.dateCompleted).toISOString() : null,
     }),
   });
+
+  if(response.status === 401) {
+    removeJwt();
+  }
 
   if (!response.ok) {
     const errorMessage = await response.text();

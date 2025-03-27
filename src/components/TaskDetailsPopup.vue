@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import type {Task} from "@/models/Task.ts";
-import { updateTask, deleteTask } from "@/api/TasksHandler.ts"
+import type { Task } from "@/models/Task.ts";
+import { updateTask, deleteTask } from "@/api/TasksHandler";
 import { jwtToken } from "@/models/JWTToken.ts";
 import TaskDependencyManager from "@/components/TaskDependencyManager.vue";
 import TaskAssignmentManager from "@/components/TaskAssignmentManager.vue";
 
-const emit = defineEmits(["close", "task-updated", "task-deleted"])
+const emit = defineEmits(["close", "task-updated", "task-deleted"]);
 
 const closePopup = () => {
-  emit("close")
-}
+  emit("close");
+};
 
 const props = defineProps<{
   task: {
@@ -25,18 +25,16 @@ const props = defineProps<{
     taskAssignees: { userID: number; githubID: string }[] | null;
     dependantTask: { taskID: number; taskName: string } | null;
   } | null;
-}>()
+}>();
 
 const customFormatDate = (date: Date | string | null): string => {
   if (!date) return "No date";
   const parsedDate = typeof date === "string" ? new Date(date) : date;
-
   const day = String(parsedDate.getDate()).padStart(2, "0");
   const month = parsedDate.toLocaleString("default", { month: "long" });
   const year = parsedDate.getFullYear();
   return `${day} ${month} ${year}`;
 };
-
 
 const isEditing = ref(false);
 const editableTask = ref({ ...props.task });
@@ -45,6 +43,8 @@ const showAssignments = ref(false);
 
 const startEdit = () => {
   isEditing.value = true;
+  showDependencies.value = false;
+  showAssignments.value = false;
   editableTask.value = { ...props.task };
 };
 
@@ -75,8 +75,21 @@ const handleDelete = async (): Promise<void> => {
   }
 };
 
-const toggleDependencies = () => (showDependencies.value = !showDependencies.value);
-const toggleAssignments = () => (showAssignments.value = !showAssignments.value);
+const toggleDependencies = () => {
+  showDependencies.value = !showDependencies.value;
+  if (showDependencies.value) {
+    isEditing.value = false;
+    showAssignments.value = false;
+  }
+};
+
+const toggleAssignments = () => {
+  showAssignments.value = !showAssignments.value;
+  if (showAssignments.value) {
+    isEditing.value = false;
+    showDependencies.value = false;
+  }
+};
 
 const taskDependencies = ref(props.task?.dependantTask ? [props.task.dependantTask] : []);
 
@@ -88,7 +101,7 @@ const onDependencyDeleted = (dependencyID: number) => {
   taskDependencies.value = taskDependencies.value.filter(
     (dep) => dep.taskID !== dependencyID
   );
-}
+};
 
 const taskState = ref({ ...props.task });
 
@@ -109,17 +122,15 @@ const onAssigneeRemoved = (userID: number) => {
 };
 </script>
 
-
 <template>
   <dialog class="task-popup" v-if="task" open>
     <article class="popup-content">
       <header class="popup-header">
-        <h2 v-if="!isEditing">{{ task.taskName }}</h2>
-        <input v-else v-model="editableTask.taskName" type="text" />
         <button @click="closePopup" aria-label="Close popup">&times;</button>
       </header>
 
-      <section class="popup-details" v-if="!isEditing">
+      <section v-if="!isEditing && !showDependencies && !showAssignments" class="popup-details">
+        <p><strong>Name:</strong> {{ task.taskName }}</p>
         <p><strong>Description:</strong> {{ task.taskDescription }}</p>
         <p :data-priority="task.taskPriority"><strong>Priority:</strong> {{ task.taskPriority }}</p>
         <p><strong>Due Date:</strong> <time>{{ customFormatDate(task.dueDate) }}</time></p>
@@ -143,7 +154,7 @@ const onAssigneeRemoved = (userID: number) => {
         </section>
       </section>
 
-      <section v-else>
+      <section v-if="isEditing && !showDependencies && !showAssignments">
         <form>
           <section class="form-group">
             <label for="task-name">Task Name</label>
@@ -173,9 +184,11 @@ const onAssigneeRemoved = (userID: number) => {
       </section>
 
       <section class="task-dependency-toggle">
-        <button @click="toggleDependencies">{{ showDependencies ? 'Hide' : 'Manage' }} Dependencies</button>
+        <button @click="toggleDependencies" :disabled="isEditing || showAssignments">
+          {{ showDependencies ? 'Hide' : 'Manage' }} Dependencies
+        </button>
         <TaskDependencyManager
-          v-if="showDependencies"
+          v-if="showDependencies && !isEditing && !showAssignments"
           :taskID="task.taskID"
           :dependencies="taskDependencies"
           @dependency-added="onDependencyAdded"
@@ -184,9 +197,11 @@ const onAssigneeRemoved = (userID: number) => {
       </section>
 
       <section class="task-assignment-toggle">
-        <button @click="toggleAssignments">{{ showAssignments ? 'Hide' : 'Manage' }} Assignments</button>
+        <button @click="toggleAssignments" :disabled="isEditing || showDependencies">
+          {{ showAssignments ? 'Hide' : 'Manage' }} Assignments
+        </button>
         <TaskAssignmentManager
-          v-if="showAssignments"
+          v-if="showAssignments && !isEditing && !showDependencies"
           :taskID="task.taskID"
           :assignees="task.taskAssignees"
           @assignee-added="onAssigneeAdded"
@@ -195,7 +210,7 @@ const onAssigneeRemoved = (userID: number) => {
       </section>
 
       <footer class="popup-footer">
-        <button v-if="!isEditing" @click="startEdit" class="edit-button">Edit</button>
+        <button v-if="!isEditing" @click="startEdit" class="edit-button" :disabled="showDependencies || showAssignments">Edit</button>
         <button v-if="isEditing" @click="handleSave" class="save-button">Save</button>
         <button v-if="isEditing" @click="cancelEdit" class="cancel-button">Cancel</button>
         <button @click="handleDelete" class="delete-button">Delete</button>
@@ -204,302 +219,207 @@ const onAssigneeRemoved = (userID: number) => {
   </dialog>
 </template>
 
-<style>
-::v-deep(.task-popup) {
-  position: fixed;
-}
-
-:root {
-  --primary: #4a6cfa;
-  --primary-light: #eef1ff;
-  --success: #34d399;
-  --warning: #fbbf24;
-  --danger: #f87171;
-  --gray-100: #f3f4f6;
-  --gray-200: #e5e7eb;
-  --gray-300: #d1d5db;
-  --gray-700: #374151;
-  --gray-800: #1f2937;
-  --gray-900: #111827;
-  --radius: 12px;
-  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-
+<style scoped>
 .task-popup {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  border: 0.05rem solid #ccc;
+  width: 90%;
+  max-width: 30rem;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
-  border: none;
-  overflow: auto;
-}
-
-.popup-content {
-  background-color: white;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  width: 100%;
-  max-width: 550px;
-  max-height: 90vh;
-  overflow-y: auto;
-  animation: fadeIn 0.3s ease-out;
+  flex-direction: column;
 }
 
 .popup-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem;
-  border-bottom: 1px solid var(--gray-200);
-  position: sticky;
-  top: 0;
-  background-color: white;
-  border-radius: var(--radius) var(--radius) 0 0;
-}
-
-.popup-header h2 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--gray-900);
+  margin-bottom: 1rem;
 }
 
 .popup-header button {
   background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
+  color: #5c2e91;
   cursor: pointer;
-  color: var(--gray-700);
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s;
 }
-
-.popup-header button:hover {
-  background-color: var(--gray-100);
-  color: var(--gray-900);
-}
-
 
 .popup-details {
-  padding: 1.5rem;
-  color: var(--gray-800);
+  font-size: 1rem;
+  color: #2d2d2d;
+  background-color: #f9f8ff;
+  padding: 1rem;
+  border: 0.05rem solid #ccc;
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: inset 0 0.1rem 0.25rem rgba(0, 0, 0, 0.05);
 }
 
 .popup-details p {
-  margin-bottom: 1rem;
-  line-height: 1.5;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border: 0.05rem solid #e2e2e2;
+  border-radius: 0.5rem;
+  background-color: #fafafa;
 }
 
 .popup-details strong {
-  color: var(--gray-900);
   font-weight: 600;
+  color: #5c2e91;
+  font-size: 0.95rem;
 }
 
-
-.popup-details p:nth-child(2) strong {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-weight: 500;
-  margin-left: 0.5rem;
+.popup-details time {
+  font-style: italic;
+  color: #444;
 }
-
-.popup-details p:nth-child(2)[data-priority="High"] strong {
-  background-color: var(--danger);
-  color: white;
-}
-
-.popup-details p:nth-child(2)[data-priority="Medium"] strong {
-  background-color: var(--warning);
-  color: var(--gray-900);
-}
-
-.popup-details p:nth-child(2)[data-priority="Low"] strong {
-  background-color: var(--success);
-  color: white;
-}
-
-
-.popup-details p:nth-child(3),
-.popup-details p:nth-child(4),
-.popup-details p:nth-child(5) {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.popup-details p:nth-child(3) strong + time,
-.popup-details p:nth-child(4) strong + time,
-.popup-details p:nth-child(5) strong + time {
-  background-color: var(--primary-light);
-  color: var(--primary);
-  padding: 0.25rem 0.5rem;
-  border-radius: 6px;
-  font-size: 0.875rem;
-}
-
-
-.popup-details p:nth-child(1) {
-  background-color: var(--gray-100);
-  padding: 1rem;
-  border-radius: var(--radius);
-  border-left: 4px solid var(--primary);
-  margin-bottom: 1.5rem;
-}
-
 
 .popup-details section {
-  margin-top: 1.5rem;
-  padding: 1rem;
-  background-color: var(--gray-100);
-  border-radius: var(--radius);
+  padding: 0.75rem;
+  border: 0.05rem solid #dad6f8;
+  background-color: #f6f4ff;
+  border-radius: 0.5rem;
 }
 
-.popup-details section h3 {
-  margin-top: 0;
-  margin-bottom: 0.75rem;
+.popup-details h3 {
   font-size: 1rem;
-  color: var(--gray-900);
-  font-weight: 600;
+  color: #5c2e91;
+  margin-bottom: 0.5rem;
+  border-bottom: 0.05rem solid #d2c7f7;
+  padding-bottom: 0.25rem;
 }
-
 
 .popup-details ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
+  list-style-type: disc;
+  margin-left: 1.25rem;
+  padding-left: 0.25rem;
 }
 
 .popup-details li {
-  padding: 0.5rem 0;
+  margin-bottom: 0.25rem;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+
+section[v-if="isEditing"] form {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  border: 0.05rem solid #ccc;
+  border-radius: 0.75rem;
+  background-color: #fff;
+  box-shadow: inset 0 0.1rem 0.25rem rgba(0, 0, 0, 0.05);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
   gap: 0.5rem;
+  padding: 0.75rem;
+  border: 0.05rem solid #e2e2e2;
+  border-radius: 0.5rem;
+  background-color: #fafafa;
 }
 
-.popup-details li::before {
-  content: "";
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  background-color: var(--primary);
-  border-radius: 50%;
-}
-
-.popup-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: var(--primary-light);
-  padding: 16px;
-  border-radius: var(--radius) var(--radius) 0 0;
-}
-.popup-header h2 {
-  margin: 0;
-  color: var(--gray-900);
-}
-.popup-header button {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: var(--gray-700);
-}
-
-.popup-details, .form-group {
-  margin-bottom: 16px;
-}
 .form-group label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 4px;
-  color: var(--gray-700);
+  font-weight: 600;
+  color: #5c2e91;
+  font-size: 0.95rem;
 }
-.form-group input, .form-group textarea {
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  font-size: 0.95rem;
+  padding: 0.5rem;
+  border: 0.05rem solid #ccc;
+  border-radius: 0.5rem;
+  background-color: #fff;
+  color: #333;
+  font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #8e7cf1;
+  box-shadow: 0 0 0.15rem #8e7cf1;
+}
+
+.task-dependency-toggle button,
+.task-assignment-toggle button {
+  margin-top: 1rem;
   width: 100%;
-  padding: 8px;
-  margin-top: 4px;
-  border: 1px solid var(--gray-300);
-  border-radius: var(--radius);
+  padding: 0.5rem;
+  background-color: #fbfbfb;
+  border: 0.05rem solid black;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  text-align: center;
 }
-.form-group textarea {
-  height: 80px;
-  resize: vertical;
+
+.task-dependency-toggle button:hover,
+.task-assignment-toggle button:hover {
+  background-color: #8e7cf1;
+  color: white;
 }
 
 .popup-footer {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
-  margin-top: 16px;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
-.save-button, .edit-button, .delete-button {
-  background-color: var(--primary);
-  color: #fff;
-  padding: 8px 16px;
-  border: none;
-  border-radius: var(--radius);
-  cursor: pointer;
-}
-.save-button {
-  background-color: var(--success);
-}
+
+.edit-button,
+.save-button,
+.cancel-button,
 .delete-button {
-  background-color: var(--danger);
+  background-color: #8e7cf1;
+  color: white;
+  padding: 0.5rem 1.25rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
 }
-.save-button:hover, .edit-button:hover, .delete-button:hover {
-  opacity: 0.9;
+
+.edit-button:hover,
+.save-button:hover,
+.delete-button:hover {
+  background-color: #5c2e91;
 }
+
 .cancel-button {
-  background-color: var(--warning);
-  color: #fff;
-  padding: 8px 16px;
-  border: none;
-  border-radius: var(--radius);
-  cursor: pointer;
+  background-color: #f3f3f3;
+  color: #5c2e91;
 }
 
-.task-dependency-toggle button {
-  margin-top: 0.5rem;
-  color: #fff;
-  background-color: #ca6de8;
-  border: none;
-  border-radius: 5px;
-  padding: 0.2rem 0.5rem;
-  cursor: pointer;
-}
-.task-dependency-toggle button:hover {
-  background-color: #a150c7;
+.cancel-button:hover {
+  background-color: #e1d4f9;
 }
 
-.task-assignment-toggle button {
-  margin-top: 0.5rem;
-  color: #fff;
-  background-color: #ca6de8;
-  border: none;
-  border-radius: 5px;
-  padding: 0.2rem 0.5rem;
-  cursor: pointer;
-}
-.task-assignment-toggle button:hover {
-  background-color: #a150c7;
+button:disabled {
+  background-color: #ababab;
+  cursor: not-allowed;
 }
 </style>
+
+

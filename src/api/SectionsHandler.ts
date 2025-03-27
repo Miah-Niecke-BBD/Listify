@@ -1,6 +1,7 @@
 const API_BASE_URL = "http://localhost:8080";
 import { jwtToken } from "@/models/JWTToken";
 import type { Section } from "@/models/Section";
+import { removeJwt } from "./Main";
 
 export default class SectionsHandler {
   static async fetchSections(projectID: number): Promise<Section[]> {
@@ -23,7 +24,11 @@ export default class SectionsHandler {
         createdAt: new Date(section.createdAt),
         updatedAt: section.updatedAt ? new Date(section.updatedAt) : null,
       }));
-    } catch (error) {
+    } catch (error:any) {
+    
+          if(error.status === 401){
+                    removeJwt()
+            }
       console.error("Error loading sections:", error);
       return [];
     }
@@ -54,7 +59,12 @@ export default class SectionsHandler {
         createdAt: new Date(createdSection.createdAt),
         updatedAt: createdSection.updatedAt ? new Date(createdSection.updatedAt) : null,
       };
-    } catch (error) {
+    } catch (error:any) {
+
+      if(error.status === 401){
+                removeJwt()
+        }
+
       console.error("Error adding section:", error);
       return null;
     }
@@ -76,7 +86,12 @@ export default class SectionsHandler {
         throw new Error(`Failed to update section: ${errorMessage}`);
       }
       return await response.json();
-    } catch (error) {
+    } catch (error:any) {
+
+      if(error.status === 401){
+                removeJwt()
+        }
+
       console.error("Error updating section:", error);
       return null;
     }
@@ -112,14 +127,17 @@ export default class SectionsHandler {
           Authorization: `Bearer ${jwtToken}`,
         },
       });
-
+      if(response.status === 401){
+        removeJwt()
+        }
       if (!response.ok) {
         const errorMessage = await response.text();
         throw new Error(`Failed to delete section: ${errorMessage}`);
       }
 
       return true;
-    } catch (error) {
+    } catch (error:any) {
+
       console.error("Error deleting section:", error);
       return false;
     }

@@ -1,63 +1,49 @@
 <script setup lang="ts">
 import { ref, computed, defineProps, watch } from 'vue';
-import { GetDueTasks } from '@/api/CalendarApi';
+import { GetDueTasks } from '@/api/Calendar';
 import type { dueTasks } from '@/models/DueTasks';
 import { jwtToken } from '@/models/JWTToken';
+import { GetTeams } from '@/api/SidebarApi';
 import type { TeamInterface } from '@/models/TeamInterface';
 import { useRoute } from 'vue-router';
 
-const dueTask = ref<dueTasks[]>([]);
 
-const route = useRoute()
-
-interface Day {
-  dateLabel: string;
-  dayName: string;
-  fullDate: string;
-  tasks: dueTasks[];
-}
-
-const props = defineProps<{
-  teams: TeamInterface[];
-}>();
+const route = useRoute();
 
 const tasksMap = ref<Record<string, dueTasks[]>>({});
 const currentOffset = ref(0);
-
 const today = new Date();
 
-function formatDate(date: Date): string {
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  });
-}
 
-function getDayName(date: Date): string {
-  return date.toLocaleDateString('en-UK', { weekday: 'long' });
-}
+const getFormattedDate = (date: Date, format: 'date' | 'weekday' = 'date'): string => {
+  const normalizedDate = new Date(date);
+  normalizedDate.setHours(0, 0, 0, 0);
 
-function getDateFromOffset(offset: number): Date {
+  const options = format === 'date'
+    ? { month: 'short', day: 'numeric', year: 'numeric' }
+    : { weekday: 'long' };
+  return normalizedDate.toLocaleDateString('en-UK', options);
+};
+
+const getDateFromOffset = (offset: number): Date => {
   const date = new Date(today);
   date.setDate(today.getDate() + offset);
+  date.setHours(0, 0, 0, 0);
   return date;
-}
+};
 
 const visibleDays = computed(() => {
-  const days: Day[] = [];
+  const days = [];
   for (let i = 0; i < 7; i++) {
     const offset = currentOffset.value + i;
     const date = getDateFromOffset(offset);
     const fullDate = date.toISOString().split('T')[0];
 
-    if (!tasksMap.value[fullDate]) {
-      tasksMap.value[fullDate] = [];
-    }
+    if (!tasksMap.value[fullDate]) tasksMap.value[fullDate] = [];
 
     days.push({
-      dateLabel: formatDate(date),
-      dayName: getDayName(date),
+      dateLabel: getFormattedDate(date, 'date'),
+      dayName: getFormattedDate(date, 'weekday'),
       fullDate,
       tasks: tasksMap.value[fullDate]
     });
@@ -65,236 +51,204 @@ const visibleDays = computed(() => {
   return days;
 });
 
-function nextWeek() {
-  currentOffset.value += 7;
-}
+const customFormatDate = (date: Date | string | null|undefined): string => {
+  if (!date) return 'No date';
+  const parsedDate = typeof date === 'string' ? new Date(date) : date;
+  return isNaN(parsedDate.getTime())
+    ? 'Invalid date'
+    : `${String(parsedDate.getDate()).padStart(2, '0')} ${new Intl.DateTimeFormat('default', { month: 'short' }).format(parsedDate)} ${parsedDate.getFullYear()}`;
+};
 
-function prevWeek() {
-  if (currentOffset.value >= 7) {
-    currentOffset.value -= 7;
-  }
-}
+const loadTasksForTeam = async (teamID: string) => {
+  const dueTasksResponse: dueTasks[] | null = await GetDueTasks(jwtToken, teamID);
+  dueTasksResponse?.forEach((task) => {
+    const taskDate = new Date(task.dueDate);
+    taskDate.setHours(0, 0, 0, 0);
+    const taskDay = taskDate.toISOString().split('T')[0];
+    if (!tasksMap.value[taskDay]) tasksMap.value[taskDay] = [];
+    tasksMap.value[taskDay].push(task);
+  });
+};
 
-const yearLabel = computed(() => {
-  const firstDay = getDateFromOffset(currentOffset.value);
-  return firstDay.getFullYear();
-});
-
-
-let hasFetched = false;
-
-async function loadAllTasks(teams: TeamInterface[]) {
+const loadAllTasks = async () => {
   try {
-   if(route.name === 'MyCalendar'){
-    for (const team of teams) {
-        const dueTasksResponse: dueTasks[] | null = await GetDueTasks(jwtToken, team.teamID.toString());
-
-        if (dueTasksResponse) {
-          dueTask.value.push(...dueTasksResponse);
-          dueTasksResponse.forEach((task) => {
-            const taskDate = new Date(task.dueDate).toISOString().split('T')[0];
-            if (!tasksMap.value[taskDate]) {
-              tasksMap.value[taskDate] = [];
-            }
-            tasksMap.value[taskDate].push(task);
-          });
-        }
+    tasksMap.value = {};
+    if (route.name === 'MyCalendar') {
+      const response: TeamInterface[] | null = await GetTeams(jwtToken);
+      const teams = ref<TeamInterface[]>([]);
+      if (response) {
+        teams.value = response;
       }
-   }else if(route.name === 'calendar'){
-        const teamID = route.params.id as string;
-        console.log(typeof teamID)
-        const dueTasksResponse: dueTasks[] | null = await GetDueTasks(jwtToken, teamID.toString());
-
-        if (dueTasksResponse) {
-          dueTask.value.push(...dueTasksResponse);
-          dueTasksResponse.forEach((task) => {
-            const taskDate = new Date(task.dueDate).toISOString().split('T')[0];
-            if (!tasksMap.value[taskDate]) {
-              tasksMap.value[taskDate] = [];
-            }
-            tasksMap.value[taskDate].push(task);
-        });
-        
+      for (const team of teams.value) {
+        await loadTasksForTeam(team.teamID.toString());
       }
-   }
-      
+    } else if (route.name === 'calendar') {
+      await loadTasksForTeam(route.params.id as string);
+    }
   } catch (error) {
     console.error('Error getting due tasks:', error);
   }
-}
-
-
-watch(
-  () => props.teams,
-  async (newTeams) => {
-   
-      await loadAllTasks(newTeams);
-  }
-);
+};
 
 watch(
-  () => route.fullPath,
-  async () => {
-    dueTask.value = [];
-    tasksMap.value = {};
-    await loadAllTasks(props.teams);
-  }
+  () => route.params,
+  loadAllTasks,
+  { immediate: true }
 );
+
+const nextWeek = () => currentOffset.value += 7;
+const prevWeek = () => currentOffset.value -= 7;
+
 
 </script>
-
-
 
 <template>
   <main class="container">
     <header class="top-bar">
-      <button class="nav-button" id="left-btn" @click="prevWeek" :disabled="currentOffset === 0">
-        Previous 7 Days
-      </button>
-
-      <button class="nav-button" id="right-btn" @click="nextWeek">
-        Next 7 Days
-      </button>
+      <button class="nav-button" id="left-btn" @click="prevWeek" :disabled="currentOffset === 0">Previous 7 Days</button>
+      <button class="nav-button" id="right-btn" @click="nextWeek">Next 7 Days</button>
     </header>
     <h1>Upcoming</h1>
     <section class="calendar-scroll">
-      <article
-        v-for="day in visibleDays"
-        :key="day.fullDate"
-        class="day-column"
-        aria-labelledby="day-{{ day.fullDate }}"
-      >
+      <article v-for="day in visibleDays" :key="day.fullDate" class="day-column">
         <header class="day-header">
-          <h3 id="day-{{ day.fullDate }}">
-            <time :datetime="day.fullDate">{{ day.dateLabel }}</time> <pre>{{ day.dayName }}</pre>
+          <h3>
+            <time :datetime="day.fullDate">{{ day.dateLabel }}</time>
+            {{ day.dayName }}
           </h3>
         </header>
         <ul class="task-list">
-          <li v-for="task in day.tasks" :key="task.taskID">
-            <section class="taskCard"> 
-              <ul>
-                <li>{{ task.taskName }}</li>
-              </ul>
-            </section> 
+          <li v-for="task in day.tasks" :key="task.taskID" class="task-item" >
+            <section class="task-content">
+              <header class="task-header">
+                <h2 class="task-title">{{ task.taskName }}</h2>
+                <time class="due-date" :datetime="task.dueDate">{{ customFormatDate(task.dueDate) }}</time>
+              </header>
+            </section>
           </li>
         </ul>
-
       </article>
     </section>
   </main>
+
 </template>
 
 <style scoped>
 .container {
+  margin-left: 1em;
   display: flex;
-  flex-flow: column;
-  padding: 1rem;
+  flex-direction: column;
+  max-width: max-content;
+  overflow-x: auto;
 }
 
 .top-bar {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  position: relative;
+  align-items: center;
 }
 
-.year-label {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: var(--heading-purple);
-}
-
-h1{
+h1 {
   margin-bottom: 1rem;
-  text-align: center;
-  color:var(--heading-purple);
-}
-
-h3{
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  gap: 5pt;
-}
-
-h3 pre{
-  font-size: 12pt;
-  padding-bottom: 5pt;
-  border-bottom: solid 1pt black;
+  margin-left: 2rem;
+  font-size: 18pt;
+  text-align: left;
+  color: var(--heading-purple);
 }
 
 .calendar-scroll {
   display: flex;
-  flex-wrap: nowrap;
   gap: 1rem;
-  overflow-x: auto;
-  overflow-y: hidden;
   padding-bottom: 1rem;
-  height: 600px;
+  overflow-x: auto;
+  width: 83vw;
 }
 
 .day-column {
-  width: 200px;
-  height: 550px;
-  border: 1px solid var(--card-bg);
-  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  width: 15rem;
+  height: 83vh;
+  border: 1pt solid var(--card-bg);
+  border-radius: 0.5rem;
   padding: 1rem;
   background-color: var(--background-color);
-  box-shadow: .1em .1em .1em var(--card-bg);
+  box-shadow: 0.05rem 0.05rem 0.05rem var(--card-bg);
   flex-shrink: 0;
 }
 
-.day-header {
-  margin-bottom: 2rem;
-  font-size: 0.95rem;
-  font-size: 14pt;
+.day-header h3 {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  border-bottom: solid 1pt black;
+  padding-bottom: 1em;
 }
 
 .task-list {
   display: flex;
-  flex-flow: wrap column;
+  flex-direction: column;
   list-style: none;
-  overflow-y:auto;
+  overflow-y: auto;
 }
 
-
 .nav-button {
-  padding: 8px 16px;
+  padding: 0.5rem 1rem;
   background-color: var(--primary-color);
   color: var(--background-color);
   border: none;
-  border-radius: 6pt;
+  border-radius: 0.375rem;
   cursor: pointer;
   font-size: 1rem;
-  transition: background-color 0.3s ease;
+  margin-top: 1em;
+  width: 9rem;
 }
 
-.taskCard{
+.task-item {
   background: #fff;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 24px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
+  border: 0.0625rem solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin: 1rem 1rem 0.5rem 0.5rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 0.5rem;
+}
+
+.task-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.task-header {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0.3rem;
 }
 
-.taskCard ul{
- list-style: none;
+.task-title {
+  font-size: 14pt;
+  font-weight: 500;
+  color: var(--heading-purple);
+}
+
+.due-date {
+  font-size: 9pt;
+  color: #555;
+  font-weight: 500;
+  margin-left: 1em;
 }
 
 .nav-button:disabled {
   background-color: var(--background-color);
   cursor: not-allowed;
-} 
+}
 
 .nav-button:hover:not(:disabled) {
   background-color: #005a99;
 }
+
+
+
+
 </style>
