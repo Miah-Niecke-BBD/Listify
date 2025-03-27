@@ -25,7 +25,7 @@ const isLoading = computed(() => route.name === "loading");
 
 @media (max-width: 700px) {
   .main-content {
-    padding-left: 2em;
+    padding-left: 4em;
   }
 }
 </style>
