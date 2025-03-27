@@ -1,423 +1,375 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, ref } from 'vue';
+import { ref, computed, onMounted, nextTick } from 'vue';
 
 interface Task {
-  id: string;
-  title: string;
+  taskID: number;
+  taskName: string;
+  createdAt?: string;
+  projectID: number;
   completed: boolean;
-  description?: string;
-  dueDate?: string;
-  priority?: string | null;
-  project?: string;
 }
 
-const props = defineProps<{
-  tasks: Task[];
-  projects: { id: string; name: string }[];
-}>();
-
-const emit = defineEmits(['toggle-completion', 'add-task', 'quick-add-task']);
-
+const tasks = ref<Task[]>([]);
 const newTaskInput = ref('');
+const isLoading = ref(false);
+const error = ref<string | null>(null);
+const currentProjectID = ref<number>(1); // Dummy project ID
 
-function toggleCompletion(id: string) {
-  emit('toggle-completion', id);
-}
+const isTasksEmpty = computed(() => tasks.value.length === 0);
 
-function openAddTaskDialog() {
-  emit('add-task');
-}
+// Load dummy tasks on mount
+const loadTasks = () => {
+  tasks.value = [
+    { taskID: 1, taskName: "Buy groceries", createdAt: "2025-03-27", projectID: 1, completed: false },
+    { taskID: 2, taskName: "Finish report", createdAt: "2025-03-26", projectID: 1, completed: true }
+  ];
+};
 
-function quickAddTask() {
-  if (newTaskInput.value.trim()) {
-    const newTask: Task = {
-      id: `task-${Date.now()}`, // Fixed syntax error
-      title: newTaskInput.value,
-      completed: false,
-      priority: null
-    };
-    emit('quick-add-task', newTask);
-    newTaskInput.value = '';
-  }
-}
+// Add a new task locally
+const quickAddTask = () => {
+  if (!newTaskInput.value.trim()) return;
+  const newTask: Task = {
+    taskID: tasks.value.length + 1,
+    taskName: newTaskInput.value,
+    createdAt: new Date().toISOString().split('T')[0], // YYYY-MM-DD
+    projectID: currentProjectID.value,
+    completed: false
+  };
+  tasks.value.unshift(newTask);
+  newTaskInput.value = '';
+};
 
-function formatDate(dateString?: string) {
-  if (!dateString) return '';
-  try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return 'Invalid Date'; // Handle invalid dates
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+// Format date
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+};
 
-    if (date.toDateString() === today.toDateString()) {
-      return 'Today';
-    }
-    if (date.toDateString() === tomorrow.toDateString()) {
-      return 'Tomorrow';
-    }
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
-    });
-  } catch (error) {
-    return 'Invalid Date';
-  }
-}
-
-function getProjectName(projectId?: string) {
-  if (!projectId) return null;
-  const project = props.projects.find(p => p.id === projectId);
-  return project ? project.name : null;
-}
+// Initialize on mount
+onMounted(() => {
+  loadTasks();
+  nextTick(() => {
+    const inputElement = document.querySelector('.task-input') as HTMLInputElement;
+    if (inputElement) inputElement.focus();
+  });
+});
 </script>
 
 <template>
-  <div class="task-list">
-    <h2 class="my-list-header">My Tasks</h2>
+  <main class="task-container">
+    <header class="task-header">
+      <h1 class="app-title">My Tasks</h1>
+    </header>
 
-    <div class="task-input-container">
-      <div class="input-with-button">
-        <input
-          v-model="newTaskInput"
-          type="text"
-          placeholder="Add a new task..."
-          class="task-input"
-          @keyup.enter="quickAddTask"
-          aria-label="New task input"
-        >
-        <button
-          @click="quickAddTask"
-          class="quick-add-btn"
-          aria-label="Quick add task"
-        >
-          +
-        </button>
-      </div>
-    </div>
+    <!-- Error display -->
+    <section v-if="error" class="error-message">
+      <p>{{ error }}</p>
+      <button @click="error = null" class="error-close-btn">×</button>
+    </section>
 
-    <div v-if="tasks.length === 0" class="empty-state">
-      <div class="empty-icon">📋</div>
-      <h3>No tasks yet</h3>
-      <p>Add your first task to get started</p>
-      <button @click="openAddTaskDialog" class="add-first-task-btn">
-        + Add Your First Task
-      </button>
-    </div>
+    <!-- Task input -->
+    <section class="task-input-section">
+      <form @submit.prevent="quickAddTask" class="task-form">
+        <input v-model="newTaskInput" type="text" placeholder="Add a new task..." class="task-input" />
+        <button type="submit" class="add-task-btn">+ Add Task</button>
+      </form>
+    </section>
 
-    <div v-else class="task-items">
-      <article
-        v-for="task in tasks"
-        :key="task.id"
-        class="task-card"
-        :class="{ 'completed': task.completed }"
-      >
-        <section class="task-content">
-          <button
-            @click="() => toggleCompletion(task.id)"
-            class="task-toggle"
-            :class="{ 'checked': task.completed }"
-            :aria-label="task.completed ? 'Mark task as incomplete' : 'Mark task as complete'"
-          >
-            <span v-if="task.completed" class="check-mark">✓</span>
-          </button>
-          <section class="task-details">
-            <h3 class="task-title" :class="{ 'completed': task.completed }">
-              {{ task.title }}
-            </h3>
-            <p v-if="task.description" class="task-description">
-              {{ task.description }}
-            </p>
-            <section class="task-meta">
-              <span v-if="task.dueDate" class="task-date">
-                <span class="meta-icon">📅</span>
-                {{ formatDate(task.dueDate) }}
-              </span>
-              <span
-                v-if="task.priority"
-                class="task-priority"
-                :class="task.priority"
-              >
-                <span class="meta-icon">🔔</span>
-                {{ task.priority }}
-              </span>
-              <span
-                v-if="getProjectName(task.project)"
-                class="task-project"
-              >
-                <span class="meta-icon">📁</span>
-                {{ getProjectName(task.project) }}
-              </span>
-            </section>
-          </section>
-        </section>
-      </article>
-    </div>
-  </div>
+    <!-- Tasks list -->
+    <section class="tasks-section">
+      <h2 class="tasks-heading">Tasks</h2>
+
+      <template v-if="isTasksEmpty">
+        <p class="empty-state-text">No tasks found. Add your first task above!</p>
+      </template>
+
+      <ul v-else class="task-list">
+        <li v-for="task in tasks" :key="task.taskID" class="task-item">
+          <input type="checkbox" v-model="task.completed" />
+          <h3 class="task-title" :class="{ 'completed-task': task.completed }">{{ task.taskName }}</h3>
+          <p>Created: {{ formatDate(task.createdAt) }}</p>
+        </li>
+      </ul>
+    </section>
+  </main>
 </template>
 
+
 <style scoped>
-.task-list {
-  max-width: 800px;
-  margin: 0 auto;
+.task-container {
+  width: 100%;
+  margin-left: -30px;
+  padding: 0 1.25rem 0 calc(250px - 0.5rem);
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
-.my-list-header {
-  font-size: 24px;
+.task-header {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 1rem 0;
+  margin-bottom: 1.5rem;
+}
+
+.app-title {
+  font-size: 1.5rem;
   font-weight: 600;
-  margin-bottom: 20px;
-  background: linear-gradient(135deg, #000000 0%, #333333 100%); /* Improved gradient */
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  display: inline-block;
+  color: #333;
+  margin: 0;
 }
 
-.task-input-container {
-  margin-bottom: 24px;
+.task-input-section {
+  margin-bottom: 1.5rem;
+  width: 100%;
 }
 
-.input-with-button {
+.task-form {
   display: flex;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  background-color: var(--card-bg);
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
 }
 
 .task-input {
   flex: 1;
-  padding: 12px 16px;
-  border: none;
-  font-size: 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
   outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
 }
 
-.quick-add-btn {
-  background-color: var(--bg-secondary);
-  border: none;
-  width: 40px;
-  font-size: 18px;
-  color: var(--text-secondary);
-  transition: all 0.2s;
-  cursor: pointer;
+.task-input:focus {
+  border-color: #8b53ff;
 }
 
-.quick-add-btn:hover {
-  background-color: var(--primary-color);
-  color: white;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--text-secondary);
-  background-color: var(--card-bg);
-  border-radius: 8px;
-  border: 1px dashed var(--border-color);
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.empty-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
-}
-
-.empty-state h3 {
-  font-size: 18px;
-  color: var(--text-primary);
-}
-
-.empty-state p {
-  font-size: 14px;
-  margin-bottom: 16px;
-}
-
-.add-first-task-btn {
-  background-color: var(--primary-color);
+.add-task-btn {
+  background-color: #8b53ff;
   color: white;
   border: none;
-  border-radius: 6px;
-  padding: 10px 18px;
-  font-size: 14px;
-  font-weight: 500;
+  border-radius: 0.25rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
   cursor: pointer;
   transition: background-color 0.2s;
+  white-space: nowrap;
 }
 
-.add-first-task-btn:hover {
-  background-color: var(--primary-dark);
+.add-task-btn:hover:not(:disabled) {
+  background-color: #7b46e6;
 }
 
-.task-items {
+.add-task-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.tasks-section {
+  background-color: #f9f9fb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  width: 100%;
+}
+
+.tasks-heading {
+  font-size: 1rem;
+  color: #333;
+  margin: 0 0 1rem 0;
+  font-weight: 600;
+}
+
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0.5rem;
+  width: 100%;
 }
 
-.task-card {
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 16px;
-  background-color: var(--card-bg);
-  transition: all 0.2s ease;
-  box-shadow: var(--shadow-sm);
-}
-
-.task-card:hover {
-  box-shadow: var(--shadow-md);
-}
-
-.task-card.completed {
-  opacity: 0.8;
-  background-color: var(--bg-secondary);
-}
-
-.task-content {
-  display: flex;
-  align-items: flex-start;
-}
-
-.task-toggle {
-  width: 22px;
-  height: 22px;
-  border: 2px solid var(--border-color);
-  border-radius: 50%;
-  margin-right: 16px;
-  margin-top: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.task-toggle:hover {
-  border-color: var(--primary-color);
-  background-color: var(--hover-color);
-}
-
-.task-toggle.checked {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-}
-
-.check-mark {
-  color: white;
-  font-size: 12px;
-}
-
-.task-details {
-  flex: 1;
+.task-item {
+  display: block;
+  background-color: white;
+  border-radius: 0.25rem;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .task-title {
-  margin: 0 0 8px 0;
-  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.875rem;
   font-weight: 500;
-  color: var(--text-primary);
+  color: #333;
 }
 
-.task-title.completed {
-  text-decoration: line-through;
-  color: var(--text-secondary);
-}
-
-.task-description {
-  margin: 0 0 12px 0;
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.5;
+.notebook-icon-small {
+  color: #8b53ff;
+  flex-shrink: 0;
 }
 
 .task-meta {
+  margin-top: 0.5rem;
+}
+
+.task-meta dl {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  font-size: 12px;
+  gap: 0.75rem;
+  margin: 0;
 }
 
-.task-date, .task-priority, .task-project {
+.task-meta dt {
+  font-weight: 500;
+  color: #666;
+}
+
+.task-meta dd {
+  margin: 0;
+  color: #888;
+  background-color: #f5f5f5;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  border: 1px solid #e0e0e0;
+}
+
+.loading-indicator {
+  text-align: center;
+  padding: 1rem;
+  color: #666;
+}
+
+.empty-state-icon {
+  margin-bottom: 1rem;
+}
+
+.empty-state-text {
+  color: #666;
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 0.75rem 1rem;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 4px 8px;
-  border-radius: 4px;
-  background-color: var(--bg-secondary);
-  color: var(--text-secondary);
 }
 
-.meta-icon {
-  margin-right: 4px;
-  font-size: 12px;
+.error-close-btn {
+  background: none;
+  border: none;
+  color: #c62828;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 0.5rem;
 }
 
-.task-priority.high {
-  background-color: var(--priority-high);
-  color: var(--priority-high-text);
-}
-
-.task-priority.medium {
-  background-color: var(--priority-medium);
-  color: var(--priority-medium-text);
-}
-
-.task-priority.low {
-  background-color: var(--priority-low);
-  color: var(--priority-low-text);
-}
-
-/* Enhanced responsiveness */
-@media (max-width: 768px) {
-  .task-list {
-    padding: 0 16px; /* Add padding for smaller screens */
+/* Responsive styles */
+@media (max-width: 1024px) {
+  .task-container {
+    padding-left: calc(200px - 0.5rem);
   }
-
-  .task-meta {
+  .task-meta dl {
     flex-direction: column;
-    gap: 8px;
+    gap: 0.25rem;
   }
+}
 
-  .input-with-button {
+@media (max-width: 768px) {
+  .task-container {
+    padding: 0 0.9375rem;
+  }
+  .task-header {
+    padding: 0.75rem 0;
+  }
+  .app-title {
+    font-size: 1.25rem;
+  }
+  .task-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .task-input {
+    margin-bottom: 0.5rem;
+  }
+  .add-task-btn {
     width: 100%;
+    padding: 0.75rem;
   }
-
-  .quick-add-btn {
-    min-width: 40px;
-  }
-
-  .task-card {
-    padding: 12px; /* Slightly reduce padding */
+  .task-item {
+    padding: 0.75rem;
   }
 }
 
 @media (max-width: 480px) {
+  .task-container {
+    padding: 0 0.625rem;
+  }
+  .task-header {
+    margin-bottom: 1rem;
+  }
+  .app-title {
+    font-size: 1.125rem;
+  }
+  .tasks-section {
+    padding: 0.75rem;
+  }
+  .empty-state-icon {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 768px) and (orientation: landscape) {
+  .task-form {
+    flex-direction: row;
+  }
   .task-input {
-    font-size: 13px; /* Slightly smaller text */
+    margin-bottom: 0;
   }
-
-  .quick-add-btn {
-    width: 36px; /* Slightly smaller button */
-    font-size: 16px;
+  .add-task-btn {
+    width: auto;
   }
-
-  .add-first-task-btn {
-    padding: 8px 16px; /* Adjust button size */
-    font-size: 13px;
+  .task-meta dl {
+    flex-direction: row;
   }
+}
 
-  .task-title {
-    font-size: 14px; /* Smaller title */
+/* High contrast mode support */
+@media (forced-colors: active) {
+  .task-item {
+    border: 1px solid ButtonText;
   }
+  .task-meta dd {
+    border: 1px solid ButtonText;
+  }
+}
 
-  .task-description {
-    font-size: 13px; /* Smaller description */
+/* Print styles */
+@media print {
+  .task-container {
+    padding: 0;
+  }
+  .add-task-btn,
+  .task-input-section {
+    display: none;
+  }
+  .task-item {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: 1px solid #ddd;
+    margin-bottom: 0.5rem;
+  }
+  .task-header {
+    text-align: center;
+    margin-bottom: 1rem;
   }
 }
 </style>
