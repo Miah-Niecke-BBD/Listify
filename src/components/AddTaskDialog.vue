@@ -1,154 +1,182 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import SideBar from '@/components/icons/SideBar.vue'
-import TaskList from '@/views/TaskList.vue'
-import AddTaskDialog from '@/components/AddTaskDialog.vue'
-import AddTeamDialog from '@/components/AddTeamDialog.vue'
+import { ref, watch } from 'vue';
 
-interface Task {
-  id: string;
-  title: string;
-  completed: boolean;
-  description?: string;
-  dueDate?: string;
-  priority?: string | null;
-  project?: string;
-}
-
-interface Team {
-  id: string;
-  name: string;
-  color: string;
-}
-
-const tasks = ref<Task[]>([
-  {
-    id: '1',
-    title: 'Complete project proposal',
-    completed: false,
-    description: 'Write up the project proposal for the new client',
-    dueDate: '2023-12-15',
-    priority: 'high'
+// Define props
+const props = defineProps({
+  isOpen: {
+    type: Boolean,
+    required: true
   },
-  {
-    id: '2',
-    title: 'Review code changes',
-    completed: true,
-    description: 'Review pull requests from the team',
-    dueDate: '2023-12-10',
-    priority: 'medium'
+  projects: {
+    type: Array,
+    required: true
   }
-])
+});
 
-const projects = ref([
-  { id: 'p1', name: 'Work' },
-  { id: 'p2', name: 'Personal' }
-])
+// Define emits
+const emit = defineEmits(['close', 'save-task']);
 
-const teams = ref<Team[]>([
-  { id: 't1', name: 'My Project Team', color: '#8b53ff' }
-])
+// Form state
+const title = ref('');
+const description = ref('');
+const dueDate = ref('');
+const priority = ref<number>(0);
+const projectID = ref<number | null>(null);
+const error = ref<string | null>(null);
+const isSubmitting = ref(false);
 
-const isAddTaskDialogOpen = ref(false)
-const isAddTeamDialogOpen = ref(false)
+// API base URL
+const API_BASE_URL = 'http://localhost:8080';
 
-function toggleTaskCompletion(id: string) {
-  const taskIndex = tasks.value.findIndex(task => task.id === id)
-  if (taskIndex !== -1) {
-    tasks.value[taskIndex].completed = !tasks.value[taskIndex].completed
+// Reset form when dialog opens/closes
+watch(() => props.isOpen, (isOpen) => {
+  if (isOpen) {
+    // Initialize with default values when dialog opens
+    title.value = '';
+    description.value = '';
+    dueDate.value = '';
+    priority.value = 0;
+    projectID.value = null;
+    error.value = null;
   }
+});
+
+// Close dialog
+function closeDialog() {
+  emit('close');
 }
 
-function openAddTaskDialog() {
-  isAddTaskDialogOpen.value = true
-}
-
-function closeAddTaskDialog() {
-  isAddTaskDialogOpen.value = false
-}
-
-function openAddTeamDialog() {
-  isAddTeamDialogOpen.value = true
-}
-
-function closeAddTeamDialog() {
-  isAddTeamDialogOpen.value = false
-}
-
-interface AddTaskDialogData {
-  title: string;
-  description: string;
-  dueDate: string;
-  priority: string | null;
-  project: string;
-}
-
-function saveTask(taskData: AddTaskDialogData) {
-  const newTask: Task = {
-    id: Date.now().toString(),
-    title: taskData.title,
-    completed: false,
-    description: taskData.description,
-    dueDate: taskData.dueDate,
-    priority: taskData.priority,
-    project: taskData.project !== 'none' ? taskData.project : undefined
+// Save task
+async function saveTask() {
+  if (!title.value.trim()) {
+    error.value = 'Task title is required';
+    return;
   }
-  tasks.value.push(newTask)
-  closeAddTaskDialog()  // Ensure dialog closes after saving
-}
 
-function quickAddTask(newTask: Task) {
-  tasks.value.push(newTask)
-}
-
-interface TeamData {
-  name: string;
-  color: string;
-}
-
-function saveTeam(teamData: TeamData) {
-  const newTeam: Team = {
-    id: Date.now().toString(),
-    name: teamData.name,
-    color: teamData.color
+  if (!projectID.value) {
+    error.value = 'Please select a project';
+    return;
   }
-  teams.value.push(newTeam)
-  closeAddTeamDialog()  // Ensure dialog closes after saving
+
+  isSubmitting.value = true;
+  error.value = null;
+
+  try {
+    const taskData = {
+      taskName: title.value,
+      taskDescription: description.value,
+      dueDate: dueDate.value || null,
+      taskPriority: priority.value,
+      projectID: projectID.value,
+      completed: false
+    };
+
+    const response = await fetch(`${API_BASE_URL}/tasks`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(taskData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      throw new Error(`Failed to create task: ${JSON.stringify(errorData) || response.statusText}`);
+    }
+
+    const createdTask = await response.json();
+    emit('save-task', createdTask);
+    closeDialog();
+  } catch (err) {
+    console.error('Error adding task:', err);
+    error.value = `Error adding task: ${err instanceof Error ? err.message : String(err)}`;
+  } finally {
+    isSubmitting.value = false;
+  }
 }
 </script>
 
 <template>
-  <div class="app-container">
-    <SideBar
-      :teams="teams"
-      @open-team-dialog="openAddTeamDialog"
-    />
-    <main class="main-content">
-      <div class="task-header">
-        <h1>My Tasks</h1>
-        <button @click="openAddTaskDialog" class="add-task-btn">+ Add Task</button>
+  <div v-if="isOpen" class="dialog-overlay" @click.self="closeDialog">
+    <div class="dialog-container">
+      <div class="dialog-header">
+        <h2 class="dialog-title">Add New Task</h2>
+        <p class="dialog-subtitle">Create a new task to keep track of your work</p>
       </div>
-      <TaskList
-        :tasks="tasks"
-        :projects="projects"
-        @toggle-completion="toggleTaskCompletion"
-        @add-task="openAddTaskDialog"
-        @quick-add-task="quickAddTask"
-      />
-    </main>
 
-    <AddTaskDialog
-      :is-open="isAddTaskDialogOpen"
-      :projects="projects"
-      @close="closeAddTaskDialog"
-      @save-task="saveTask"
-    />
+      <!-- Error message -->
+      <div v-if="error" class="error-message">
+        {{ error }}
+        <button @click="error = null" class="error-close-btn">×</button>
+      </div>
 
-    <AddTeamDialog
-      :is-open="isAddTeamDialogOpen"
-      @close="closeAddTeamDialog"
-      @save-team="saveTeam"
-    />
+      <form @submit.prevent="saveTask" class="dialog-form">
+        <div class="form-group">
+          <label for="task-title" class="form-label">Task Title *</label>
+          <input
+            id="task-title"
+            v-model="title"
+            type="text"
+            class="form-input"
+            placeholder="Enter task title"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="task-description" class="form-label">Description</label>
+          <textarea
+            id="task-description"
+            v-model="description"
+            class="form-textarea"
+            placeholder="Enter task description"
+          ></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="task-due-date" class="form-label">Due Date</label>
+            <input
+              id="task-due-date"
+              v-model="dueDate"
+              type="date"
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="task-priority" class="form-label">Priority</label>
+            <select id="task-priority" v-model="priority" class="form-select">
+              <option :value="0">Low</option>
+              <option :value="1">Medium</option>
+              <option :value="2">High</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="task-project" class="form-label">Project *</label>
+          <select id="task-project" v-model="projectID" class="form-select" required>
+            <option :value="null" disabled>Select a project</option>
+            <option v-for="project in projects" :key="project.id" :value="project.id">
+              {{ project.name }}
+            </option>
+          </select>
+          <p class="form-help">Tasks must be associated with a project</p>
+        </div>
+      </form>
+
+      <div class="dialog-footer">
+        <button @click="closeDialog" class="cancel-btn">Cancel</button>
+        <button
+          @click="saveTask"
+          class="save-btn"
+          :disabled="isSubmitting"
+        >
+          {{ isSubmitting ? 'Saving...' : 'Save Task' }}
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -168,13 +196,13 @@ function saveTeam(teamData: TeamData) {
 }
 
 .dialog-container {
-  background-color: var(--card-bg);
+  background-color: white;
   border-radius: 12px;
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   animation: slideIn 0.3s ease;
 }
 
@@ -187,11 +215,11 @@ function saveTeam(teamData: TeamData) {
   font-size: 20px;
   font-weight: 600;
   margin-bottom: 8px;
-  color: var(--text-primary);
+  color: #333;
 }
 
 .dialog-subtitle {
-  color: var(--text-secondary);
+  color: #666;
   font-size: 14px;
 }
 
@@ -218,7 +246,7 @@ function saveTeam(teamData: TeamData) {
   font-size: 14px;
   font-weight: 500;
   margin-bottom: 8px;
-  color: var(--text-primary);
+  color: #333;
 }
 
 .form-input,
@@ -226,10 +254,10 @@ function saveTeam(teamData: TeamData) {
 .form-textarea {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid var(--border-color);
+  border: 1px solid #e0e0e0;
   border-radius: 6px;
   font-size: 14px;
-  background-color: var(--card-bg);
+  background-color: white;
   transition: border-color 0.2s;
 }
 
@@ -237,7 +265,7 @@ function saveTeam(teamData: TeamData) {
 .form-select:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: var(--primary-color);
+  border-color: #8b53ff;
   box-shadow: 0 0 0 2px rgba(139, 83, 255, 0.1);
 }
 
@@ -247,7 +275,7 @@ function saveTeam(teamData: TeamData) {
 }
 
 .form-help {
-  color: var(--text-secondary);
+  color: #666;
   font-size: 12px;
   margin-top: 4px;
 }
@@ -256,39 +284,67 @@ function saveTeam(teamData: TeamData) {
   display: flex;
   justify-content: flex-end;
   padding: 16px 24px;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid #e0e0e0;
   margin-top: 24px;
   gap: 12px;
 }
 
 .cancel-btn {
   padding: 10px 16px;
-  background-color: var(--bg-secondary);
-  border: 1px solid var(--border-color);
+  background-color: #f5f5f5;
+  border: 1px solid #e0e0e0;
   border-radius: 6px;
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-primary);
+  color: #333;
   transition: background-color 0.2s ease;
+  cursor: pointer;
 }
 
 .cancel-btn:hover {
-  background-color: var(--hover-color);
+  background-color: #eeeeee;
 }
 
 .save-btn {
   padding: 10px 16px;
-  background-color: var(--primary-color);
+  background-color: #8b53ff;
   color: white;
   border: none;
   border-radius: 6px;
   font-size: 14px;
   font-weight: 500;
   transition: background-color 0.2s ease;
+  cursor: pointer;
 }
 
-.save-btn:hover {
-  background-color: var(--primary-dark);
+.save-btn:hover:not(:disabled) {
+  background-color: #7b46e6;
+}
+
+.save-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 0.75rem 1rem;
+  margin: 0 24px 16px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.error-close-btn {
+  background: none;
+  border: none;
+  color: #c62828;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 0.5rem;
 }
 
 @keyframes fadeIn {
