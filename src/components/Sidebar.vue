@@ -78,11 +78,11 @@ const toggleModal = () => {
 
     <nav class="sidebar-nav" aria-label="Main navigation" v-if="!collapsed">
       <section class="nav-section" v-if="!collapsed">
-        <h2 class="nav-section-title">My Lists</h2>
+        <h2 class="nav-section-title">Home Page</h2>
         <ul class="nav-list">
           <li class="nav-item">
-            <RouterLink to="/tasklist" class="nav-link" title="My List">
-              <span v-if="!collapsed">All Tasks</span>
+            <RouterLink to="/tutorial" class="nav-link" title="My List">
+              <span v-if="!collapsed">Introduction</span>
             </RouterLink>
           </li>
         </ul>

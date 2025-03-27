@@ -31,7 +31,7 @@ onMounted(async () => {
         } else if (user) {
           newUser.value = false;
           console.log("User:", user);
-          router.push("/tasklist");
+          router.push("/tutorial");
         }
       }
     } catch (error) {
