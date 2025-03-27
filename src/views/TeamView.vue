@@ -20,8 +20,11 @@ import {
   deleteProject,
   addProjectAssignee,
   deleteProjectAssignee,
+  deleteTeam,
 } from "@/api/TeamApiCalls";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const route = useRoute();
 const teamID = route.params.id as string;
 const loggedInMemberId: string = localStorage.getItem("loggedInUser") ?? "";
@@ -154,6 +157,15 @@ const removeAProjectAssignee = async (projectID: number, googleID: string) => {
   }
 };
 
+const deleteATeam = async () => {
+  try {
+    await deleteTeam(teamID);
+    router.push(`/tasklist`);
+  } catch (error) {
+    throw error;
+  }
+};
+
 const activeTab = ref("members");
 </script>
 
@@ -166,13 +178,14 @@ const activeTab = ref("members");
       :updateTeamName="updateTeamName"
       :teamMembers="teamMembers"
       :changeTeamLeader="changeTeamLeader"
+      :deleteTeam="deleteATeam"
     />
 
     <nav class="tabs">
       <button :class="{ active: activeTab === 'members' }" @click="activeTab = 'members'">
         <svg
-          width="20"
-          height="20"
+          width="24"
+          height="24"
           viewBox="0 0 24 24"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -187,8 +200,8 @@ const activeTab = ref("members");
 
       <button :class="{ active: activeTab === 'projects' }" @click="activeTab = 'projects'">
         <svg
-          width="20"
-          height="20"
+          width="24"
+          height="24"
           viewBox="0 0 24 24"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -226,25 +239,26 @@ const activeTab = ref("members");
 .team-view {
   display: flex;
   flex-direction: column;
-  padding: 0.5em;
-  margin: 2em 5em;
+  margin: 2em;
+  margin-bottom: 0;
   width: 100%;
+  container-type: inline-size;
 }
 
 .tabs {
   display: flex;
-  gap: 1em;
 }
 
 .tabs button {
   font-size: 13pt;
-  padding: 0.8em;
+  margin: 0.5em 0.5em 1em;
   cursor: pointer;
   border: none;
   background: none;
   display: flex;
   align-items: center;
   gap: 0.5em;
+  position: relative;
 }
 
 .tabs button.active {
@@ -253,16 +267,19 @@ const activeTab = ref("members");
   font-weight: bold;
 }
 
-.tabs button svg {
-  fill: currentColor;
-}
-
 .team-view svg {
   color: var(--primary-color);
 }
-@media (max-width: 900px) {
+
+@container (max-width: 650px) {
   .team-view {
-    margin: 2em;
+    margin: 1.5em;
+  }
+}
+
+@container (max-width: 250px) {
+  .tabs {
+    flex-direction: column;
   }
 }
 </style>
