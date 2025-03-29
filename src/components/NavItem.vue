@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRoute } from "vue-router";
 import type { TeamInterface, ProjectInterface } from '@/models/TeamInterface'
 
 import IconDownTriangle from '@/components/icons/IconDownTraingle.vue'
@@ -11,6 +12,7 @@ const props = defineProps<{
   teams: TeamInterface[]
 }>()
 
+const route = useRoute();
 
 const activeDropdowns = ref<Set<number>>(new Set<number>())
 
@@ -21,6 +23,10 @@ const toggleDropdown = (index: number) => {
     activeDropdowns.value.add(index)
   }
 }
+
+const isTeamActive = (path: string) => {
+  return route.path.startsWith(path);
+}
 </script>
 
 <template>
@@ -28,7 +34,7 @@ const toggleDropdown = (index: number) => {
     <li v-for="(team, index) in props.teams" :key="team.teamID" class="nav-item">
       <header class="inline">
         <nav>
-        <RouterLink :to="'/team/' + team.teamID" class="nav-link">
+        <RouterLink :to="'/team/' + team.teamID" class="nav-link" :class="{ active: isTeamActive(`/team/${team.teamID}`) }">
           {{ team.teamName }}
         </RouterLink>
       </nav>
@@ -88,6 +94,13 @@ const toggleDropdown = (index: number) => {
 .nav-link:hover,
 .nav-link2:hover {
   background-color: rgb(241, 241, 241);
+}
+
+.nav-link.active {
+  background-color: var(--button-hover-bg);
+  color: var(--primary-color);
+  font-weight: bold;
+  border-radius: 5px;
 }
 
 .inline {
