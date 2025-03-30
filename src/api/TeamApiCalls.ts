@@ -53,12 +53,7 @@ export const fetchTeamMembers = async (teamID: string): Promise<TeamMember[]> =>
 
         const data: TeamMember[] = await response.json();
 
-        const updatedMembers: TeamMember[] = data.map((member) => {
-            member.name = "Random Name";
-            return member;
-        });
-
-        return updatedMembers;
+        return data;
     } catch (error) {
         console.error("Error fetching team members:", error);
         throw error;
@@ -179,12 +174,7 @@ export const addTeamMember = async (teamID: string, googleID: string): Promise<T
 
         const data: TeamMember[] = await response.json();
 
-        const updatedMembers: TeamMember[] = data.map((member) => {
-            member.name = "Random Name";
-            return member;
-        });
-
-        return updatedMembers;
+        return data;
     } catch (error) {
         throw error
     }

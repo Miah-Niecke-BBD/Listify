@@ -68,8 +68,7 @@ const updateTeamLeader = () => {
           </svg>
 
           <section class="member-details">
-            <p class="member-name">{{ member.name }}</p>
-            <p class="member-id">ID: {{ member.githubID }}</p>
+            <p class="member-name">{{ member.githubID }}</p>
           </section>
         </li>
       </ul>

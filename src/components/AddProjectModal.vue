@@ -33,8 +33,8 @@ const createProject = () => {
 
 <template>
   <section v-if="isVisible" class="project-modal">
-    <article class="modal-content">
-      <h3 class="modal-header">Please enter project name to add a new project</h3>
+    <form class="modal-content">
+      <label class="modal-header">Please enter project name to add a new project</label>
       <input
         v-model="newProjectName"
         maxlength="100"
@@ -43,7 +43,7 @@ const createProject = () => {
         class="modal-input"
         required
       />
-      <h3 class="modal-header">Add a description if you wish to the new project</h3>
+      <label class="modal-header">Add a description if you wish to the new project</label>
       <textarea
         v-model="description"
         maxlength="500"
@@ -53,10 +53,10 @@ const createProject = () => {
         placeholder="Enter description"
       ></textarea>
       <footer class="modal-footer">
-        <button @click="createProject" class="modal-btn">Add Project</button>
+        <button for="add-project" @click="createProject" class="modal-btn">Add Project</button>
         <button @click="closeModal" class="modal-btn">Cancel</button>
       </footer>
-    </article>
+    </form>
   </section>
 </template>
 
@@ -82,6 +82,12 @@ const createProject = () => {
   flex-direction: column;
   align-items: center;
   min-width: 30em;
+}
+
+.modal-content label {
+  font-size: 13pt;
+  font-weight: bold;
+  color: var(--heading-purple);
 }
 
 .modal-header {

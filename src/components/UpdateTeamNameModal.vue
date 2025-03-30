@@ -6,54 +6,32 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
-  mode: {
-    type: String,
-    required: true, // "addMember" or "updateTeamName"
-  },
   onClose: {
     type: Function,
     required: true,
   },
-  onAddMember: {
-    type: Function,
-    required: false,
-  },
   onUpdateTeamName: {
     type: Function,
-    required: false,
+    required: true,
   },
 });
 
-const newMemberId = ref<number | null>(null);
 const newTeamName = ref<string>("");
 const errorMessage = ref<string | null>(null);
 
 const closeModal = () => {
-  newMemberId.value = null;
   newTeamName.value = "";
   errorMessage.value = null;
   props.onClose();
 };
 
-const handleAction = async () => {
-  if (props.mode === "updateTeamName" && props.onUpdateTeamName) {
-    props.onUpdateTeamName(newTeamName.value);
-    closeModal();
-  } else if (props.mode === "addMember" && props.onAddMember) {
+const handleUpdateTeamName = async () => {
+  if (props.onUpdateTeamName) {
     try {
-      await props.onAddMember(newMemberId.value);
+      await props.onUpdateTeamName(newTeamName.value);
       closeModal();
     } catch (error: any) {
-      if (error.message.includes("404")) {
-        errorMessage.value = `User id: ${newMemberId.value} does not exist`;
-      } else if (
-        error.message.includes("403") &&
-        error.message.includes("already a member of team")
-      ) {
-        errorMessage.value = `User id: ${newMemberId.value} is already added to the team`;
-      } else {
-        errorMessage.value = error.message;
-      }
+      errorMessage.value = error.message;
     }
   }
 };
@@ -63,20 +41,10 @@ const handleAction = async () => {
   <section v-if="isVisible" class="modal">
     <article class="modal-content">
       <header class="modal-header">
-        <h3 v-if="mode === 'addMember'">Enter User ID to Add to Your Team</h3>
-        <h3 v-else>Update Team Name</h3>
+        <h3>Update Team Name</h3>
       </header>
 
       <input
-        v-if="mode === 'addMember'"
-        v-model="newMemberId"
-        type="text"
-        placeholder="Enter User ID"
-        class="modal-input"
-        required
-      />
-      <input
-        v-else
         v-model="newTeamName"
         type="text"
         placeholder="New Team Name"
@@ -86,9 +54,7 @@ const handleAction = async () => {
       />
       <p class="error-message">{{ errorMessage }}</p>
       <footer class="modal-footer">
-        <button @click="handleAction" class="modal-btn" type="submit">
-          {{ mode === "addMember" ? "Add Member" : "Update Name" }}
-        </button>
+        <button @click="handleUpdateTeamName" class="modal-btn" type="submit">Update Name</button>
         <button @click="closeModal" class="modal-btn">Cancel</button>
       </footer>
     </article>
