@@ -34,35 +34,36 @@ public class UserController {
 
     }
 
-
     @GetMapping("/create")
     public ResponseEntity<Users> createUser(HttpServletRequest request) {
-
+        System.out.println("Called");
         String googleID = (String) request.getAttribute("sub");
+        String email = (String) request.getAttribute("email");
 
-        if (!userService.userExistsByGitHubID(googleID)) {
-            userService.createUser(googleID);
+        if (!userService.userExistsByGitHubID(email)) {
+            userService.createUser(email);
         }
-        Users user = userService.getUserByGitHubID(googleID);
+        Users user = userService.getUserByGitHubID(email);
+        System.out.println(user);
         return ResponseEntity.ok(user);
 
     }
 
     @GetMapping
     public ResponseEntity<UserDTO> getUser(HttpServletRequest request) {
-
         String googleID = (String) request.getAttribute("sub");
+        String email = (String) request.getAttribute("email");
         String name = (String) request.getAttribute("name");
         UserDTO userDto = null;
-        Users user = userService.getUserByGitHubID(googleID);
+        Users user = userService.getUserByGitHubID(email);
 
-        if (userService.userExistsByGitHubID(googleID)) {
+        if (userService.userExistsByGitHubID(email)) {
             userDto = new UserDTO();
             userDto.setUsername(name);
             userDto.setUserID(user.getUserID());
-             userDto.setGithubID(googleID);
+            userDto.setGithubID(email);
         }
         return ResponseEntity.ok(userDto);
-    }
 
+    }
 }
