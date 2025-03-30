@@ -1,5 +1,7 @@
 package org.listify.controller;
 
+import java.util.List;
+
 import org.listify.dto.UserDTO;
 import org.listify.model.Users;
 import org.listify.service.UserService;
@@ -25,12 +27,12 @@ public class UserController {
 
     @DeleteMapping
     @Transactional
-    public ResponseEntity<?> deleteUser(@RequestParam("userID") Long userID , HttpServletRequest request) {
+    public ResponseEntity<?> deleteUser(@RequestParam("userID") Long userID, HttpServletRequest request) {
 
         Long currentUserID = userService.getUserIDFromAuthentication(request);
 
-            userService.deleteUserByUserID(userID ,currentUserID);
-            return ResponseEntity.noContent().build();
+        userService.deleteUserByUserID(userID, currentUserID);
+        return ResponseEntity.noContent().build();
 
     }
 
@@ -65,5 +67,11 @@ public class UserController {
         }
         return ResponseEntity.ok(userDto);
 
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<String>> getAllGitHubIDs() {
+        List<String> githubIds = userService.getAllGitHubIDs();
+        return ResponseEntity.ok(githubIds);
     }
 }
