@@ -80,8 +80,7 @@ public class JwtTokenFilter implements Filter {
 
             List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
 
-
-            Authentication authentication = new UsernamePasswordAuthenticationToken(sub, null, authorities);
+            Authentication authentication = new UsernamePasswordAuthenticationToken(email, null, authorities);
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 

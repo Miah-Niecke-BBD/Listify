@@ -76,7 +76,7 @@ public class UserService {
 
         if(request!=null)
         {
-            String googleID = (String) request.getAttribute("sub");
+            String googleID = (String) request.getAttribute("email");
 
             if(googleID!=null)
             {

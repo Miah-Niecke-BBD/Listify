@@ -38,15 +38,13 @@ public class UserController {
 
     @GetMapping("/create")
     public ResponseEntity<Users> createUser(HttpServletRequest request) {
-        System.out.println("Called");
         String googleID = (String) request.getAttribute("sub");
         String email = (String) request.getAttribute("email");
 
         if (!userService.userExistsByGitHubID(email)) {
             userService.createUser(email);
         }
-        Users user = userService.getUserByGitHubID(email);
-        System.out.println(user);
+        Users user = userService.getUserByGitHubID(email);;
         return ResponseEntity.ok(user);
 
     }
