@@ -27,11 +27,11 @@ onMounted(async () => {
         if (error) {
           newUser.value = true;
           const { user, error } = await CreateUser(response.jwtToken);
-          console.log("User:", user);
+     
           router.push("/tutorial");
         } else if (user) {
           newUser.value = false;
-          console.log("User:", user);
+  
           router.push("/tutorial");
         }
       }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import "@/assets/base.css";
-import AddTeamMemberModal from "@/components/EditTeamModal.vue";
+import UpateTeamNameModal from "@/components/UpdateTeamNameModal.vue";
 import { ref } from "vue";
 import ReassignLeaderModal from "./ReassignLeaderModal.vue";
 import type { TeamMember } from "@/models/TeamMember";
@@ -71,8 +71,7 @@ const deleteATeam = async () => {
         <button @click="deleteATeam">Delete Team</button>
       </section>
     </section>
-    <AddTeamMemberModal
-      mode="updateTeamName"
+    <UpateTeamNameModal
       :isVisible="isAddTeamMemberModalVisible"
       :onClose="closeModal"
       :onUpdateTeamName="updateTeamName"

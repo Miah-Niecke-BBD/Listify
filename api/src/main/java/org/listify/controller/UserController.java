@@ -1,5 +1,7 @@
 package org.listify.controller;
 
+import java.util.List;
+
 import org.listify.dto.UserDTO;
 import org.listify.model.Users;
 import org.listify.service.UserService;
@@ -25,44 +27,49 @@ public class UserController {
 
     @DeleteMapping
     @Transactional
-    public ResponseEntity<?> deleteUser(@RequestParam("userID") Long userID , HttpServletRequest request) {
+    public ResponseEntity<?> deleteUser(@RequestParam("userID") Long userID, HttpServletRequest request) {
 
         Long currentUserID = userService.getUserIDFromAuthentication(request);
 
-            userService.deleteUserByUserID(userID ,currentUserID);
-            return ResponseEntity.noContent().build();
+        userService.deleteUserByUserID(userID, currentUserID);
+        return ResponseEntity.noContent().build();
 
     }
 
-
     @GetMapping("/create")
     public ResponseEntity<Users> createUser(HttpServletRequest request) {
-
         String googleID = (String) request.getAttribute("sub");
+        String email = (String) request.getAttribute("email");
 
-        if (!userService.userExistsByGitHubID(googleID)) {
-            userService.createUser(googleID);
+        if (!userService.userExistsByGitHubID(email)) {
+            userService.createUser(email);
         }
-        Users user = userService.getUserByGitHubID(googleID);
+        Users user = userService.getUserByGitHubID(email);;
         return ResponseEntity.ok(user);
 
     }
 
     @GetMapping
     public ResponseEntity<UserDTO> getUser(HttpServletRequest request) {
-
         String googleID = (String) request.getAttribute("sub");
+        String email = (String) request.getAttribute("email");
         String name = (String) request.getAttribute("name");
         UserDTO userDto = null;
-        Users user = userService.getUserByGitHubID(googleID);
+        Users user = userService.getUserByGitHubID(email);
 
-        if (userService.userExistsByGitHubID(googleID)) {
+        if (userService.userExistsByGitHubID(email)) {
             userDto = new UserDTO();
             userDto.setUsername(name);
             userDto.setUserID(user.getUserID());
-             userDto.setGithubID(googleID);
+            userDto.setGithubID(email);
         }
         return ResponseEntity.ok(userDto);
+
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<String>> getAllGitHubIDs() {
+        List<String> githubIds = userService.getAllGitHubIDs();
+        return ResponseEntity.ok(githubIds);
+    }
 }

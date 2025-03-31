@@ -1,6 +1,7 @@
 package org.listify.service;
 
 import jakarta.servlet.http.HttpServletRequest;
+
 import org.listify.exception.BadRequestException;
 import org.listify.exception.ForbiddenException;
 import org.listify.exception.NotFoundException;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Service
@@ -74,7 +76,7 @@ public class UserService {
 
         if(request!=null)
         {
-            String googleID = (String) request.getAttribute("sub");
+            String googleID = (String) request.getAttribute("email");
 
             if(googleID!=null)
             {
@@ -121,6 +123,10 @@ public class UserService {
         {
             throw new NotFoundException("User with user ID: " + userID + " not found");
         }
+    }
+
+    public List<String> getAllGitHubIDs() {
+        return usersRepo.findAllGitHubIDs();
     }
 }
 

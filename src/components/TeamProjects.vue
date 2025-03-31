@@ -23,10 +23,15 @@ const props = defineProps<{
 
 const hoveredAssigneeKey = ref<string | null>(null);
 
-const getInitials = (name: string | undefined): string | undefined => {
-  if (!name) return undefined;
-  const nameParts = name.split(" ");
-  return nameParts.map((part) => part.charAt(0).toUpperCase()).join("");
+const getInitials = (email: string | undefined): string | undefined => {
+  if (!email) return undefined;
+
+  const localPart = email.split("@")[0];
+
+  return localPart
+    .split(".")
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
 };
 
 const emit = defineEmits(["addProject"]);
@@ -67,46 +72,49 @@ const closeMembersModal = () => {
               @mouseenter="hoveredAssigneeKey = assignee.githubID + '-' + project.projectID"
               @mouseleave="hoveredAssigneeKey = null"
             >
-              <p class="initials">{{ getInitials(assignee.name) }}</p>
+              <p class="initials">{{ getInitials(assignee.githubID) }}</p>
               <p
                 class="full-name"
                 v-if="hoveredAssigneeKey === assignee.githubID + '-' + project.projectID"
               >
-                {{ assignee.name }}
+                {{ assignee.githubID }}
               </p>
             </section>
           </li>
         </ul>
-        <button
-          v-if="loggedInMemberId === teamMembers.find((m) => m.teamLeader)?.githubID"
-          class="manage-btn"
-          aria-label="Manage Project Members"
-          @click="openMembersModal(project.projectID)"
-        >
-          Manage Members
-        </button>
-        <button
-          v-if="loggedInMemberId === teamMembers.find((m) => m.teamLeader)?.githubID"
-          class="delete-btn"
-          aria-label="Delete Project"
-          @click="deleteProject(project.projectID)"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="red"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+
+        <section class="buttons-container">
+          <button
+            v-if="loggedInMemberId === teamMembers.find((m) => m.teamLeader)?.githubID"
+            class="manage-btn"
+            aria-label="Manage Project Members"
+            @click="openMembersModal(project.projectID)"
           >
-            <path
-              d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m4 5v6m6-6v6"
-            />
-          </svg>
-        </button>
+            Manage Members
+          </button>
+          <button
+            v-if="loggedInMemberId === teamMembers.find((m) => m.teamLeader)?.githubID"
+            class="delete-btn"
+            aria-label="Delete Project"
+            @click="deleteProject(project.projectID)"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="red"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m4 5v6m6-6v6"
+              />
+            </svg>
+          </button>
+        </section>
       </li>
     </ul>
     <AddButton
@@ -145,23 +153,25 @@ const closeMembersModal = () => {
 
 .team-projects ul {
   list-style-type: none;
-  padding: 0.5em;
   display: flex;
-  flex-direction: column;
-  max-height: calc(100vh - 18em);
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1em;
+  max-height: calc(100vh - 24em);
   overflow-y: auto;
+  justify-content: left;
 }
 
 .project-item {
+  position: relative;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  padding: 1em 0.5em 1em 1em;
+  padding: 0.5em;
   border: 0.1em solid lightgrey;
   border-radius: 1em;
   box-shadow: 0.2em 0.1em 0.7em rgba(0, 0, 0, 0.2);
   margin-bottom: 1em;
-  position: relative;
+  min-width: 20em;
 }
 
 .project-name {
@@ -188,6 +198,7 @@ const closeMembersModal = () => {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  justify-content: left;
   gap: 0.5em;
   margin: 1em 0;
 }
@@ -211,18 +222,26 @@ const closeMembersModal = () => {
 
 .assignee .full-name {
   position: absolute;
+  word-wrap: break-word;
   background-color: transparent;
   color: var(--light-purple);
 }
 
-.delete-btn {
-  position: absolute;
+.buttons-container {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 1em;
+  margin-top: auto;
+}
+
+.delete-btn,
+.manage-btn {
   background: none;
   border: none;
-  top: 1.5em;
-  right: 2em;
   cursor: pointer;
+  font-weight: bold;
 }
+
 .delete-btn svg {
   stroke: red;
 }
@@ -231,26 +250,22 @@ const closeMembersModal = () => {
   stroke: darkred;
 }
 
-.manage-btn {
-  position: absolute;
-  font-weight: bold;
-  background-color: none;
-  border: none;
-  bottom: 1.5em;
-  right: 2em;
-  cursor: pointer;
-  background-color: transparent;
-}
-
 .manage-btn:hover {
   opacity: 0.75;
 }
 
-@container (max-width: 600px) {
-  .team-projects h2,
-  h3,
+@container (max-width: 450px) {
+  .team-projects h2 {
+    font-size: 18pt;
+  }
+  .team-projects h3 {
+    font-size: 12pt;
+  }
+  .team-projects ul {
+    flex-direction: row;
+  }
   .project-item {
-    word-wrap: break-word;
+    min-width: 100%;
   }
 }
 </style>

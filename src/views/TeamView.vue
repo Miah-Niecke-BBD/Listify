@@ -23,6 +23,7 @@ import {
   deleteTeam,
 } from "@/api/TeamApiCalls";
 import { useRouter } from "vue-router";
+import { getAllUserIDs } from "@/api/User";
 
 const router = useRouter();
 const route = useRoute();
@@ -33,6 +34,18 @@ const team = ref<Team | null>(null);
 const teamMembers = ref<TeamMember[]>([]);
 const teamProjects = ref<Project[]>([]);
 const teamName = ref("Loading...");
+const allUsers = ref<string[] | []>([]);
+
+const getAllUsers = async () => {
+  try {
+    const users = await getAllUserIDs();
+    if (users) {
+      allUsers.value = users;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
 
 onMounted(async () => {
   try {
@@ -42,6 +55,7 @@ onMounted(async () => {
     if (team.value?.teamName) {
       teamName.value = team.value.teamName;
     }
+    await getAllUsers();
   } catch (error) {
     throw error;
   }
@@ -222,6 +236,7 @@ const activeTab = ref("members");
       :loggedInMemberId="loggedInMemberId"
       :addAMember="addMemberToTeam"
       :deleteAMember="removeMember"
+      :allUsersID="allUsers"
     />
     <TeamProjects
       v-if="activeTab === 'projects'"
