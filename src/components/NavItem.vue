@@ -53,7 +53,7 @@ const isTeamActive = (path: string) => {
           </span>
         </li>
         <li v-if="team.projects && team.projects.length > 0"v-for="(project, projectIndex) in team.projects":key="project.projectID">
-          <RouterLink :to="'/projects/' + project.projectID" class="nav-link2">
+          <RouterLink :to="'/projects/' + project.projectID" class="nav-link2" :class="{ active: isTeamActive(`/projects/${project.projectID}`) }">
             <pre># </pre> {{ project.projectName }}
           </RouterLink>
         </li>
@@ -103,6 +103,12 @@ const isTeamActive = (path: string) => {
   border-radius: 5px;
 }
 
+.nav-link2.active {
+  background-color: var(--button-hover-bg);
+  color: var(--primary-color);
+  font-weight: bold;
+  border-radius: 5px;
+}
 .inline {
   display: flex;
   flex-direction: row;
