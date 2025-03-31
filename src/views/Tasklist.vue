@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick, computed } from 'vue';
-import { useRoute } from 'vue-router';
 
 interface Task {
   taskID: number;
@@ -9,7 +8,7 @@ interface Task {
   createdAt?: string;
   projectID: number;
   sectionID: number;
-  completed?: boolean;
+  completed: boolean;
   dateCompleted?: string | null;
 }
 
@@ -24,7 +23,13 @@ interface Team {
   teamName: string;
 }
 
-const route = useRoute();
+interface Section {
+  sectionID: number;
+  sectionName: string;
+  sectionPosition: number;
+  projectID: number;
+}
+
 const tasks = ref<Task[]>([]);
 const newTaskInput = ref('');
 const newTaskDescription = ref('');
@@ -33,9 +38,9 @@ const error = ref<string | null>(null);
 const myListProject = ref<Project | null>(null);
 const myListTeam = ref<Team | null>(null);
 const userID = ref<number | null>(null);
+const sectionID = ref<number | null>(null);
 const isInitialized = ref(false);
 const showTaskDescription = ref(false);
-const taskSource = ref('api'); // Default to 'api' since offline is removed
 
 const getJwtToken = () => localStorage.getItem('jwtToken');
 
@@ -102,7 +107,12 @@ const setupMyListProject = async () => {
       myListTeam.value = createTeamResponse.ok ? await createTeamResponse.json() : null;
     }
 
-    if (myListTeam.value) {
+    if (!myListTeam.value) throw new Error('Failed to set up team');
+
+    const savedProjectID = localStorage.getItem(`myListProjectID_${userID.value}`);
+    if (savedProjectID) {
+      myListProject.value = { projectID: Number(savedProjectID), projectName: 'Home', lastSectionID: 0 };
+    } else {
       const projectsUrl = `http://localhost:8080/teams/${myListTeam.value.teamID}/projects`;
       const projectsResponse = await fetch(projectsUrl, {
         method: 'GET',
@@ -114,12 +124,15 @@ const setupMyListProject = async () => {
 
       if (projectsResponse.ok) {
         const projects: Project[] = await projectsResponse.json();
-        const existingProject = projects.find(p => p.projectName === 'Home') || projects[0] || null;
-        myListProject.value = existingProject ? {
-          projectID: existingProject.projectID,
-          projectName: 'Home',
-          lastSectionID: existingProject.lastSectionID || 0
-        } : null;
+        const existingProject = projects.find(p => p.projectName === 'Home');
+        if (existingProject) {
+          myListProject.value = {
+            projectID: existingProject.projectID,
+            projectName: 'Home',
+            lastSectionID: existingProject.lastSectionID || 0
+          };
+          localStorage.setItem(`myListProjectID_${userID.value}`, String(existingProject.projectID));
+        }
       }
 
       if (!myListProject.value) {
@@ -139,30 +152,85 @@ const setupMyListProject = async () => {
             projectName: 'Home',
             lastSectionID: 0
           };
+          localStorage.setItem(`myListProjectID_${userID.value}`, String(newProject.projectID));
+        } else {
+          throw new Error('Failed to create project');
         }
       }
     }
 
-    if (myListProject.value) {
-      localStorage.setItem(`myListProjectID_${userID.value}`, String(myListProject.value.projectID));
-      return true;
+    const savedSectionID = localStorage.getItem(`myListSectionID_${userID.value}`);
+    if (savedSectionID) {
+      sectionID.value = Number(savedSectionID);
+    } else {
+      const sectionsUrl = `http://localhost:8080/sections?projectID=${myListProject.value!.projectID}`;
+      const sectionsResponse = await fetch(sectionsUrl, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (sectionsResponse.ok) {
+        const sections: Section[] = await sectionsResponse.json();
+        console.log('Sections for project', myListProject.value!.projectID, ':', sections);
+        const existingSection = sections.find(s => s.sectionName === 'Default' && s.projectID === myListProject.value!.projectID);
+        if (existingSection) {
+          sectionID.value = existingSection.sectionID;
+          localStorage.setItem(`myListSectionID_${userID.value}`, String(sectionID.value));
+          console.log('Reusing Default section:', sectionID.value);
+        } else {
+          const sectionParams = new URLSearchParams();
+          sectionParams.append('projectID', String(myListProject.value!.projectID));
+          sectionParams.append('sectionName', 'Default');
+          sectionParams.append('sectionPosition', '0');
+          const sectionUrl = `http://localhost:8080/sections?${sectionParams.toString()}`;
+          const sectionResponse = await fetch(sectionUrl, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          });
+
+          if (sectionResponse.ok) {
+            const sectionData = await sectionResponse.json();
+            sectionID.value = sectionData.sectionID;
+            localStorage.setItem(`myListSectionID_${userID.value}`, String(sectionID.value));
+            console.log('Created Default section:', sectionID.value);
+          } else {
+            throw new Error('Failed to create section');
+          }
+        }
+      } else {
+        throw new Error('Failed to fetch sections');
+      }
     }
-    throw new Error('Could not set up project');
+
+    console.log('Setup complete:', {
+      projectID: myListProject.value?.projectID,
+      sectionID: sectionID.value
+    });
+    return true;
   } catch (err) {
-    console.error('Error in project setup:', err);
+    console.error('Setup error:', err);
+    error.value = 'Setup failed. Please try again.';
     return false;
   }
 };
 
 const loadTasks = async () => {
-  if (!myListProject.value) return;
+  if (!myListProject.value || !sectionID.value) return;
 
   isLoading.value = true;
   try {
     const token = getJwtToken();
     if (!token) throw new Error('Authentication token is missing');
 
-    const response = await fetch('http://localhost:8080/tasks', {
+    const url = `http://localhost:8080/tasks?projectID=${myListProject.value.projectID}§ionID=${sectionID.value}`;
+    console.log('Fetching tasks from:', url);
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -170,21 +238,31 @@ const loadTasks = async () => {
       }
     });
 
-    if (!response.ok) throw new Error('Failed to fetch tasks');
+    if (!response.ok) {
+      const errorText = await response.text();
+      if (response.status === 404) {
+        tasks.value = [];
+        console.log('No tasks found for projectID:', myListProject.value.projectID, 'sectionID:', sectionID.value);
+        return;
+      }
+      throw new Error(`Failed to fetch tasks: ${response.status} - ${errorText}`);
+    }
 
-    const data = await response.json();
+    const data: any[] = await response.json();
+    console.log('Raw tasks from server:', data);
     tasks.value = data
-      .filter((task: any) => task.projectID === myListProject.value!.projectID)
-      .map((task: any) => ({
+      .map(task => ({
         taskID: task.taskID,
         taskName: task.taskName,
         taskDescription: task.taskDescription || null,
         createdAt: task.createdAt || null,
-        projectID: task.projectID,
-        sectionID: task.sectionID || 0,
-        completed: task.dateCompleted !== null,
-        dateCompleted: task.dateCompleted
-      }));
+        projectID: myListProject.value!.projectID,
+        sectionID: sectionID.value!,
+        completed: task.dateCompleted !== null && task.dateCompleted !== undefined,
+        dateCompleted: task.dateCompleted || null
+      }))
+      .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+    console.log('Loaded tasks:', tasks.value);
   } catch (err) {
     console.error('Error fetching tasks:', err);
     error.value = 'Failed to load tasks. Please try again.';
@@ -195,36 +273,12 @@ const loadTasks = async () => {
 
 const createTaskOnServer = async (taskName: string, taskDescription: string | null = null) => {
   const token = getJwtToken();
-  if (!token || !myListProject.value) throw new Error('Authentication token or project missing');
-
-  const projectID = myListProject.value.projectID;
-  let sectionID = 1;
+  if (!token || !myListProject.value || !sectionID.value) throw new Error('Authentication token, project, or section missing');
 
   try {
-    const sectionParams = new URLSearchParams();
-    sectionParams.append('projectID', String(projectID));
-    sectionParams.append('sectionName', 'Default');
-    sectionParams.append('sectionPosition', '0');
-    const sectionUrl = `http://localhost:8080/sections?${sectionParams.toString()}`;
-    const sectionResponse = await fetch(sectionUrl, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-    if (sectionResponse.ok) {
-      const sectionData = await sectionResponse.json();
-      sectionID = sectionData.sectionID;
-      console.log('Section created with ID:', sectionID);
-    } else {
-      console.error('Section creation failed:', await sectionResponse.text());
-    }
-
     const taskParams = new URLSearchParams();
-    taskParams.append('projectID', String(projectID));
-    taskParams.append('sectionID', String(sectionID));
+    taskParams.append('projectID', String(myListProject.value.projectID));
+    taskParams.append('sectionID', String(sectionID.value));
     taskParams.append('taskName', taskName);
     if (taskDescription) taskParams.append('taskDescription', taskDescription);
 
@@ -238,10 +292,13 @@ const createTaskOnServer = async (taskName: string, taskDescription: string | nu
     });
 
     if (!response.ok) throw new Error(await response.text());
-    return await response.json();
-  } catch (err) {
+    const newTask = await response.json();
+    console.log('Task created:', newTask);
+    return newTask;
+  } catch (_err) {
+    const err = _err instanceof Error ? _err : new Error(String(_err));
     console.error('Error creating task:', err);
-    throw err;
+    throw new Error(`Failed to create task: ${err.message}`);
   }
 };
 
@@ -251,21 +308,22 @@ const quickAddTask = async () => {
     return;
   }
 
-  error.value = null; // Clear any previous error
+  error.value = null;
 
-  if (!myListProject.value || !myListTeam.value) {
+  if (!myListProject.value || !sectionID.value) {
     await setupMyListProject();
-    if (!myListProject.value || !myListTeam.value) return;
+    if (!myListProject.value || !sectionID.value) return;
   }
 
-  const newTask = {
-    taskID: 0, // Temporary, will be replaced by server
+  const newTask: Task = {
+    taskID: 0,
     taskName: newTaskInput.value,
     taskDescription: newTaskDescription.value.trim() || null,
     createdAt: new Date().toISOString(),
     projectID: myListProject.value.projectID,
-    sectionID: 1,
-    completed: false
+    sectionID: sectionID.value,
+    completed: false,
+    dateCompleted: null
   };
 
   tasks.value.unshift(newTask);
@@ -275,10 +333,18 @@ const quickAddTask = async () => {
 
   try {
     const createdTask = await createTaskOnServer(newTask.taskName, newTask.taskDescription);
-    const index = tasks.value.findIndex(t => t.createdAt === newTask.createdAt); // Match by createdAt since taskID is temp
+    const index = tasks.value.findIndex(t => t.createdAt === newTask.createdAt);
     if (index !== -1) {
-      tasks.value[index] = { ...createdTask, taskDescription: newTask.taskDescription, completed: false };
+      tasks.value[index] = {
+        ...createdTask,
+        taskDescription: newTask.taskDescription,
+        completed: false,
+        dateCompleted: null,
+        projectID: myListProject.value!.projectID,
+        sectionID: sectionID.value!
+      };
     }
+    console.log('Updated tasks after creation:', tasks.value);
   } catch (err) {
     error.value = 'Failed to add task. Please try again.';
   }
@@ -307,11 +373,15 @@ const deleteTask = async (taskId: number) => {
 
 const toggleTaskCompletion = async (task: Task) => {
   task.completed = !task.completed;
+  task.dateCompleted = task.completed ? new Date().toISOString() : null;
 
   if (task.completed) {
     setTimeout(() => {
-      tasks.value = tasks.value.filter(t => t.taskID !== task.taskID);
-    }, 3500);
+      const index = tasks.value.findIndex(t => t.taskID === task.taskID);
+      if (index !== -1) {
+        tasks.value.splice(index, 1);
+      }
+    }, 2500);
   }
 
   try {
@@ -321,7 +391,7 @@ const toggleTaskCompletion = async (task: Task) => {
     const updateData = {
       taskName: task.taskName,
       taskDescription: task.taskDescription || null,
-      dateCompleted: task.completed ? new Date().toISOString() : null
+      dateCompleted: task.dateCompleted
     };
 
     const response = await fetch(`http://localhost:8080/tasks/${task.taskID}`, {
@@ -367,13 +437,16 @@ const initialize = async () => {
   if (!userID.value) return;
 
   const savedProjectID = localStorage.getItem(`myListProjectID_${userID.value}`);
-  if (savedProjectID) {
+  const savedSectionID = localStorage.getItem(`myListSectionID_${userID.value}`);
+  if (savedProjectID && savedSectionID) {
     myListProject.value = { projectID: Number(savedProjectID), projectName: 'Home', lastSectionID: 0 };
+    sectionID.value = Number(savedSectionID);
+    console.log('Loaded from localStorage:', { projectID: savedProjectID, sectionID: savedSectionID });
   } else {
     await setupMyListProject();
   }
 
-  if (myListProject.value) await loadTasks();
+  if (myListProject.value && sectionID.value) await loadTasks();
 
   nextTick(() => {
     const inputElement = document.querySelector('.task-input') as HTMLInputElement;
@@ -390,7 +463,6 @@ onMounted(initialize);
   <main class="task-container">
     <header class="task-header">
       <h1 class="app-title">Home</h1>
-      <p class="task-source">Tasks from: {{ taskSource }}</p>
     </header>
 
     <section class="error-message" v-if="error">
@@ -407,7 +479,7 @@ onMounted(initialize);
             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
           </svg>
         </button>
-        <button type="submit" class="add-task-btn" :disabled="isLoading">Add</button>
+        <button type="submit" class="add-task-btn" :disabled="isLoading">+ Add</button>
         <textarea v-if="showTaskDescription" v-model="newTaskDescription" placeholder="Add a description (optional)" class="task-description-input" />
       </form>
     </section>
@@ -496,11 +568,6 @@ onMounted(initialize);
   margin: 0;
 }
 
-.task-source {
-  font-size: 0.75rem;
-  color: #666;
-}
-
 .task-input-section {
   margin-bottom: 1rem;
   width: 100%;
@@ -587,24 +654,27 @@ onMounted(initialize);
 .tasks-section {
   background-color: #f9f9fb;
   border-radius: 0.5rem;
-  padding: 1rem;
+  padding: 0.75rem 1rem 0.25rem 1rem;
   width: 100%;
 }
 
 .tasks-heading {
-  font-size: 1rem;
+  font-size: 1.25rem;
   color: #333;
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 0.5rem 0;
   font-weight: 600;
+  line-height: 1;
 }
 
-.task-list {
+.tasks-section .task-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 0.75rem;
   width: 100%;
 }
 
@@ -613,10 +683,14 @@ onMounted(initialize);
   align-items: center;
   background-color: white;
   border-radius: 0.25rem;
-  padding: 0.75rem;
-  transition: opacity 0.3s ease;
+  padding: 0.25rem 0.75rem;
+  margin: 0;
+  transition: opacity 0.3s ease, height 0.3s ease, padding 0.3s ease, margin 0.3s ease;
   border-left: 0.1875rem solid #8b53ff;
   width: 100%;
+  box-sizing: border-box;
+  height: auto;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .task-item.completed {
@@ -625,7 +699,13 @@ onMounted(initialize);
 
 .task-item.fade-out {
   opacity: 0;
-  transition: opacity 3.5s ease;
+  height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  overflow: hidden;
+  transition: opacity 3.5s ease, height 0.3s ease, padding 0.3s ease, margin 0.3s ease;
 }
 
 .task-checkbox {
@@ -668,6 +748,7 @@ onMounted(initialize);
 
 .task-description {
   margin: 0.25rem 0 0 2rem;
+  padding: 0;
   font-size: 0.75rem;
   color: #666;
   max-height: 3em;
@@ -675,11 +756,13 @@ onMounted(initialize);
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 
 .task-date {
   margin: 0.25rem 0 0 2rem;
+  padding: 0;
   font-size: 0.7rem;
   color: #888;
 }
@@ -763,9 +846,9 @@ onMounted(initialize);
   margin-left: 0.5rem;
 }
 
-@media (max-width: 48rem) {
+@media (max-width: 768px) {
   .task-container {
-    padding: 0 0.75rem;
+    padding: 0 12px;
     margin-left: 0;
   }
 
@@ -774,37 +857,37 @@ onMounted(initialize);
   }
 
   .task-header {
-    padding: 0.75rem 0;
+    padding: 12px 0;
   }
 
   .app-title {
-    font-size: 1.25rem;
+    font-size: 20px;
   }
 
   .add-task-btn {
-    padding: 0.5rem 0.75rem;
+    padding: 8px 12px;
   }
 
   .task-item {
-    padding: 0.5rem;
+    padding: 0.25rem 0.75rem;
   }
 }
 
-@media (max-width: 30rem) {
+@media (max-width: 480px) {
   .task-container {
-    padding: 0 0.5rem;
+    padding: 0 8px;
   }
 
   .task-header {
-    margin-bottom: 0.75rem;
+    margin-bottom: 12px;
   }
 
   .app-title {
-    font-size: 1.125rem;
+    font-size: 18px;
   }
 
   .tasks-section {
-    padding: 0.75rem;
+    padding: 0.75rem 12px 0.25rem 12px;
   }
 }
 </style>
