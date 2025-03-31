@@ -8,7 +8,7 @@ const props = defineProps<{ taskID: number; dependencies: { taskID: number; task
 const emit = defineEmits(["dependency-added", "dependency-deleted"]);
 
 const newDependencyID = ref<number | null>(null);
-const newDependencyName = ref<string | null>('');  // Initialize as empty string
+const newDependencyName = ref<string | null>('');  
 const dueTasks = ref<{ taskID: number; taskName: string }[]>([]);
 const showDropdown = ref(false);
 
@@ -30,7 +30,7 @@ const addDependency = async () => {
     const newDependency = await TaskDependencyHandler.createDependency(props.taskID, newDependencyID.value);
     if (newDependency) emit("dependency-added", newDependency);
     newDependencyID.value = null;
-    newDependencyName.value = '';  // Reset task name after adding the dependency
+    newDependencyName.value = ''; 
     showDropdown.value = false;
   }
 };
@@ -43,7 +43,7 @@ const removeDependency = async (dependencyID: number) => {
 
 <template>
   <section class="task-dependency-manager">
-    <!-- Input field that binds to newDependencyName -->
+   
     <input
       v-model="newDependencyName"
       placeholder="Click to select task"
@@ -52,7 +52,7 @@ const removeDependency = async (dependencyID: number) => {
       :readonly="true" 
     />
 
-    <!-- Dropdown showing task options -->
+
     <ul v-if="showDropdown" class="dropdown">
       <li
         v-for="task in dueTasks"
