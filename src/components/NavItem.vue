@@ -100,14 +100,14 @@ const isTeamActive = (path: string) => {
   background-color: var(--button-hover-bg);
   color: var(--primary-color);
   font-weight: bold;
-  border-radius: 5px;
+  border-radius: 0.3em;
 }
 
 .nav-link2.active {
   background-color: var(--button-hover-bg);
   color: var(--primary-color);
   font-weight: bold;
-  border-radius: 5px;
+  border-radius: 0.3em;
 }
 .inline {
   display: flex;

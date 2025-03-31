@@ -208,7 +208,7 @@ const isActive = (path: string) => {
 
 .nav-section-title {
   padding: 0 10pt;
-  margin-bottom: 8px;
+  margin-bottom: 0.5em;
   font-size: 11pt;
   font-weight: bold;
   color: var(--heading-purple);
@@ -229,7 +229,7 @@ const isActive = (path: string) => {
   padding: 0;
 }
 .nav-item {
-  margin-bottom: 2px;
+  margin-bottom: 0.13em;
 }
 
 .nav-item span {
@@ -239,7 +239,7 @@ const isActive = (path: string) => {
 .nav-link {
   display: flex;
   align-items: center;
-  padding: 8px 16px;
+  padding: 0.5em 1em;
   font-size: 14px;
   color: var(--light-text-color);
   transition: background-color 0.2s ease;
@@ -256,7 +256,7 @@ const isActive = (path: string) => {
 .nav-link2 {
   display: flex;
   align-items: center;
-  padding: 8px 16px;
+  padding: 0.5em 1em;
   font-size: 10pt;
   color: var(--light-text-color);
   transition: background-color 0.2s ease;
@@ -286,18 +286,18 @@ const isActive = (path: string) => {
 }
 
 .nav-icon {
-  width: 20px;
-  height: 20px;
+  width: 1.25em;
+  height: 1.25em;
   align-items: center;
   justify-content: center;
-  margin-right: 8px;
-  font-size: 16px;
+  margin-right: 0.5em;
+  font-size: 1em;
   text-decoration: none;
 }
 
 .sidebar.collapsed .nav-link {
   justify-content: center;
-  padding: 8px 0;
+  padding: 0.53em 0;
 }
 
 .sidebar.collapsed .nav-icon {
@@ -313,11 +313,11 @@ const isActive = (path: string) => {
 .add-button {
   background: none;
   border: none;
-  font-size: 18px;
+  font-size: 1.13em;
   cursor: pointer;
   color: var(--light-text-color);
-  width: 35px;
-  height: 35px;
+  width: 2.2em;
+  height: 2.2em;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -326,7 +326,7 @@ const isActive = (path: string) => {
 .add-button:hover {
   color: var(--primary-color);
   background-color: rgba(202, 109, 232, 0.1);
-  border-radius: 4px;
+  border-radius: 0.25em;
 }
 .inline {
   display: flex;
