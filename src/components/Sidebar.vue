@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { GetTeams, GetProjects } from "@/api/SidebarApi";
-import { onMounted, ref, defineEmits } from "vue";
+import { onMounted, ref, defineEmits, onUnmounted } from "vue";
+import { useRoute } from "vue-router";
 import type { TeamInterface, ProjectInterface } from "@/models/TeamInterface";
 import NavItem from "@/components/NavItem.vue";
 import IconCollapse from "./icons/IconCollapse.vue";
@@ -12,8 +13,15 @@ const myList = ref<ProjectInterface | null>(null);
 const emit = defineEmits(["select"]);
 const collapsed = ref(window.innerWidth <= 700);
 const modalOpen = ref(false);
+const route = useRoute();
+
+const handleResize = () => {
+  collapsed.value = window.innerWidth <= 700;
+};
 
 onMounted(async () => {
+  window.addEventListener("resize", handleResize)
+
   const jwtToken: string | null = localStorage.getItem("jwtToken");
 
   if (jwtToken) {
@@ -54,6 +62,10 @@ onMounted(async () => {
   }
 });
 
+onUnmounted(() => {
+  window.removeEventListener("resize", handleResize);
+});
+
 const GetAllTeams = () => {
   emit("select", teams.value);
 };
@@ -64,6 +76,10 @@ const toggleSidebar = () => {
 
 const toggleModal = () => {
   modalOpen.value = !modalOpen.value;
+};
+
+const isActive = (path: string) => {
+  return route.path.startsWith(path);
 };
 </script>
 
@@ -77,37 +93,42 @@ const toggleModal = () => {
     </header>
 
     <nav class="sidebar-nav" aria-label="Main navigation" v-if="!collapsed">
-      <section class="nav-section" v-if="!collapsed">
+      <section class="nav-section">
         <h2 class="nav-section-title">Home Page</h2>
         <ul class="nav-list">
           <li class="nav-item">
-            <RouterLink to="/tutorial" class="nav-link" title="My List">
-              <span v-if="!collapsed">Introduction</span>
+            <RouterLink to="/tutorial" class="nav-link" :class="{ active: isActive('/tutorial') }" title="My List">
+              <span>Introduction</span>
             </RouterLink>
           </li>
         </ul>
       </section>
 
-      <section class="nav-section" v-if="!collapsed">
+      <section class="nav-section">
         <h2 class="nav-section-title">Calendar</h2>
         <ul class="nav-list">
           <li class="nav-item">
-            <RouterLink to="/calendar" class="nav-link" title="Personal Calendar">
-              <span v-if="!collapsed">Personal Calendar</span>
+            <RouterLink to="/calendar" class="nav-link" :class="{ active: isActive('/calendar') }" title="Personal Calendar">
+              <span>Personal Calendar</span>
             </RouterLink>
           </li>
         </ul>
       </section>
 
-      <section class="nav-section" v-if="!collapsed">
-        <section class="nav-section-title">
-          <h2 id="teamTitle">Teams</h2>
+      <section class="teams-container">
+        <section class="teams-header">
+          <h2 id="teamTitle">TEAMS</h2>
           <button class="add-button" @click="toggleModal">+</button>
         </section>
-        <NavItem :teams="teams" />
+
+        <section class="teams-scrollable">
+          <NavItem :teams="teams" />
+        </section>
       </section>
-      <AddTeam :isOpen="modalOpen" :toggleModal="toggleModal" :addTeam="addNewTeam" />
     </nav>
+
+    <AddTeam :isOpen="modalOpen" :toggleModal="toggleModal" :addTeam="addNewTeam" />
+
   </aside>
 </template>
 
@@ -115,22 +136,18 @@ const toggleModal = () => {
 .sidebar {
   min-width: 14em;
   background-color: var(--nav-bg-color);
-  min-width: 14em;
-  background-color: var(--nav-bg-color);
   border-right: 1pt solid var(--card-bg);
   box-shadow: 1pt 1pt 1pt var(--card-bg);
   display: flex;
   flex-direction: column;
-  max-height: 100;
+  max-height: 100vh;
   min-height: 100vh;
   transition: width 0.3s ease;
   overflow-y: auto;
 }
 
 .sidebar.collapsed {
-  min-width: 2em;
-  min-width: 2em;
-}
+  min-width: 2em;}
 
 .sidebar-header {
   display: flex;
@@ -150,11 +167,38 @@ const toggleModal = () => {
   background-color: var(--nav-bg-color);
   border: none;
   width: 20%;
+  cursor: pointer;
 }
 
 .sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   flex: 1;
   padding: 16pt 0;
+  overflow-y: auto;
+}
+
+.teams-container {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 0;
+}
+
+.teams-header {
+  position: sticky;
+  top: 0;
+  background: var(--nav-bg-color);
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10pt;
+}
+
+.teams-scrollable {
+  flex-grow: 1;
   overflow-y: auto;
 }
 
@@ -164,7 +208,7 @@ const toggleModal = () => {
 
 .nav-section-title {
   padding: 0 10pt;
-  margin-bottom: 8px;
+  margin-bottom: 0.5em;
   font-size: 11pt;
   font-weight: bold;
   color: var(--heading-purple);
@@ -184,10 +228,10 @@ const toggleModal = () => {
   list-style: none;
   padding: 0;
 }
-
 .nav-item {
-  margin-bottom: 2px;
+  margin-bottom: 0.13em;
 }
+
 .nav-item span {
   margin-left: 5pt;
 }
@@ -195,7 +239,7 @@ const toggleModal = () => {
 .nav-link {
   display: flex;
   align-items: center;
-  padding: 8px 16px;
+  padding: 0.5em 1em;
   font-size: 14px;
   color: var(--light-text-color);
   transition: background-color 0.2s ease;
@@ -203,10 +247,16 @@ const toggleModal = () => {
   text-decoration: none;
 }
 
+.nav-link.active {
+  background-color: var(--button-hover-bg);
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
 .nav-link2 {
   display: flex;
   align-items: center;
-  padding: 8px 16px;
+  padding: 0.5em 1em;
   font-size: 10pt;
   color: var(--light-text-color);
   transition: background-color 0.2s ease;
@@ -236,18 +286,18 @@ const toggleModal = () => {
 }
 
 .nav-icon {
-  width: 20px;
-  height: 20px;
+  width: 1.25em;
+  height: 1.25em;
   align-items: center;
   justify-content: center;
-  margin-right: 8px;
-  font-size: 16px;
+  margin-right: 0.5em;
+  font-size: 1em;
   text-decoration: none;
 }
 
 .sidebar.collapsed .nav-link {
   justify-content: center;
-  padding: 8px 0;
+  padding: 0.53em 0;
 }
 
 .sidebar.collapsed .nav-icon {
@@ -263,21 +313,27 @@ const toggleModal = () => {
 .add-button {
   background: none;
   border: none;
-  font-size: 18px;
+  font-size: 1.13em;
   cursor: pointer;
   color: var(--light-text-color);
-  width: 20px;
-  height: 20px;
+  width: 2.2em;
+  height: 2.2em;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+.add-button:hover {
+  color: var(--primary-color);
+  background-color: rgba(202, 109, 232, 0.1);
+  border-radius: 0.25em;
+}
 .inline {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 }
+
 .inline button {
   display: flex;
   justify-content: right;
@@ -296,6 +352,8 @@ const toggleModal = () => {
   color: var(--primary-color);
   font-weight: 500;
 }
+
+
 @media (max-width: 700px) {
   .sidebar {
     position: fixed;

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRoute } from "vue-router";
 import type { TeamInterface, ProjectInterface } from '@/models/TeamInterface'
 
 import IconDownTriangle from '@/components/icons/IconDownTraingle.vue'
@@ -11,6 +12,7 @@ const props = defineProps<{
   teams: TeamInterface[]
 }>()
 
+const route = useRoute();
 
 const activeDropdowns = ref<Set<number>>(new Set<number>())
 
@@ -21,6 +23,10 @@ const toggleDropdown = (index: number) => {
     activeDropdowns.value.add(index)
   }
 }
+
+const isTeamActive = (path: string) => {
+  return route.path.startsWith(path);
+}
 </script>
 
 <template>
@@ -28,7 +34,7 @@ const toggleDropdown = (index: number) => {
     <li v-for="(team, index) in props.teams" :key="team.teamID" class="nav-item">
       <header class="inline">
         <nav>
-        <RouterLink :to="'/team/' + team.teamID" class="nav-link">
+        <RouterLink :to="'/team/' + team.teamID" class="nav-link" :class="{ active: isTeamActive(`/team/${team.teamID}`) }">
           {{ team.teamName }}
         </RouterLink>
       </nav>
@@ -47,7 +53,7 @@ const toggleDropdown = (index: number) => {
           </span>
         </li>
         <li v-if="team.projects && team.projects.length > 0"v-for="(project, projectIndex) in team.projects":key="project.projectID">
-          <RouterLink :to="'/projects/' + project.projectID" class="nav-link2">
+          <RouterLink :to="'/projects/' + project.projectID" class="nav-link2" :class="{ active: isTeamActive(`/projects/${project.projectID}`) }">
             <pre># </pre> {{ project.projectName }}
           </RouterLink>
         </li>
@@ -90,6 +96,19 @@ const toggleDropdown = (index: number) => {
   background-color: rgb(241, 241, 241);
 }
 
+.nav-link.active {
+  background-color: var(--button-hover-bg);
+  color: var(--primary-color);
+  font-weight: bold;
+  border-radius: 0.3em;
+}
+
+.nav-link2.active {
+  background-color: var(--button-hover-bg);
+  color: var(--primary-color);
+  font-weight: bold;
+  border-radius: 0.3em;
+}
 .inline {
   display: flex;
   flex-direction: row;
