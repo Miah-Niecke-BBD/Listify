@@ -121,16 +121,14 @@ export default class TasksHandler {
   static async updateTask(task: Partial<Task>, jwtToken: string | null): Promise<Task> {
     if (!jwtToken) throw new Error("JWT token is missing");
   
-    // Construct the request payload dynamically
     const body: any = {
-      taskName: task.taskName, // Required field
-      taskPriority: task.taskPriority || null, // Optional, null if not provided
-      taskDescription: task.taskDescription || null, // Optional, null if not provided
-      dueDate: task.dueDate ? new Date(task.dueDate).toISOString() : null, // Optional, null if not provided
-      dateCompleted: task.dateCompleted ? new Date(task.dateCompleted).toISOString() : null, // Optional, null if not provided
+      taskName: task.taskName, 
+      taskPriority: task.taskPriority || null, 
+      taskDescription: task.taskDescription || null, 
+      dueDate: task.dueDate ? new Date(task.dueDate).toISOString() : null, 
+      dateCompleted: task.dateCompleted ? new Date(task.dateCompleted).toISOString() : null,
     };
   
-    // Only include the properties that are not null or undefined
     const cleanedBody: any = Object.fromEntries(
       Object.entries(body).filter(([key, value]) => value !== null && value !== undefined)
     );
@@ -141,7 +139,7 @@ export default class TasksHandler {
         "Content-Type": "application/json",
         Authorization: `Bearer ${jwtToken}`,
       },
-      body: JSON.stringify(cleanedBody), // Send the cleaned body
+      body: JSON.stringify(cleanedBody), 
     });
   
     if (!response.ok) {
