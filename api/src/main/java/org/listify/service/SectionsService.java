@@ -9,6 +9,7 @@ import org.listify.exception.NotFoundException;
 import org.listify.model.Sections;
 import org.listify.model.Tasks;
 import org.listify.repo.SectionsRepository;
+import org.listify.repo.TasksRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,8 +20,11 @@ public class SectionsService {
 
     private final SectionsRepository repository;
 
-    public SectionsService(SectionsRepository repository) {
+    private final TasksRepository tasksRepository;
+
+    public SectionsService(SectionsRepository repository, TasksRepository tasksRepository) {
         this.repository = repository;
+        this.tasksRepository = tasksRepository;
     }
 
     public Sections getSectionById(Long id) {
@@ -87,11 +91,14 @@ public class SectionsService {
     }
 
     private SectionTaskDTO mapTaskToSectionTaskDTO(Tasks task) {
+        String priorityLabelName = tasksRepository.getPriorityLabelNameByTaskID(task.getTaskID());
         return new SectionTaskDTO(
               task.getTaskID(),
               task.getTaskName(),
+                priorityLabelName,
               task.getParentTaskID(),
               task.getTaskPosition(),
+              task.getDateCompleted(),
               task.getCreatedAt(),
               task.getDueDate()
         );

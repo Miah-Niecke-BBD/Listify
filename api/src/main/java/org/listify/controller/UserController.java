@@ -61,7 +61,11 @@ public class UserController {
             userDto = new UserDTO();
             userDto.setUsername(name);
             userDto.setUserID(user.getUserID());
+<<<<<<< Updated upstream
             userDto.setGithubID(email);
+=======
+            userDto.setGithubID(googleID);
+>>>>>>> Stashed changes
         }
         return ResponseEntity.ok(userDto);
 

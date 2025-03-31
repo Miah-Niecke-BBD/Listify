@@ -103,7 +103,6 @@ const handleDrop = async (event: DragEvent, targetPosition: number) => {
 <template>
   <main>
     <section class="project-container">
-      <h1 id="project-title">Project</h1>
       <section class="sections-container" @dragover="handleDragOver">
 
         <SectionCard

@@ -56,5 +56,55 @@ export default class AssigneesHandler {
     }
   }
 
+  static async GetProjectMembers(jwtToken: string|null,projectID:string): Promise<any> {
+    try {
+      const response = await fetch("http://localhost:8080/project/assignees/"+projectID, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${jwtToken}`
+        },
+      });
+      
+      const data = await response.json();
+  
+   
+      if (!response.ok) {
+       
+        return null
+      }
+  
+      return data;
+    } catch (error:any) {
+  
+      console.log((`Failed to get project members (status ${error.status}): ${error.message}`))
+      throw error;
+    }
+  }
+
+  static async GetTaskMembers<taskAssignee>(jwtToken: string|null,taskID:string): Promise<taskAssignee|null> {
+    try {
+      const response = await fetch("http://localhost:8080/tasks/assignee/"+taskID, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${jwtToken}`
+        },
+      });
+      
+      const data:taskAssignee = await response.json();
+  
+   
+      if (!response.ok) {
+       
+        return null
+      }
+  
+      return data;
+    } catch (error:any) {
+  
+      console.log((`Failed to get project members (status ${error.status}): ${error.message}`))
+      throw error;
+    }
+  }
 
 }
+

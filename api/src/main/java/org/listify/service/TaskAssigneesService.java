@@ -1,5 +1,6 @@
 package org.listify.service;
 
+import org.listify.dto.TaskAssigneeDTO;
 import org.listify.exception.ForbiddenException;
 import org.listify.exception.NotFoundException;
 import org.listify.model.TaskAssignees;
@@ -8,6 +9,7 @@ import org.listify.repo.TaskAssigneesRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskAssigneesService {
@@ -50,15 +52,33 @@ public class TaskAssigneesService {
         repository.deleteUserFromTask(userID, taskID, teamLeaderID);
     }
 
-    public List<Users> getUsersAssignedToTask(Long taskID, Long loggedInUserID) {
+    public List<TaskAssigneeDTO> getUsersAssignedToTask(Long taskID, Long loggedInUserID) {
+
         if (!repository.findUserAndTaskInProject(loggedInUserID, taskID)) {
-            throw new ForbiddenException("Cannot excess tasks that are not in the project");
+            throw new ForbiddenException("Cannot access tasks that are not in the project");
         }
+
+
         List<Users> usersAssignedToTask = repository.getUsersAssignedToTask(taskID);
+
+
         if (usersAssignedToTask.isEmpty()) {
-            throw new NotFoundException("There no users assigned to task: "+taskID);
+            throw new NotFoundException("There are no users assigned to task: " + taskID);
         }
-        return usersAssignedToTask;
+
+
+        return usersAssignedToTask.stream()
+                .map(this::convertUserToTaskAssigneeDTO)
+                .collect(Collectors.toList());
+    }
+
+    private TaskAssigneeDTO convertUserToTaskAssigneeDTO(Users user) {
+        return new TaskAssigneeDTO(
+                user.getUserID(),
+                user.getGitHubID(),
+                user.getCreatedAt(),
+                user.getUpdatedAt()
+        );
     }
 
     public boolean isUserAssignedToTask(Long taskID, Long userID) {

@@ -47,12 +47,13 @@ BEGIN
     SET
         taskName = COALESCE(@newTaskName, taskName),
         taskDescription = COALESCE(@newTaskDescription, taskDescription),
-        taskPriority = COALESCE(@newTaskPriority, taskPriority),
-        dueDate = COALESCE(@newDueDate, dueDate),
-        dateCompleted = COALESCE(@newDateCompleted, dateCompleted),
+        taskPriority = @newTaskPriority,
+        dueDate = @newDueDate,
+        dateCompleted = @newDateCompleted,
         updatedAt = SYSDATETIMEOFFSET()
     WHERE taskID = @taskID;
 
     COMMIT TRANSACTION;
 END;
 GO
+

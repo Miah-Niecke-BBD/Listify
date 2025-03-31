@@ -146,17 +146,12 @@ public class TasksService {
             newTaskPriority = null;
         }
 
-        if (updatedTask.getDueDate() != null) {
-            if (updatedTask.getDueDate().isBefore(OffsetDateTime.now())) {
-                throw new BadRequestException("Due dates can only be in the future");
-            }
-            newDueDate = updatedTask.getDueDate();
-        }
+        newDueDate = updatedTask.getDueDate();
 
-        if (updatedTask.getDateCompleted() != null) {
-            dateCompleted = updatedTask.getDateCompleted();
-        }
 
+        dateCompleted = updatedTask.getDateCompleted();
+
+        System.out.println("Updating Date Completed: " + dateCompleted);
         repository.updateTaskDetails(taskID, userID, newTaskName, newTaskDescription, newTaskPriority, newDueDate, dateCompleted);
     }
 
