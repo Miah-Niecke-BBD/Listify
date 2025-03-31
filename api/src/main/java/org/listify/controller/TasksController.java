@@ -112,6 +112,7 @@ public class TasksController {
         tasksService.updateTaskDetails(userID, taskID, updatedTask);
         ViewTaskDTO taskDTO = tasksService.getTaskById(taskID, userID);
         return ResponseEntity.status(HttpStatus.CREATED).body(taskDTO);
+
     }
 
 

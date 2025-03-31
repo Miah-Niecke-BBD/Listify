@@ -1,16 +1,37 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { useRoute } from "vue-router";
 import TaskDependencyHandler from "@/api/TaskDependencyHandler";
+import { GetDueTasksForProject } from "@/api/Calendar"; 
 
 const props = defineProps<{ taskID: number; dependencies: { taskID: number; taskName: string }[] }>();
 const emit = defineEmits(["dependency-added", "dependency-deleted"]);
+
 const newDependencyID = ref<number | null>(null);
+const newDependencyName = ref<string | null>('');  
+const dueTasks = ref<{ taskID: number; taskName: string }[]>([]);
+const showDropdown = ref(false);
+
+const route = useRoute();
+
+const fetchDueTasks = async () => {
+  const projectID = route.params.id as string;
+  const jwtToken = localStorage.getItem("jwtToken");
+  if (jwtToken && projectID) {
+    const tasks = await GetDueTasksForProject(jwtToken, projectID);
+    if (tasks) {
+      dueTasks.value = tasks as { taskID: number; taskName: string }[];
+    }
+  }
+};
 
 const addDependency = async () => {
   if (newDependencyID.value) {
     const newDependency = await TaskDependencyHandler.createDependency(props.taskID, newDependencyID.value);
     if (newDependency) emit("dependency-added", newDependency);
     newDependencyID.value = null;
+    newDependencyName.value = ''; 
+    showDropdown.value = false;
   }
 };
 
@@ -22,73 +43,66 @@ const removeDependency = async (dependencyID: number) => {
 
 <template>
   <section class="task-dependency-manager">
-    <h3>Manage Task Dependencies</h3>
-    <ul v-if="dependencies.length">
-      <li v-for="dependency in dependencies" :key="dependency.taskID">
-        {{ dependency.taskName }}
-        <button @click="removeDependency(dependency.taskID)">Remove</button>
+   
+    <input
+      v-model="newDependencyName"
+      placeholder="Click to select task"
+      type="text"
+      @focus="fetchDueTasks(); showDropdown = true"
+      :readonly="true" 
+    />
+
+
+    <ul v-if="showDropdown" class="dropdown">
+      <li
+        v-for="task in dueTasks"
+        :key="task.taskID"
+        @click="newDependencyID = task.taskID; newDependencyName = task.taskName; showDropdown = false"
+      >
+        {{ task.taskName }}
       </li>
     </ul>
-    <p v-else>No dependencies</p>
 
-    <input v-model="newDependencyID" placeholder="Enter task ID" type="number" />
     <button @click="addDependency">Add Dependency</button>
+
+
+    <h3>Dependencies</h3>
+    <ul v-if="props.dependencies.length">
+      <li v-for="dependency in props.dependencies" :key="dependency.taskID">
+        {{ dependency.taskName }}
+        <button id="removeBtn" @click="removeDependency(dependency.taskID)">Remove</button>
+      </li>
+    </ul>
   </section>
 </template>
 
 <style scoped>
 .task-dependency-manager {
-  margin-top: 2rem;
-  padding: 1rem;
-  background-color: var(--background-color);
-  border: 0.1rem solid black;
-  border-radius: 0.5rem;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-  font-family: Arial, sans-serif;
-}
-
-h3 {
-  color: var(--heading-purple);
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-  margin-bottom: 1rem;
-}
-
-li {
-  background-color: var(--faq-bg);
-  border-radius: 0.3rem;
-  padding: 1rem;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 0.8rem;
-}
-
-button {
+  margin-top: 0.5rem;
+  padding: 1rem;
+  width: 25rem;
   background-color: var(--background-color);
-  color: black;
-  border: 1pt solid black;
-  border-radius: 0.3rem;
-  padding: 0.4rem 0.8rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  border: 0.1rem solid rgba(0, 0, 0, 0.134);
+  border-radius: 0.5rem;
+  box-shadow: 1pt 1pt 1pt rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
-button:hover {
-  background-color: var(--primary-color);
+h3{
+  color: var(--heading-purple);
+  font-size: 16pt;
+  margin-bottom: .5rem;
 }
 
 input {
   padding: 0.6rem 1rem;
-  border-radius: 0.3rem;
+  border-radius: 0.23rem;
   border: 0.1rem solid #ccc;
-  width: 100%;
-  margin-bottom: 1rem;
+  width: 15em;
+  margin-bottom: .5rem;
 }
 
 input:focus {
@@ -96,10 +110,74 @@ input:focus {
   border-color: var(--primary-color);
 }
 
-p {
-  color: var(--light-text-color);
-  font-size: 1.2rem;
+button {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-evenly;
+  width: 12rem;
+  margin-top: .5rem;
+  padding: 0.5rem;
+  background-color: var(--primary-color);
+  border: 0.05rem solid rgba(8, 1, 42, 0.678);
+  box-shadow: 1pt 1pt 1pt rgb(47, 0, 255);
+  color: white;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}   
+
+button:hover {
+  background-color: rgb(25, 0, 137);
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border: 0.05rem solid #e2e2e2;
+  border-radius: 0.5rem;
+  background-color: #fafafa;
+  margin-bottom: 0.5rem;
+}
+
+#removeBtn {
+  background-color: red;
+  border: 0.05rem solid rgb(105, 1, 1);
+  box-shadow: 1pt 1pt 1pt rgb(100, 0, 0);
+  color: white;
+  border: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.3rem;
+  margin-left: 1em;
+  width: 5rem;
+  cursor: pointer;
+}
+
+#removeBtn:hover {
+  background-color: darkred;
+}
+
+.dropdown {
+  max-height: 200px;
+  overflow-y: auto;
+  width: 100%;
+  border: 1pt solid #ccc;
+  border-radius: 0.5rem;
+  background-color: var(--background-color);
+}
+
+.dropdown li {
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.dropdown li:hover {
+  background-color: rgb(244, 244, 244);
 }
 </style>
-
-

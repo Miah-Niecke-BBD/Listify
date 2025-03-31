@@ -19,6 +19,7 @@ const props = defineProps<{
 }>();
 
 const emits = defineEmits(["section-updated", "section-deleted"]);
+const minDate = ref(new Date().toISOString().split('T')[0]);
 
 const isSectionPopupVisible = ref(false);
 const section = ref({
@@ -43,6 +44,8 @@ const newTask = ref({
 
 const loadTasks = async () => {
   sectionTask.value = await TasksHandler.getTasksForSection(section.value.sectionID)
+  console.log("The Task:"+sectionTask.value[1].dateCompleted)
+  
 }
 
 const cancelTask = () => {
@@ -56,6 +59,7 @@ onMounted(() => {
 
 const sortedTasks = computed(() => {
   return [...sectionTask.value].sort((a, b) => a.taskPosition - b.taskPosition);
+  
 });
 
 const toggleSectionPopup = () => {
@@ -100,6 +104,7 @@ const handleAddTask = async () => {
 
 const handlePopup = async (taskID: number) => {
   selectedTask.value = await TasksHandler.openTaskPopup(taskID);
+  console.log(selectedTask.value.taskPriority)
 };
 
 const handleDragEnd = async (event: DragEvent, targetTaskID: number) => {
@@ -148,8 +153,10 @@ const handleDragEnd = async (event: DragEvent, targetTaskID: number) => {
           :key="task.taskID"
           :taskID="task.taskID"
           :taskName="task.taskName"
+          :taskPriority="task.taskPriority"
           :parentTaskID="task.parentTaskID"
           :taskPosition="task.taskPosition"
+          :dateCompleted="task.dateCompleted"
           :dueDate="task.dueDate"
           :createdAt="task.createdAt"
           draggable="true"
@@ -165,7 +172,7 @@ const handleDragEnd = async (event: DragEvent, targetTaskID: number) => {
         <textarea v-model="newTask.taskDescription" placeholder="Task Description"></textarea>
         <label>
           Priority:
-          <select v-model="newTask.taskPriority">
+          <select v-model.number="newTask.taskPriority">
             <option :value="null">None</option>
             <option value="1">Low</option>
             <option value="2">Medium</option>
@@ -175,7 +182,7 @@ const handleDragEnd = async (event: DragEvent, targetTaskID: number) => {
 
         <label>
           Due Date:
-          <input type="date" v-model="newTask.dueDate" />
+          <input type="date" v-model="newTask.dueDate" :min="minDate"/>
         </label>
 
         <footer class="form-actions">
@@ -208,12 +215,8 @@ const handleDragEnd = async (event: DragEvent, targetTaskID: number) => {
 
 
 <style scoped>
-* {
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
-  sans-serif;
-}
 
-/* Form Styling */
+
 .add-task-form {
   display: flex;
   flex-direction: column;

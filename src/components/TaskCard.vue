@@ -1,59 +1,144 @@
 <script setup lang="ts">
 import IconEllipse from './icons/IconEllipse.vue';
+import { ref, watch, computed } from 'vue';
+import TasksHandler from '@/api/TasksHandler';
 
 const props = defineProps<{
-  taskID: number
+  taskID: number;
   taskName: string;
+  taskPriority?: string | null;
   parentTaskID: number | null;
   taskPosition: number;
+  dateCompleted: Date | null;
   dueDate: Date | null;
   createdAt: Date;
 }>();
 
 const customFormatDate = (date: Date | null): string => {
-  if (!date) return 'No date';
+  if (!date) return '';
   const day = String(date.getDate()).padStart(2, '0');
   const month = new Intl.DateTimeFormat('default', { month: 'short' }).format(date);
   const year = date.getFullYear();
   return `${day} ${month} ${year}`;
 };
 
-
-const emit = defineEmits(["task-clicked"]);
+const emit = defineEmits(['task-clicked']);
 
 const openTaskDetails = () => {
-  emit("task-clicked", props.taskID)
-}
+  emit('task-clicked', props.taskID);
+};
+
+const priorityMap: Record<string, number> = {
+  Low: 1,
+  Medium: 2,
+  High: 3,
+};
+
+const localDateCompleted = ref<Date | null>(props.dateCompleted ?? null);
+
+const getPriorityString = (priority: number | null): string | null => {
+  const priorityMapReverse: Record<number, string> = {
+    1: 'Low',
+    2: 'Medium',
+    3: 'High',
+  };
+  return priority === null ? null : priorityMapReverse[priority] || null;
+};
+
+watch(() => props.dateCompleted, (newVal) => {
+  localDateCompleted.value = newVal ?? null;
+});
+
+const numericPriority = priorityMap[props.taskPriority as string] || null;
+
+const isChecked = computed({
+  get: () => localDateCompleted.value !== null, 
+  set: async (val: boolean) => {
+    const newDate = val ? new Date() : null;
+    try {
+      const updatedTask: Record<string, any> = {};
+
+      if (props.taskID) updatedTask.taskID = props.taskID;
+      if (props.taskName) updatedTask.taskName = props.taskName;
+      if (numericPriority !== null) updatedTask.taskPriority = numericPriority.toString();
+      if (props.dueDate) updatedTask.dueDate = props.dueDate;
+      if (newDate !== null) updatedTask.dateCompleted = newDate;
+
+      const jwtToken = localStorage.getItem('jwtToken');
+      if (jwtToken) {
+        console.log("Updating task with newDate:", newDate);
+
+        await TasksHandler.updateTask(updatedTask, jwtToken);
+        console.log(updatedTask);
+
+        localDateCompleted.value = newDate;
+        console.log("Task updated. New dateCompleted:", newDate);
+      }
+    } catch (error) {
+      console.error('Error updating task:', error);
+    }
+  }
+});
 </script>
 
 <template>
-  <article class="task-item">
+  <article class="task-item":class="{'priority-high': taskPriority === 'High','priority-medium': taskPriority === 'Medium','priority-low': taskPriority === 'Low' ,'task-completed': isChecked}">
     <section class="task-row">
-      <input type="checkbox" class="checkbox" aria-label="Mark task as complete" />
+      <input type="checkbox" class="checkbox" aria-label="Mark task as complete" v-model="isChecked"/>
       <section class="task-content">
         <header class="task-header">
           <h2 class="task-title">{{ taskName }}</h2>
-          <time class="due-date due-date-red" datetime="2025-03-22">{{ customFormatDate(dueDate) }} </time>
+          <time class="due-date due-date-red" :datetime="dueDate?.toISOString()">
+            {{ customFormatDate(dueDate) }}
+          </time>
+          <p class="priority-label">{{ taskPriority }}</p>
         </header>
       </section>
-      <button class="expand-button" @click="openTaskDetails" ><IconEllipse/><IconEllipse/><IconEllipse/></button>
+      <button class="expand-button" @click="openTaskDetails">
+        <IconEllipse />
+        <IconEllipse />
+        <IconEllipse />
+      </button>
     </section>
   </article>
 </template>
 
 <style scoped>
-
 .task-item {
   background: #fff;
-  border: 1pt solid #d1d5db;
+  border: 2pt solid #d1d5db;
   border-radius: 8pt;
   padding: 12pt;
-  margin: 1em 1em .5em .5em;
+  margin: 1em 1em 0.5em 0.5em;
   box-shadow: 0 2pt 4pt rgba(0, 0, 0, 0.1);
   cursor: pointer;
   display: flex;
   flex-direction: column;
   gap: 8pt;
+}
+
+.priority-high {
+  border-color: red;
+  border-width: 2pt;
+  --priority-color: red;
+}
+
+.priority-medium {
+  border-color: orange;
+  border-width: 2pt;
+  --priority-color: orange;
+}
+
+.priority-low {
+  border-color: rgb(0, 255, 0);
+  border-width: 2pt;
+  --priority-color: rgb(0, 255, 0);
+}
+
+.priority-label {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--priority-color, inherit);
 }
 
 .task-row {
@@ -62,7 +147,6 @@ const openTaskDetails = () => {
   gap: 12pt;
   margin-bottom: 8pt;
 }
-
 
 .checkbox {
   appearance: none;
@@ -77,15 +161,13 @@ const openTaskDetails = () => {
   justify-content: center;
 }
 
-
 .checkbox:checked {
   background-color: #9333ea;
   border: none;
 }
 
-
 .checkbox:checked::after {
-  content: "✔";
+  content: '✔';
   color: #fff;
   font-size: 8pt;
   line-height: 12pt;
@@ -144,6 +226,12 @@ time {
 
 .expand-button:hover {
   background: var(--button-hover-bg);
-  opacity: 1;
+  opacity: 1; 
 }
+.task-completed {
+  opacity: .3;
+  z-index: 0;
+}
+
+
 </style>

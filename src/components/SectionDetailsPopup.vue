@@ -107,7 +107,7 @@ input {
 button {
   padding: 0.5rem 1rem;
   border: none;
-  border-radius: 5px;
+  border-radius: 5pt;
   cursor: pointer;
 }
 
@@ -121,13 +121,13 @@ button:hover {
   color: white;
 }
 #close-button {
-  background-color: rgb(163, 163, 163);
+  background-color: rgb(0, 4, 255);
   color: white;
 }
 
 
 button:not(.delete-button) {
-  background-color: #ca6de8;
+  background-color: #0dc100;
   color: white;
 }
 </style>

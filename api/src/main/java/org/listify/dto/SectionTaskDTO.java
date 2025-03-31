@@ -9,17 +9,21 @@ public class SectionTaskDTO {
 
     private Long taskID;
     private String taskName;
+    private String taskPriority;
     private Long parentTaskID;
     private Integer taskPosition;
+    private OffsetDateTime dateCompleted;
     private OffsetDateTime createdAt;
     private OffsetDateTime dueDate;
 
-    public SectionTaskDTO(Long taskID, String taskName, Long parentTaskID, Integer taskPosition, OffsetDateTime createdAt,
+    public SectionTaskDTO(Long taskID, String taskName,String taskPriority, Long parentTaskID, Integer taskPosition,OffsetDateTime dateCompleted, OffsetDateTime createdAt,
                           OffsetDateTime dueDate) {
         this.taskID = taskID;
         this.taskName = taskName;
+        this.taskPriority = taskPriority;
         this.parentTaskID = parentTaskID;
         this.taskPosition = taskPosition;
+        this.dateCompleted = dateCompleted;
         this.createdAt = createdAt;
         this.dueDate = dueDate;
     }
@@ -40,6 +44,13 @@ public class SectionTaskDTO {
         this.taskName = taskName;
     }
 
+    public  String getTaskPriority() {return taskPriority;}
+
+    public void setTaskPriority(String taskPriority) {
+
+        this.taskPriority = taskPriority;
+    }
+
     public Long getParentTaskID() {
         return parentTaskID;
     }
@@ -47,6 +58,11 @@ public class SectionTaskDTO {
     public void setParentTaskID(Long parentTaskID) {
         this.parentTaskID = parentTaskID;
     }
+
+    public OffsetDateTime getDueCompleted(){return dateCompleted;}
+
+    public void setDateCompleted(OffsetDateTime dateCompleted){this.dateCompleted =dateCompleted;}
+
 
     public OffsetDateTime getCreatedAt() {
         return createdAt;

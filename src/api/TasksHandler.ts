@@ -25,10 +25,12 @@ export default class TasksHandler {
       return task.map((task: any) => ({
         taskID: task.taskID,
         taskName: task.taskName,
-        parentTaskID: task.parentTaskID ?? null,
-        taskPosition: task.taskPosition ?? 0,
+        taskPriority:task.taskPriority,
+        parentTaskID: task.parentTaskID ? task.parentTaskID: null,
+        taskPosition: task.taskPosition,
+        dateCompleted:task.dueCompleted ||null,
+        dueDate: task.dueDate? new Date(task.dueDate) : null,
         createdAt: new Date(task.createdAt),
-        dueDate: task.dueDate ? new Date(task.dueDate) : null,
       }))
     } catch (error) {
       console.error(`Error loading tasks for section ${sectionID}:`, error);
@@ -71,8 +73,10 @@ export default class TasksHandler {
       return {
         taskID: createdTask.taskID,
         taskName: createdTask.taskName,
+        taskPriority:createdTask.taskPriority,
         parentTaskID: createdTask.parentTaskID ? createdTask.parentTaskID: null,
         taskPosition: createdTask.taskPosition,
+        dateCompleted:createdTask.dateCompleted,
         dueDate: createdTask.dueDate? new Date(createdTask.dueDate) : null,
         createdAt: new Date(createdTask.createdAt),
       }
@@ -116,30 +120,37 @@ export default class TasksHandler {
 
   static async updateTask(task: Partial<Task>, jwtToken: string | null): Promise<Task> {
     if (!jwtToken) throw new Error("JWT token is missing");
-
+  
+    const body: any = {
+      taskName: task.taskName, 
+      taskPriority: task.taskPriority || null, 
+      taskDescription: task.taskDescription || null, 
+      dueDate: task.dueDate ? new Date(task.dueDate).toISOString() : null, 
+      dateCompleted: task.dateCompleted ? new Date(task.dateCompleted).toISOString() : null,
+    };
+  
+    const cleanedBody: any = Object.fromEntries(
+      Object.entries(body).filter(([key, value]) => value !== null && value !== undefined)
+    );
+  
     const response = await fetch(`http://localhost:8080/tasks/${task.taskID}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${jwtToken}`,
       },
-      body: JSON.stringify({
-        taskName: task.taskName || null,
-        taskDescription: task.taskDescription || null,
-        taskPriority: task.taskPriority || null,
-        dueDate: task.dueDate ? new Date(task.dueDate).toISOString() : null,
-        dateCompleted: task.dateCompleted ? new Date(task.dateCompleted).toISOString() : null,
-      }),
+      body: JSON.stringify(cleanedBody), 
     });
-
+  
     if (!response.ok) {
       const errorMessage = await response.text();
       throw new Error(`Failed to update task: ${errorMessage}`);
     }
-
-    if(response.status === 401) {
+  
+    if (response.status === 401) {
       removeJwt();
     }
+  
     return response.json();
   }
 
@@ -184,4 +195,7 @@ export default class TasksHandler {
       throw new Error(`Failed to delete task: ${errorMessage}`);
     }
   }
+
+  
 }
+

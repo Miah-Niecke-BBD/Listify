@@ -1,6 +1,7 @@
 package org.listify.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.listify.dto.TaskAssigneeDTO;
 import org.listify.model.TaskAssignees;
 import org.listify.model.Users;
 import org.listify.service.TaskAssigneesService;
@@ -28,10 +29,10 @@ public class TaskAssigneesController {
 
 
     @GetMapping("/{taskID}")
-    public ResponseEntity<List<Users>> getUsersAssignedToTask(@PathVariable("taskID") Long taskID,
-                                                              HttpServletRequest request) {
+    public ResponseEntity<List<TaskAssigneeDTO>> getUsersAssignedToTask(@PathVariable("taskID") Long taskID,
+                                                                        HttpServletRequest request) {
         Long loggedInUserID = userService.getUserIDFromAuthentication(request);
-        List<Users> usersAssignedToTask = taskAssigneesService.getUsersAssignedToTask(taskID, loggedInUserID);
+        List<TaskAssigneeDTO> usersAssignedToTask = taskAssigneesService.getUsersAssignedToTask(taskID, loggedInUserID);
         return ResponseEntity.ok(usersAssignedToTask);
     }
 
