@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import "@/assets/base.css";
-import AddTeamMemberModal from "@/components/EditTeamModal.vue";
+import AddTeamMemberModal from "@/components/AddMemberModal.vue";
 import AddButton from "@/components/AddButton.vue";
 import type { TeamMember } from "@/models/TeamMember";
 
@@ -12,6 +12,7 @@ defineProps<{
   loggedInMemberId: string;
   addAMember: Function;
   deleteAMember: Function;
+  allUsersID: string[];
 }>();
 
 const openModal = () => {
@@ -28,8 +29,8 @@ const closeModal = () => {
     <h2>Team Members ({{ members.length }})</h2>
     <ul>
       <li v-for="member in members" :key="member.githubID" class="member-item">
-        <h3 class="member-name">{{ member.name }}</h3>
-        <p class="member-id">ID: {{ member.githubID }}</p>
+        <h3 class="member-name">{{ member.githubID }}</h3>
+
         <p v-if="member.teamLeader" class="leader-label">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -79,10 +80,10 @@ const closeModal = () => {
       @click="openModal"
     />
     <AddTeamMemberModal
-      mode="addMember"
       :isVisible="isModalVisible"
       :onClose="closeModal"
       :onAddMember="addAMember"
+      :allUsersID="allUsersID"
     />
   </section>
 </template>
@@ -90,6 +91,7 @@ const closeModal = () => {
 <style scoped>
 .team-members {
   margin-top: 1.5em;
+  word-wrap: break-word;
 }
 
 .team-members h2 {
@@ -103,34 +105,30 @@ const closeModal = () => {
 .team-members ul {
   padding: 0.5em;
   display: flex;
-  flex-direction: column;
-  max-height: calc(100vh - 18em);
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1em;
+  max-height: calc(100vh - 27em);
   overflow-y: auto;
+  justify-content: center;
 }
 
 .member-item {
   display: flex;
   flex-direction: column;
-  width: 100%;
   padding: 1em;
   border: 0.1em solid lightgrey;
   border-radius: 1em;
   box-shadow: 0.2em 0.1em 0.7em rgba(0, 0, 0, 0.2);
   margin-bottom: 1em;
-  position: relative;
+  min-width: 20em;
+  max-width: 20em;
 }
 
 .member-name {
   font-size: 15pt;
   font-weight: bold;
   margin-bottom: 0.5em;
-}
-
-.member-id {
-  font-size: 12pt;
-  margin-bottom: 0.5em;
-  color: var(--dark-purple);
-  margin-left: 0.5em;
 }
 
 .leader-label {
@@ -140,18 +138,13 @@ const closeModal = () => {
   display: flex;
   align-items: center;
   gap: 0.3em;
-  position: absolute;
-  top: 1em;
-  right: 1.5em;
 }
 
 .delete-btn {
   background: none;
   border: none;
   cursor: pointer;
-  position: absolute;
-  bottom: 1.2em;
-  right: 1.8em;
+  margin-left: auto;
 }
 
 .delete-btn svg {
@@ -162,22 +155,27 @@ const closeModal = () => {
   stroke: darkred;
 }
 
-@container (max-width: 500px) {
-  .team-members {
-    word-wrap: break-word;
+@container (max-width: 700px) {
+  .member-item {
+    width: 40vw;
+    min-width: 0;
   }
-  .leader-label {
-    position: relative;
-    top: 0em;
-    right: 0em;
+}
+
+@container (max-width: 500px) {
+  .team-members h2 {
+    font-size: 18pt;
+  }
+  .team-members h3 {
+    font-size: 12pt;
+  }
+  .member-item ul {
+    flex-direction: row;
   }
 
-  .delete-btn {
-    position: relative;
-    bottom: 0em;
-    right: 0em;
-    margin-left: auto;
-    bottom: 1.1em;
+  .member-item {
+    width: 100%;
+    min-width: 0;
   }
 }
 </style>
